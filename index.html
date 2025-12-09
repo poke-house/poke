@@ -20,24 +20,30 @@
                             dark: '#212121',
                         },
                         pastel: {
-                            blue: { 50: '#F0F8FF', 100: '#E0F0FF', 200: '#BAE0FF', 300: '#7CC4FA', 500: '#4080C0', text: '#004085' },
-                            pink: { 50: '#FFF0F5', 100: '#FFE0EB', 200: '#FFB6C1', 300: '#FF99A8', 500: '#D63384', text: '#850028' },
-                            yellow: { 50: '#FFFEF0', 100: '#FFF9C4', 200: '#FFF176', 300: '#FFEE58', 500: '#FBC02D', text: '#665C00' },
+                            blue: { 50: '#E1F5FE', 100: '#B3E5FC', 200: '#81D4FA', 300: '#4FC3F7', 500: '#29B6F6', text: '#01579B' },
+                            pink: { 50: '#FCE4EC', 100: '#F8BBD0', 200: '#F48FB1', 300: '#F06292', 500: '#EC407A', text: '#880E4F' },
+                            yellow: { 50: '#FFFDE7', 100: '#FFF9C4', 200: '#FFF59D', 300: '#FFF176', 500: '#FFEE58', text: '#F57F17' },
                         }
                     },
                     boxShadow: {
                         'fluent': '0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)',
                         'fluent-hover': '0 8px 16px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)',
                     },
-                    borderRadius: { 'win': '12px' },
+                    borderRadius: { 'win': '0px' },
                     animation: {
                         'fade-in': 'fadeIn 0.3s ease-out forwards',
                         'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'dance': 'dance 0.6s ease-in-out infinite',
                     },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+                        dance: { 
+                            '0%, 100%': { transform: 'rotate(0deg) scale(1)' }, 
+                            '25%': { transform: 'rotate(-15deg) scale(1.1)' }, 
+                            '75%': { transform: 'rotate(15deg) scale(1.1)' } 
+                        }
                     }
                 }
             }

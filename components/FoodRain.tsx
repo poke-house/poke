@@ -12,14 +12,15 @@ export const FoodRain = ({ trigger, quantity = 1 }: { trigger: number; quantity?
         if (!canvas) return;
         const newParticles = [];
         for (let i = 0; i < quantity; i++) {
+            const size = 24 + Math.random() * 16;
             newParticles.push({
-                x: Math.random() * canvas.width,
+                x: Math.random() * (canvas.width - size), // Ensure it spawns within width
                 y: -50,
-                vx: (Math.random() - 0.5) * 5,
-                vy: 5 + Math.random() * 5,
-                gravity: 0.1,
+                vx: (Math.random() - 0.5) * 3, // Reduced horizontal speed slightly
+                vy: 1 + Math.random(), // Reduced initial vertical speed (was 2 + ...)
+                gravity: 0.02, // Very low positive gravity for slow fall
                 emoji: EASTER_EGG_EMOJIS[Math.floor(Math.random() * EASTER_EGG_EMOJIS.length)],
-                size: 24 + Math.random() * 16,
+                size: size,
                 life: 1.0
             });
         }
@@ -42,7 +43,21 @@ export const FoodRain = ({ trigger, quantity = 1 }: { trigger: number; quantity?
             particlesRef.current = particlesRef.current.filter(p => p.y < canvas.height + 100);
             particlesRef.current.forEach(p => {
                 p.y += p.vy;
+                p.vy += p.gravity;
                 p.x += p.vx;
+
+                // Boundary checks to keep items within screen width
+                // If it hits the left wall, position at 0 and reverse velocity
+                if (p.x <= 0) {
+                    p.x = 0;
+                    p.vx *= -1;
+                } 
+                // If it hits the right wall (width - size), position at max and reverse velocity
+                else if (p.x >= canvas.width - p.size) {
+                    p.x = canvas.width - p.size;
+                    p.vx *= -1;
+                }
+
                 ctx.font = `${p.size}px sans-serif`;
                 ctx.fillText(p.emoji, p.x, p.y);
             });
