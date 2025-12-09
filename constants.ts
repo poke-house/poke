@@ -7,7 +7,10 @@ export const PA_EMOJIS = { MALE: ["👨", "🧔🏻", "👨🏿", "👨🏿‍�
 export const FINAL_CUSTOM_PHRASES = ["Uau! Ficou linda sua bowl!", "Bom apetite!", "Prontinho! Experimente um dos nosso sumos.", "Seu rosto é famíliar, já é nosso cliente né?", "Muito obrigado, volte mais vezes!"];
 
 export const CHANGELOG = [
-    { version: "4.13", date: "Atual", changes: ["Atualização de UX.", "Logo Resize na barra lateral.", "Novos emojis nas receitas."] },
+    { version: "4.16", date: "Atual", changes: ["Correção do botão 'Voltar' da sidebar."] },
+    { version: "4.15", date: "Anterior", changes: ["Contador de porções com cores temáticas no 'Crie sua Bowl'."] },
+    { version: "4.14", date: "Anterior", changes: ["Contador de porções adicionado ao modo 'Crie sua Bowl'."] },
+    { version: "4.13", date: "Anterior", changes: ["Fundo 'Peach' sem caixas brancas na Home.", "Cor da fonte da Home alterada para Azul Escuro.", "Logo centralizado."] },
     { version: "4.12", date: "Anterior", changes: ["Títulos do 'Crie sua Bowl' em azul pastel.", "Botão 'Voltar ao Início' centralizado.", "Correção de opções duplicadas."] },
     { version: "4.11", date: "Anterior", changes: ["Layout Mobile reorganizado.", "Botão de versão abaixado."] }
 ];
@@ -41,9 +44,9 @@ export const RECIPES: Recipe[] = [
     { id: 10, category: "GREEN", name: "Exotic Salmon 🥗", variants: { "Regular": { base: ["Coconut Basmati", "Espinafres", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Batata Doce com Alecrim", "Batata Doce com Alecrim", "Brócolis", "Abacate"], protein: ["Filé de Salmão", "Filé de Salmão", "Filé de Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Não leva"], sesame: ["Não"] } } },
     { id: 11, category: "GREEN", name: "Velvet Garden 🥗", variants: { "Regular": { base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Cenoura c/ Soja", "Beterraba", "Azeitonas", "Pickle Cebola", "Feta", "Feta", "Feta"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Não leva"], sesame: ["Não"] } } },
     { id: 12, category: "GREEN", name: "Cozy Chicken 🥗", variants: { "Regular": { base: ["Coconut Basmati", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Brócolis", "Batata Doce com Alecrim", "Couve roxa", "Courgette"], protein: ["Frango Vietnamita", "Frango Vietnamita", "Frango Vietnamita"], sauce_final: ["Soja"], crispy: ["Não leva"], sesame: ["Não"] } } },
-    { id: 13, category: "SMOOTHIE", name: "Into the Sun", smoothie_liquid: ["Leite de Coco"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Manga 40g", "Manga 40g", "Ananás 30g", "Ananás 30g", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
-    { id: 14, category: "SMOOTHIE", name: "Sweet Pink", smoothie_liquid: ["Leite"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Morango", "Morango", "Morango", "Morango", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
-    { id: 15, category: "SMOOTHIE", name: "So Green", smoothie_liquid: ["Suco de Maçã"], smoothie_amount: ["250ml"], smoothie_ingredients: ["Pepino 20g", "Abacate 45g", "Espinafre 30g", "Sumo de Lima 25g", "Gengibre 5g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] }
+    { id: 13, category: "SMOOTHIE", name: "Into the Sun 💛", smoothie_liquid: ["Leite de Coco"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Manga 40g", "Manga 40g", "Ananás 30g", "Ananás 30g", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
+    { id: 14, category: "SMOOTHIE", name: "Sweet Pink 🩷", smoothie_liquid: ["Leite"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Morango", "Morango", "Morango", "Morango", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
+    { id: 15, category: "SMOOTHIE", name: "So Green 💚", smoothie_liquid: ["Suco de Maçã"], smoothie_amount: ["250ml"], smoothie_ingredients: ["Pepino 20g", "Abacate 45g", "Espinafre 30g", "Sumo de Lima 25g", "Gengibre 5g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] }
 ];
 
 export const PHASES_BOWL: Phase[] = [{ key: "size", title: "Tamanho" }, { key: "base", title: "Base" }, { key: "sauce_base", title: "Molho da base" }, { key: "greens", title: "Greens" }, { key: "protein", title: "Proteína" }, { key: "sauce_final", title: "Molho final" }, { key: "crispy", title: "Crispy" }, { key: "sesame", title: "Sésamo" }];
@@ -52,26 +55,26 @@ export const PHASES_SMOOTHIE: Phase[] = [{ key: "smoothie_liquid", title: "Líqu
 export const THEMES: { [key: string]: Theme } = {
     HOUSE: {
         bg: "bg-pastel-blue-50/95", 
-        border: "border-pastel-blue-300",
+        border: "border-transparent",
         text: "text-pastel-blue-text",
-        btn_default: "bg-white border-2 border-pastel-blue-200 text-gray-700 hover:border-pastel-blue-300",
-        btn_active: "bg-pastel-blue-100 border-2 border-pastel-blue-500 text-pastel-blue-text",
-        binary: ["bg-pastel-pink-100 border-pastel-pink-300 text-pastel-pink-text", "bg-pastel-blue-100 border-pastel-blue-300 text-pastel-blue-text"]
+        btn_default: "bg-pastel-blue-100 text-pastel-blue-text hover:bg-pastel-blue-200 shadow-sm",
+        btn_active: "bg-pastel-blue-300 text-pastel-blue-text shadow-inner",
+        binary: ["bg-pastel-blue-100 text-pastel-blue-text shadow-sm", "bg-pastel-blue-300 text-pastel-blue-text shadow-sm"]
     },
     GREEN: {
         bg: "bg-pastel-pink-50/95", 
         border: "border-pastel-pink-300",
         text: "text-pastel-pink-text",
-        btn_default: "bg-white border-2 border-pastel-pink-200 text-gray-700 hover:border-pastel-pink-300",
-        btn_active: "bg-pastel-pink-100 border-2 border-pastel-pink-500 text-pastel-pink-text",
-        binary: ["bg-pastel-yellow-100 border-pastel-yellow-300 text-pastel-yellow-text", "bg-pastel-blue-100 border-pastel-blue-300 text-pastel-blue-text"]
+        btn_default: "bg-pastel-pink-100 text-pastel-pink-text hover:bg-pastel-pink-200 shadow-sm",
+        btn_active: "bg-pastel-pink-300 text-pastel-pink-text shadow-inner",
+        binary: ["bg-pastel-yellow-100 text-pastel-yellow-text", "bg-pastel-blue-100 text-pastel-blue-text"]
     },
     SMOOTHIE: {
         bg: "bg-pastel-yellow-50/95",
         border: "border-pastel-yellow-300",
         text: "text-pastel-yellow-text",
-        btn_default: "bg-white border-2 border-pastel-yellow-200 text-gray-700 hover:border-pastel-yellow-300",
-        btn_active: "bg-pastel-yellow-100 border-2 border-pastel-yellow-500 text-pastel-yellow-text",
-        binary: ["bg-pastel-pink-100 border-pastel-pink-300 text-pastel-pink-text", "bg-pastel-blue-100 border-pastel-blue-300 text-pastel-blue-text"]
+        btn_default: "bg-pastel-yellow-100 text-pastel-yellow-text hover:bg-pastel-yellow-200 shadow-sm",
+        btn_active: "bg-pastel-yellow-300 text-pastel-yellow-text shadow-inner",
+        binary: ["bg-pastel-pink-100 text-pastel-pink-text", "bg-pastel-blue-100 text-pastel-blue-text"]
     }
 };

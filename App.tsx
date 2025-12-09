@@ -65,7 +65,7 @@ function App() {
 
     // Lógica para cor da sidebar
     const getSidebarClass = () => {
-        if (gameState === "HOME" && menuCategory === null) return "bg-white/80 backdrop-blur-md";
+        if (menuCategory === null && gameState !== "CUSTOM_BOWL") return "bg-white/80 backdrop-blur-md";
         if (menuCategory === "HOUSE") return "bg-pastel-blue-50";
         if (menuCategory === "GREEN") return "bg-pastel-pink-50";
         if (menuCategory === "SMOOTHIE") return "bg-pastel-yellow-50";
@@ -87,6 +87,34 @@ function App() {
         if (menuCategory === "SMOOTHIE") return "hover:bg-pastel-yellow-100";
         return "hover:bg-gray-100";
     };
+
+    // Lógica para classe de scrollbar (MAIN CONTENT)
+    const getScrollClass = () => {
+        if (gameState === "PLAYING" && selectedRecipe) {
+            if (selectedRecipe.category === "HOUSE") return "scroll-blue";
+            if (selectedRecipe.category === "GREEN") return "scroll-pink";
+            if (selectedRecipe.category === "SMOOTHIE") return "scroll-yellow";
+        }
+        if (gameState === "CUSTOM_BOWL") {
+            // Colors match the phase background logic in renderCustomBowl
+            if (customPhase === 5) return "scroll-pink"; // Greens
+            if (customPhase === 7) return "scroll-yellow"; // Sauce
+            return "scroll-blue"; // Default for Base, Protein, Crispy
+        }
+        if (gameState === "RESULT_FAIL") return "scroll-red";
+        return "scroll-blue";
+    };
+
+    // Lógica para cor da barra de rolagem da sidebar
+    const getSidebarScrollClass = () => {
+        if (menuCategory === "HOUSE") return "scroll-blue";
+        if (menuCategory === "GREEN") return "scroll-pink";
+        if (menuCategory === "SMOOTHIE") return "scroll-yellow";
+        return "";
+    };
+
+    const scrollClass = getScrollClass();
+    const sidebarScrollClass = getSidebarScrollClass();
 
     useEffect(() => {
         let interval: any;
@@ -339,11 +367,46 @@ function App() {
             case 1: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8 animate-fade-in"><div className="text-6xl mb-4">{paPersona.emoji}</div><MessageBubble className="bg-pastel-blue-50" text={`Olá! Me chamo ${paPersona.name}. Já conhece a Poke House? Vou ajudar-te a escolher a bowl perfeita. Queres criar a tua?`} /><button onClick={handleCustomNext} className="bg-brand-pink text-white px-8 py-3 rounded-win font-bold text-lg shadow-fluent hover:bg-pink-600 transition-all btn-transition">Vamos lá!</button></div> );
             case 2: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8 animate-fade-in"><MessageBubble className="bg-pastel-blue-50" text="Para comer aqui ou para levar?" /><div className="flex gap-4"><button onClick={handleCustomNext} className="bg-white text-pastel-blue-text px-8 py-4 rounded-win font-bold text-xl shadow-sm hover:bg-pastel-blue-50 btn-transition">AQUI</button><button onClick={() => setShowPopup({ msg: "A caixa para levar tem custo de 0,20€, ok?", callback: () => { setShowPopup(null); handleCustomNext(); } })} className="bg-white text-pastel-pink-text px-8 py-4 rounded-win font-bold text-xl shadow-sm hover:bg-pastel-pink-50 btn-transition">LEVAR</button></div></div> );
             case 3: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8 animate-fade-in"><MessageBubble className="bg-pastel-blue-50" text="Qual tamanho prefere?" /><div className="flex gap-4"><button onClick={() => handleCustomSize("Large")} className="bg-pastel-blue-200 text-pastel-blue-text px-8 py-6 rounded-win font-bold text-2xl shadow-fluent hover:bg-pastel-blue-300 hover:scale-105 btn-transition">LARGE</button><button onClick={() => handleCustomSize("Regular")} className="bg-pastel-pink-200 text-pastel-pink-text px-8 py-6 rounded-win font-bold text-2xl shadow-fluent hover:bg-pastel-pink-300 hover:scale-105 btn-transition">REGULAR</button></div></div> );
-            case 4: return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-blue-50" text="Escolha até 2 bases:" isTitle={true} /></div><div className="flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.bases.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'base')} className={`p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 text-pastel-blue-text' : 'bg-white text-gray-700 hover:bg-pastel-blue-50 hover:text-pastel-blue-text'}`}>{ing}</button>))}</div></div> );
-            case 5: { const limit = size === "Large" ? 5 : 4; return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-pink-50" text={`Escolha ${limit} greens:`} isTitle={true} /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.greens.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'green')} className={`p-3 rounded-win shadow-sm text-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-pink-100 text-pastel-pink-text' : 'bg-white text-gray-700 hover:bg-pastel-pink-50 hover:text-pastel-pink-text'}`}>{ing}</button>))}</div></div> ); }
-            case 6: { const limit = size === "Large" ? 3 : 2; const proteins = INGREDIENTS_DB.proteins.filter(p => p !== "Wakame"); return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-blue-50" text={`Escolha ${limit} proteínas:`} isTitle={true} /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{proteins.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'protein')} className={`p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 text-pastel-blue-text' : 'bg-white text-gray-700 hover:bg-pastel-blue-50 hover:text-pastel-blue-text'}`}>{ing}</button>))}</div></div> ); }
-            case 7: return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-yellow-50" text="Escolha 1 molho:" isTitle={true} /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.sauces_final.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'sauce')} className={`p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-yellow-100 text-pastel-yellow-text' : 'bg-white text-gray-700 hover:bg-pastel-yellow-50 hover:text-pastel-yellow-text'}`}>{ing}</button>))}</div></div> );
-            case 8: return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-blue-50" text="Escolha 2 crispys:" isTitle={true} /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.crispies.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'crispy')} className={`p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 text-pastel-blue-text' : 'bg-white text-gray-700 hover:bg-pastel-blue-50 hover:text-pastel-blue-text'}`}>{ing}</button>))}</div></div> );
+            case 4: return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-blue-50" text="Escolha até 2 bases:" isTitle={true} /></div><div className={`flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20 custom-scroll ${scrollClass}`}>{INGREDIENTS_DB.bases.map(ing => {
+                const count = currentSelections.filter(i => i === ing).length;
+                return (
+                <button key={ing} onClick={() => handleCustomSelection(ing, 'base')} className={`relative p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 text-pastel-blue-text' : 'bg-white text-gray-700 hover:bg-pastel-blue-50 hover:text-pastel-blue-text'}`}>
+                    {ing}
+                    {count > 0 && <div className="absolute top-0 right-0 bg-brand-blue text-white w-8 h-8 flex items-center justify-center font-bold text-lg shadow-sm">{count}</div>}
+                </button>
+            )})}</div></div> );
+            case 5: { const limit = size === "Large" ? 5 : 4; return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-pink-50" text={`Escolha ${limit} greens:`} isTitle={true} /></div><div className={`flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20 custom-scroll ${scrollClass}`}>{INGREDIENTS_DB.greens.map(ing => {
+                const count = currentSelections.filter(i => i === ing).length;
+                return (
+                <button key={ing} onClick={() => handleCustomSelection(ing, 'green')} className={`relative p-3 rounded-win shadow-sm text-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-pink-100 text-pastel-pink-text' : 'bg-white text-gray-700 hover:bg-pastel-pink-50 hover:text-pastel-pink-text'}`}>
+                    {ing}
+                    {count > 0 && <div className="absolute top-0 right-0 bg-brand-pink text-white w-8 h-8 flex items-center justify-center font-bold text-lg shadow-sm">{count}</div>}
+                </button>
+            )})}</div></div> ); }
+            case 6: { const limit = size === "Large" ? 3 : 2; const proteins = INGREDIENTS_DB.proteins.filter(p => p !== "Wakame"); return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-blue-50" text={`Escolha ${limit} proteínas:`} isTitle={true} /></div><div className={`flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20 custom-scroll ${scrollClass}`}>{proteins.map(ing => {
+                const count = currentSelections.filter(i => i === ing).length;
+                return (
+                <button key={ing} onClick={() => handleCustomSelection(ing, 'protein')} className={`relative p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 text-pastel-blue-text' : 'bg-white text-gray-700 hover:bg-pastel-blue-50 hover:text-pastel-blue-text'}`}>
+                    {ing}
+                    {count > 0 && <div className="absolute top-0 right-0 bg-brand-blue text-white w-8 h-8 flex items-center justify-center font-bold text-lg shadow-sm">{count}</div>}
+                </button>
+            )})}</div></div> ); }
+            case 7: return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-yellow-50" text="Escolha 1 molho:" isTitle={true} /></div><div className={`flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20 custom-scroll ${scrollClass}`}>{INGREDIENTS_DB.sauces_final.map(ing => {
+                const count = currentSelections.filter(i => i === ing).length;
+                return (
+                <button key={ing} onClick={() => handleCustomSelection(ing, 'sauce')} className={`relative p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-yellow-100 text-pastel-yellow-text' : 'bg-white text-gray-700 hover:bg-pastel-yellow-50 hover:text-pastel-yellow-text'}`}>
+                    {ing}
+                    {count > 0 && <div className="absolute top-0 right-0 bg-pastel-yellow-500 text-white w-8 h-8 flex items-center justify-center font-bold text-lg shadow-sm">{count}</div>}
+                </button>
+            )})}</div></div> );
+            case 8: return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-blue-50" text="Escolha 2 crispys:" isTitle={true} /></div><div className={`flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20 custom-scroll ${scrollClass}`}>{INGREDIENTS_DB.crispies.map(ing => {
+                const count = currentSelections.filter(i => i === ing).length;
+                return (
+                <button key={ing} onClick={() => handleCustomSelection(ing, 'crispy')} className={`relative p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 text-pastel-blue-text' : 'bg-white text-gray-700 hover:bg-pastel-blue-50 hover:text-pastel-blue-text'}`}>
+                    {ing}
+                    {count > 0 && <div className="absolute top-0 right-0 bg-brand-blue text-white w-8 h-8 flex items-center justify-center font-bold text-lg shadow-sm">{count}</div>}
+                </button>
+            )})}</div></div> );
             case 9: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8 animate-fade-in"><MessageBubble className="bg-pastel-blue-50" text="Aceita sésamo de oferta?" /><div className="flex gap-4"><button onClick={() => setCustomPhase(10)} className="bg-pastel-blue-200 text-pastel-blue-text px-10 py-4 rounded-win font-bold text-xl shadow-fluent hover:bg-pastel-blue-300 btn-transition">Sim</button><button onClick={() => setCustomPhase(10)} className="bg-white text-gray-600 px-10 py-4 rounded-win font-bold text-xl shadow-sm hover:bg-gray-50 btn-transition">Não</button></div></div> );
             case 10: const finalPhrase = FINAL_CUSTOM_PHRASES[Math.floor(Math.random() * FINAL_CUSTOM_PHRASES.length)]; return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8 animate-slide-up"><div className="text-6xl">🎉</div><h2 className="text-3xl font-bold text-brand-blue">{finalPhrase}</h2><button onClick={resetToHome} className="bg-brand-pink text-white px-8 py-3 rounded-win font-bold shadow-fluent hover:bg-pink-600 transition-all flex items-center justify-center gap-2 w-full max-w-xs"><IconHome /> Voltar ao Início</button></div> );
             default: return null;
@@ -351,15 +414,15 @@ function App() {
     };
 
     return (
-        <div className="fixed inset-0 w-full h-full font-sans text-brand-dark flex flex-col md:flex-row overflow-hidden bg-white">
+        <div className="fixed inset-0 w-full h-full font-sans text-brand-dark flex flex-col md:flex-row overflow-hidden bg-[#efbeb1]">
             <FoodRain trigger={easterEggTrigger} quantity={1} />
             {showPopup && <PopupModal message={showPopup.msg} onConfirm={showPopup.callback} />}
 
-            <div className={`p-6 md:w-80 flex flex-col gap-4 z-10 shadow-fluent transition-colors duration-300 ${getSidebarClass()} ${gameState === "HOME" ? "w-full h-full overflow-y-auto" : (gameState === "CUSTOM_BOWL" ? "hidden" : "hidden md:flex h-full overflow-y-auto")}`}>
-                <div className="mb-4 flex justify-center md:justify-start">
-                    <img src="https://storage.googleapis.com/ikona-bucket-production/images/5db193be3ea71a0001bb09f7/EXTENDED%20VERSION_original%20colors-617ac363073e550017b9966b.png" alt="Poke House" className="w-11/12 md:w-auto md:h-24 object-contain mx-auto md:mx-0" />
+            <div className={`p-6 md:w-80 flex flex-col gap-4 z-10 shadow-fluent transition-colors duration-300 ${getSidebarClass()} ${gameState === "HOME" ? "w-full h-full overflow-y-auto" : (gameState === "CUSTOM_BOWL" ? "hidden" : "hidden md:flex h-full overflow-y-auto")} custom-scroll ${sidebarScrollClass}`}>
+                <div className="mb-4 flex justify-center">
+                    <img src="https://i.imgur.com/ILFq2UI.png" alt="Poke House" className="w-3/4 md:w-auto md:h-24 object-contain" />
                 </div>
-                {gameState === "HOME" && menuCategory === null ? ( 
+                {menuCategory === null && gameState !== "CUSTOM_BOWL" ? ( 
                     <div className="flex flex-col gap-3 h-full justify-center md:justify-start">
                         <div onClick={handleEasterEggClick} className="md:hidden text-5xl text-center py-4 cursor-pointer select-none hover:scale-110 transition-transform">🥗</div>
                         <button onClick={initCustomGame} className="bg-gradient-to-r from-brand-pink to-pink-500 text-white p-4 rounded-win shadow-fluent hover:shadow-fluent-hover transition-all font-bold text-lg flex items-center justify-center gap-2 transform hover:scale-[1.02]">✨ Crie sua Bowl ✨</button> 
@@ -378,7 +441,7 @@ function App() {
                 )}
             </div>
 
-            <div className={`flex-1 relative z-10 flex flex-col items-center justify-center p-4 transition-colors duration-500 ${gameState === "PLAYING" ? currentTheme.bg : "bg-pastel-blue-50"} ${gameState === "HOME" ? "hidden md:flex" : "flex h-full"}`}>
+            <div className={`flex-1 relative z-10 flex flex-col items-center justify-center p-4 transition-colors duration-500 ${gameState === "PLAYING" ? currentTheme.bg : "bg-[#efbeb1]"} ${gameState === "HOME" ? "hidden md:flex" : "flex h-full"}`}>
                 {gameState === "CUSTOM_BOWL" && ( 
                     <div className="w-full h-full md:h-auto md:max-h-[90vh] max-w-5xl bg-white/80 backdrop-blur-md rounded-win shadow-fluent flex flex-col overflow-hidden relative border border-white">
                         <div className="flex-1 overflow-hidden relative">{renderCustomBowl()}</div>
@@ -401,7 +464,7 @@ function App() {
                             <div><h2 className={`text-2xl font-bold ${currentTheme.text}`}>{getCurrentPhaseData().title}</h2><p className="text-sm text-gray-600 mt-1">{getSelectionLimit() > 1 ? `Selecione ${getSelectionLimit()} opções.` : "Selecione a opção correta."}</p></div>
                             <div className="flex flex-col items-center bg-white/80 px-4 py-2 rounded-win shadow-sm"><span className={`text-2xl font-bold font-mono ${timer <= 5 ? 'text-red-500' : 'text-gray-700'}`}>00:{timer < 10 ? `0${timer}` : timer}</span></div>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scroll"><div className={`grid gap-3 w-full ${phaseOptions.length > 6 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-2 md:grid-cols-3'}`}>{phaseOptions.map((ing, idx) => { const count = currentSelections.filter(i => i === ing).length; let btnClass = "bg-white hover:bg-white/80 shadow-sm border-0 text-gray-700"; if (phaseOptions.length === 2 && count === 0) { btnClass = `${currentTheme.binary[idx]} shadow-sm opacity-90 hover:opacity-100 hover:scale-[1.02] border-0`; } else if (count > 0) { btnClass = currentTheme.btn_active.replace('border-2', 'border-0').replace('border-pastel-blue-500', ''); } return (<button key={idx} onClick={() => handleSelection(ing)} className={`relative p-4 rounded-win font-bold text-sm transition-all flex items-center justify-center text-center h-24 btn-transition ${btnClass}`}>{ing}{count > 0 && <span className={`absolute -top-2 -right-2 ${currentTheme.text === 'text-pastel-yellow-text' ? 'bg-yellow-500' : 'bg-brand-blue'} text-white text-xs w-6 h-6 flex items-center justify-center rounded-none shadow-sm`}>{count}</span>}</button>)})}</div></div>
+                        <div className={`flex-1 overflow-y-auto p-4 md:p-8 custom-scroll ${scrollClass}`}><div className={`grid gap-3 w-full ${phaseOptions.length > 6 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-2 md:grid-cols-3'}`}>{phaseOptions.map((ing, idx) => { const count = currentSelections.filter(i => i === ing).length; let btnClass = currentTheme.btn_default; if (phaseOptions.length === 2 && count === 0) { btnClass = `${currentTheme.binary[idx]} shadow-sm opacity-90 hover:opacity-100 hover:scale-[1.02]`; } else if (count > 0) { btnClass = currentTheme.btn_active; } return (<button key={idx} onClick={() => handleSelection(ing)} className={`relative p-4 rounded-win font-bold text-sm transition-all flex items-center justify-center text-center h-24 btn-transition ${btnClass}`}>{ing}{count > 0 && <span className={`absolute -top-2 -right-2 ${currentTheme.text === 'text-pastel-yellow-text' ? 'bg-yellow-500' : 'bg-brand-blue'} text-white text-xs w-6 h-6 flex items-center justify-center rounded-none shadow-sm`}>{count}</span>}</button>)})}</div></div>
                         <div className="p-4 border-t border-white/40 bg-white/30 flex justify-between items-center">
                             <button onClick={resetToHome} className="p-3 bg-white/50 hover:bg-white text-gray-600 hover:text-brand-pink rounded-win transition-all shadow-sm hover:shadow-md" title="Voltar ao Início">
                                 <IconHome size={22} />
@@ -427,22 +490,22 @@ function App() {
                         <div className="text-5xl mb-4">😕</div>
                         <h2 className="text-2xl font-bold text-gray-800 mb-2">Ops!</h2>
                         <p className="text-gray-600 mb-6">{resultMessage}</p>
-                        <div className="bg-red-50 p-4 rounded-win text-left text-sm text-red-600 mb-8 border border-red-100 max-h-40 overflow-y-auto custom-scroll">{errorDetails.map((e, i) => <div key={i} className="mb-1 pb-1 border-b border-red-100 last:border-0">• {e}</div>)}</div>
+                        <div className={`bg-red-50 p-4 rounded-win text-left text-sm text-red-600 mb-8 border border-red-100 max-h-40 overflow-y-auto custom-scroll ${scrollClass}`}>{errorDetails.map((e, i) => <div key={i} className="mb-1 pb-1 border-b border-red-100 last:border-0">• {e}</div>)}</div>
                         <button onClick={resetToHome} className="w-full bg-gray-800 text-white px-6 py-3 rounded-win font-semibold hover:bg-black transition-colors shadow-lg flex items-center justify-center gap-2"><IconRotate size={18} /> Tentar Novamente</button>
                     </div> 
                 )}
 
                 {gameState === "HOME" && ( 
-                    <div className="hidden md:flex flex-col items-center justify-center text-center p-12 max-w-lg bg-white/50 backdrop-blur-sm rounded-win border border-white">
-                        <div className="w-24 h-24 bg-white rounded-none flex items-center justify-center shadow-fluent mb-6"><span className="text-4xl">🥗</span></div>
-                        <h1 className="text-brand-dark font-bold text-3xl mb-2">Treino Poke House</h1>
-                        <p className="text-gray-500">Selecione uma categoria ao lado para treinar.</p>
+                    <div className="hidden md:flex flex-col items-center justify-center text-center p-12 max-w-lg">
+                        <div className="mb-6"><span className="text-6xl drop-shadow-sm">🥗</span></div>
+                        <h1 className="font-bold text-3xl mb-2 text-[#234171]">Treino Poke House</h1>
+                        <p className="text-[#234171]">Selecione uma categoria ao lado para treinar.</p>
                     </div> 
                 )}
             </div>
             
             <div className="fixed bottom-1 right-1 z-50 opacity-50 hover:opacity-100 transition-opacity">
-                <button onClick={() => setShowChangelog(true)} className="text-[10px] text-gray-400 font-sans hover:text-brand-blue transition-colors bg-white/80 px-2 py-1 rounded-none border border-gray-200">v4.13 BETA</button>
+                <button onClick={() => setShowChangelog(true)} className="text-[10px] text-gray-400 font-sans hover:text-brand-blue transition-colors bg-white/80 px-2 py-1 rounded-none border border-gray-200">v4.16 BETA</button>
             </div>
             {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
         </div>

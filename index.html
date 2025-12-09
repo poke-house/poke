@@ -51,9 +51,18 @@
     </script>
     <style>
         body { margin: 0; overflow: hidden; background-color: #F3F3F3; color: #212121; touch-action: manipulation; }
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+        
+        /* Scrollbar Global Styles */
+        .custom-scroll::-webkit-scrollbar { width: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 0px; }
+        
+        /* Themed Scrollbars */
+        .scroll-blue::-webkit-scrollbar-thumb { background: #4FC3F7; }
+        .scroll-pink::-webkit-scrollbar-thumb { background: #F06292; }
+        .scroll-yellow::-webkit-scrollbar-thumb { background: #FFEE58; }
+        .scroll-red::-webkit-scrollbar-thumb { background: #EF5350; }
+
         .glass-panel { backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.6); }
         .btn-transition { transition: all 0.2s cubic-bezier(0.33, 1, 0.68, 1); }
     </style>
