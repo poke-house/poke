@@ -479,9 +479,9 @@ function App() {
                 {gameState === "RESULT_SUCCESS" && ( 
                     <div className="text-center p-12 bg-white rounded-win shadow-fluent animate-slide-up mx-4 max-w-md w-full border-t-8 border-brand-blue">
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-none bg-blue-50 text-brand-blue mb-6"><IconCheck size={32} /></div>
-                        <h2 className="text-3xl font-bold text-gray-800 mb-2">Excelente!</h2>
+                        <h2 className="text-3xl font-bold text-[#234171] mb-2">Excelente!</h2>
                         <p className="text-gray-600 mb-8">{resultMessage}</p>
-                        <button onClick={resetToHome} className="w-full bg-gray-800 text-white px-6 py-3 rounded-win font-semibold hover:bg-black transition-colors shadow-lg flex justify-center items-center">Menu Principal</button>
+                        <button onClick={resetToHome} className="w-full bg-[#234171] text-white px-6 py-3 rounded-win font-semibold hover:bg-[#1a3155] transition-colors shadow-lg flex justify-center items-center">Menu Principal</button>
                     </div> 
                 )}
 
@@ -505,7 +505,7 @@ function App() {
             </div>
             
             <div className="fixed bottom-1 right-1 z-50 opacity-50 hover:opacity-100 transition-opacity">
-                <button onClick={() => setShowChangelog(true)} className="text-[10px] text-gray-400 font-sans hover:text-brand-blue transition-colors bg-white/80 px-2 py-1 rounded-none border border-gray-200">v4.16 BETA</button>
+                <button onClick={() => setShowChangelog(true)} className="text-[10px] text-gray-400 font-sans hover:text-brand-blue transition-colors bg-white/80 px-2 py-1 rounded-none border border-gray-200">v4.17 BETA</button>
             </div>
             {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
         </div>
