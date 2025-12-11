@@ -1,13 +1,33 @@
-import { IngredientDB, Recipe, Theme, Phase } from './types';
+import { IngredientDB, Recipe, Theme, Phase, BilingualMessage } from './types';
 
-export const SUCCESS_MESSAGES = ["Ficou perfeita! 🤩", "Estudou direitinho! ✅", "Igualzinha ao SOP! 📚", "Que mente de titânio! 🧠"];
-export const FAIL_MESSAGES = ["Algo não tá legal. 🤨", "O cliente vai reclamar. 🤦🏻‍♂️", "Precisamos revisar o SOP. 📚"];
+export const SUCCESS_MESSAGES: BilingualMessage[] = [
+    { pt: "Ficou perfeita! 🤩", en: "It turned out perfect! 🤩" },
+    { pt: "Estudou direitinho! ✅", en: "You studied well! ✅" },
+    { pt: "Igualzinha ao SOP! 📚", en: "Just like the SOP! 📚" },
+    { pt: "Que mente de titânio! 🧠", en: "What a titanium mind! 🧠" }
+];
+
+export const FAIL_MESSAGES: BilingualMessage[] = [
+    { pt: "Algo não tá legal. 🤨", en: "Something is not right. 🤨" },
+    { pt: "O cliente vai reclamar. 🤦🏻‍♂️", en: "The customer will complain. 🤦🏻‍♂️" },
+    { pt: "Precisamos revisar o SOP. 📚", en: "We need to review the SOP. 📚" }
+];
+
 export const PA_NAMES = { MALE: ["Pedro", "Paulo", "Francisco", "Heitor", "Marcelo", "José"], FEMALE: ["Inês", "Eliz", "Melissa", "Mariana", "Vilma", "Bruna"] };
 export const PA_EMOJIS = { MALE: ["👨", "🧔🏻", "👨🏿", "👨🏿‍🦰"], FEMALE: ["👩🏻", "👩🏻‍🦰", "👩🏿", "👩"] };
-export const FINAL_CUSTOM_PHRASES = ["Uau! Ficou linda sua bowl!", "Bom apetite!", "Prontinho! Experimente um dos nosso sumos.", "Seu rosto é famíliar, já é nosso cliente né?", "Muito obrigado, volte mais vezes!"];
+
+export const FINAL_CUSTOM_PHRASES: BilingualMessage[] = [
+    { pt: "Uau! Ficou linda sua bowl!", en: "Wow! Your bowl looks beautiful!" },
+    { pt: "Bom apetite!", en: "Enjoy your meal!" },
+    { pt: "Prontinho! Experimente um dos nosso sumos.", en: "All done! Try one of our smoothies." },
+    { pt: "Seu rosto é famíliar, já é nosso cliente né?", en: "Your face is familiar, you're a regular right?" },
+    { pt: "Muito obrigado, volte mais vezes!", en: "Thank you very much, come back soon!" }
+];
 
 export const CHANGELOG = [
-    { version: "4.26", date: "Atual", changes: ["Histórico de versões limitado às 5 mais recentes."] },
+    { version: "4.28", date: "Atual", changes: ["Adicionado suporte a Inglês (EN).", "Botão de troca de idioma no canto inferior direito."] },
+    { version: "4.27", date: "Anterior", changes: ["Textos de instrução personalizados para 'Tamanho' e 'Base' no modo House Bowl."] },
+    { version: "4.26", date: "Anterior", changes: ["Histórico de versões limitado às 5 mais recentes."] },
     { version: "4.25", date: "Anterior", changes: ["Cor do título 'Molho' no modo Crie sua Bowl atualizada para laranja.", "Mensagem final do Crie sua Bowl simplificada (sem emoji, texto fixo)."] },
     { version: "4.24", date: "Anterior", changes: ["Removido o molho 'Soja e Sésamo' da lista de ingredientes."] },
     { version: "4.23", date: "Anterior", changes: ["Correção da animação da salada na Home Desktop.", "Textos e cores do 'Crie sua Bowl' atualizados.", "Estilo dos botões de oferta de Sésamo atualizado.", "Receita do Cozy Chicken corrigida."] },

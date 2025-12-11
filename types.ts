@@ -1,3 +1,6 @@
+
+export type Language = 'pt' | 'en';
+
 export interface Variant {
   base: string[];
   sauce_base: string[];
@@ -52,12 +55,17 @@ export type GameState = "HOME" | "PLAYING" | "RESULT_SUCCESS" | "RESULT_FAIL" | 
 
 export interface Phase {
   key: string;
-  title: string;
+  title: string; // Kept for fallback, but UI will use translation keys
 }
 
 export interface PaPersona {
   name: string;
   emoji: string;
+}
+
+export interface BilingualMessage {
+    pt: string;
+    en: string;
 }
 
 declare global {
