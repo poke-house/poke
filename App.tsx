@@ -614,7 +614,7 @@ function App() {
             </div>
             
             <div className="fixed bottom-1 right-1 z-50 opacity-50 hover:opacity-100 transition-opacity">
-                <button onClick={() => setShowChangelog(true)} className="text-[10px] text-gray-400 font-sans hover:text-brand-blue transition-colors bg-white/80 px-2 py-1 rounded-none border border-gray-200">v4.25 BETA</button>
+                <button onClick={() => setShowChangelog(true)} className="text-[10px] text-gray-400 font-sans hover:text-brand-blue transition-colors bg-white/80 px-2 py-1 rounded-none border border-gray-200">v4.26 BETA</button>
             </div>
             {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
         </div>

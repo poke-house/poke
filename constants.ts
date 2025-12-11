@@ -7,7 +7,8 @@ export const PA_EMOJIS = { MALE: ["👨", "🧔🏻", "👨🏿", "👨🏿‍�
 export const FINAL_CUSTOM_PHRASES = ["Uau! Ficou linda sua bowl!", "Bom apetite!", "Prontinho! Experimente um dos nosso sumos.", "Seu rosto é famíliar, já é nosso cliente né?", "Muito obrigado, volte mais vezes!"];
 
 export const CHANGELOG = [
-    { version: "4.25", date: "Atual", changes: ["Cor do título 'Molho' no modo Crie sua Bowl atualizada para laranja.", "Mensagem final do Crie sua Bowl simplificada (sem emoji, texto fixo)."] },
+    { version: "4.26", date: "Atual", changes: ["Histórico de versões limitado às 5 mais recentes."] },
+    { version: "4.25", date: "Anterior", changes: ["Cor do título 'Molho' no modo Crie sua Bowl atualizada para laranja.", "Mensagem final do Crie sua Bowl simplificada (sem emoji, texto fixo)."] },
     { version: "4.24", date: "Anterior", changes: ["Removido o molho 'Soja e Sésamo' da lista de ingredientes."] },
     { version: "4.23", date: "Anterior", changes: ["Correção da animação da salada na Home Desktop.", "Textos e cores do 'Crie sua Bowl' atualizados.", "Estilo dos botões de oferta de Sésamo atualizado.", "Receita do Cozy Chicken corrigida."] },
     { version: "4.22", date: "Anterior", changes: ["Receita do Cozy Chicken atualizada.", "Animações na Sidebar e Home.", "Ajuste de preços e textos no 'Crie sua Bowl'."] },
