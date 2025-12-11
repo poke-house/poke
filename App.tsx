@@ -572,7 +572,7 @@ function App() {
                 )}
             </div>
 
-            <div className={`flex-1 relative z-10 flex flex-col items-center justify-center p-4 transition-colors duration-500 ${gameState === "PLAYING" ? currentTheme.bg : "bg-[#efbeb1]"} ${gameState === "HOME" ? "hidden md:flex" : "flex h-full"}`}>
+            <div className={`flex-1 relative z-10 flex flex-col items-center justify-center p-4 pb-12 md:p-4 transition-colors duration-500 ${gameState === "PLAYING" ? currentTheme.bg : "bg-[#efbeb1]"} ${gameState === "HOME" ? "hidden md:flex" : "flex h-full"}`}>
                 {gameState === "CUSTOM_BOWL" && ( 
                     <div className="w-full h-full md:h-auto md:max-h-[90vh] max-w-5xl bg-white/80 backdrop-blur-md rounded-win shadow-fluent flex flex-col overflow-hidden relative border border-white">
                         <div className="flex-1 overflow-hidden relative">{renderCustomBowl()}</div>
