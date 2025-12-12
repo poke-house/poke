@@ -19,6 +19,9 @@ export const ChangelogModal = ({ onClose }: { onClose: () => void }) => (
                 <button onClick={onClose} className="text-gray-400 hover:text-brand-dark transition-colors"><IconX /></button>
             </div>
             <div className="space-y-6">{CHANGELOG.slice(0, 5).map((item, index) => (<div key={index} className="border-l-2 border-brand-blue pl-4"><div className="flex justify-between items-baseline mb-1"><span className="font-semibold text-brand-dark">v{item.version}</span><span className="text-xs text-gray-500 uppercase">{item.date}</span></div><ul className="list-disc list-inside text-sm text-gray-600 space-y-1">{item.changes.map((change, i) => (<li key={i}>{change}</li>))}</ul></div>))}</div>
+            <div className="mt-8 pt-4 border-t border-gray-100 text-center">
+                 <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Dev Marcelo Requião</h4>
+            </div>
         </div>
     </div>
 );
