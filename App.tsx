@@ -32,6 +32,7 @@ function App() {
     const [easterEggTrigger, setEasterEggTrigger] = useState(0);
     const [dancingEmoji, setDancingEmoji] = useState<number | null>(null);
     const [rushScore, setRushScore] = useState(0);
+    const [rushLives, setRushLives] = useState(3);
 
     const handleEasterEggClick = () => { if (window.innerWidth < 768) { setEasterEggTrigger(prev => prev + 1); } };
     
@@ -137,7 +138,7 @@ function App() {
             if (customPhase === 7) return "scroll-yellow"; 
             return "scroll-blue"; 
         }
-        if (gameState === "RUSH_GAME_OVER") return "scroll-rush";
+        if (gameState === "RUSH_GAME_OVER" || gameState === "RUSH_ERROR" || gameState === "RUSH_SELECT") return "scroll-rush";
         if (gameState === "RESULT_FAIL") return "scroll-red";
         return "scroll-blue";
     };
@@ -160,7 +161,7 @@ function App() {
                     if (prev <= 1) {
                         clearInterval(interval);
                         if (gameState === "RUSH_PLAYING") {
-                            handleRushGameOver([t('timer_ended')]);
+                            handleRushError([t('timer_ended')]);
                         } else {
                             handleGameOver(false, [t('timer_ended')]);
                         }
@@ -212,7 +213,12 @@ function App() {
     };
     
     const startRushMode = () => {
+        setGameState("RUSH_SELECT");
+    };
+    
+    const confirmRushStart = (lives: number) => {
         setRushScore(0);
+        setRushLives(lives);
         nextRushRound();
     };
     
@@ -275,7 +281,7 @@ function App() {
         if (gameState === "RUSH_PLAYING" && !isCorrect) {
             const phaseTitle = t('phase_' + activePhases[currentPhaseIndex].key);
             const errorMsg = t('instr_error_prefix', {phase: phaseTitle, required: requiredList.join(", ")});
-            handleRushGameOver([errorMsg]);
+            handleRushError([errorMsg]);
             return;
         }
 
@@ -338,17 +344,33 @@ function App() {
                  }
                  nextRushRound();
              } else {
-                 handleRushGameOver(errors);
+                 handleRushError(errors);
              }
         } else {
             handleGameOver(errors.length === 0, errors);
         }
     };
 
+    const handleRushError = (errors: string[]) => {
+        playSound("sad");
+        setErrorDetails(errors);
+        if (rushLives > 1) {
+            setGameState("RUSH_ERROR");
+        } else {
+            handleRushGameOver(errors);
+        }
+    }
+
+    const consumeRushLife = () => {
+        setRushLives(prev => prev - 1);
+        nextRushRound();
+    }
+
     const handleRushGameOver = (errors: string[] = []) => {
         playSound("sad");
         setErrorDetails(errors);
         setGameState("RUSH_GAME_OVER");
+        setRushLives(0); // Ensure they show as 0 on game over
         const sorted = [...RUSH_MESSAGES].sort((a,b) => b.threshold - a.threshold);
         const msgObj = sorted.find(m => rushScore >= m.threshold);
         const defaultMsg = { pt: "Vamos lá, foco! 🧐", en: "Come on, focus! 🧐" };
@@ -622,7 +644,7 @@ function App() {
                 ) : gameState !== "CUSTOM_BOWL" && ( 
                     <div className="flex-1 flex flex-col gap-2 animate-fade-in overflow-y-auto custom-scroll min-h-0">
                         <button onClick={() => setMenuCategory(null)} className={`mb-2 font-medium flex items-center gap-2 px-3 py-2 rounded-win transition-colors flex-shrink-0 ${getBackBtnClass()}`}><IconArrowLeft size={18}/> {t('btn_back')}</button>
-                        <h3 className="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2 px-1 flex-shrink-0">{menuCategory || (gameState === "RUSH_PLAYING" ? "RUSH MODE" : "MENU")}</h3>
+                        <h3 className="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2 px-1 flex-shrink-0">{menuCategory || ((gameState === "RUSH_PLAYING" || gameState === "RUSH_SELECT") ? "RUSH MODE" : "MENU")}</h3>
                         {menuCategory && RECIPES.filter(r => r.category === menuCategory).map(recipe => ( 
                             <button key={recipe.id} onClick={() => startGame(recipe)} disabled={gameState === "PLAYING" && selectedRecipe?.id !== recipe.id} className={`p-4 rounded-win text-left font-medium text-sm transition-all flex-shrink-0 ${selectedRecipe?.id === recipe.id ? "bg-white/80 shadow-md scale-[1.02] font-bold" : `bg-transparent ${getRecipeHoverClass()}`} ${gameState === "PLAYING" && selectedRecipe?.id !== recipe.id ? "opacity-40 hidden md:block" : ""}`} style={{ color: selectedRecipe?.id === recipe.id ? 'inherit' : '#555' }}>{recipe.name}</button> 
                         ))}
@@ -645,13 +667,29 @@ function App() {
                         )}
                     </div> 
                 )}
+
+                {gameState === "RUSH_SELECT" && (
+                    <div className="text-center p-10 bg-white rounded-win shadow-fluent animate-slide-up mx-4 max-w-md w-full border-t-8 border-rush-500">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-8">{t('rush_select_title')}</h2>
+                        <div className="flex flex-col gap-4">
+                            <button onClick={() => confirmRushStart(3)} className="bg-blue-100 text-blue-800 px-6 py-4 rounded-win font-bold text-xl hover:bg-blue-200 transition-all shadow-sm transform hover:scale-[1.02]">
+                                {t('rush_btn_douradores')}
+                            </button>
+                            <button onClick={() => confirmRushStart(1)} className="bg-rush-100 text-rush-900 px-6 py-4 rounded-win font-bold text-xl hover:bg-rush-200 transition-all shadow-sm transform hover:scale-[1.02]">
+                                {t('rush_btn_colombo')}
+                            </button>
+                        </div>
+                    </div>
+                )}
                 
                 {(gameState === "PLAYING" || gameState === "RUSH_PLAYING") && selectedRecipe && ( 
                     <div className={`w-full h-full md:h-auto md:max-h-[90vh] max-w-5xl bg-white/60 backdrop-blur-xl rounded-win shadow-fluent flex flex-col overflow-hidden animate-slide-up border ${currentTheme.border}`}>
-                        <div className={`p-3 bg-white/40 border-b ${currentTheme.border} flex justify-between items-center ${currentTheme.text} text-sm font-bold tracking-wide`}>
-                             <span className="w-1/3 text-left pl-2">{gameState === "RUSH_PLAYING" ? `😰 ${t('score_label')}: ${rushScore}` : ""}</span>
-                             <span className="w-1/3 text-center">{selectedRecipe.name} {selectedSize && `• ${selectedSize}`}</span>
-                             <span className="w-1/3"></span>
+                        <div className={`p-3 bg-white/40 border-b ${currentTheme.border} flex justify-between items-center ${currentTheme.text} font-bold tracking-wide`}>
+                             <span className="w-1/4 text-left pl-2 text-sm">{gameState === "RUSH_PLAYING" ? `😰 ${t('score_label')}: ${rushScore}` : ""}</span>
+                             <span className="w-1/2 text-center text-xl md:text-2xl drop-shadow-sm">{selectedRecipe.name} {selectedSize && <span className="text-sm md:text-base block md:inline opacity-80 md:ml-2"> {selectedSize}</span>}</span>
+                             <span className="w-1/4 text-right pr-2 text-xl tracking-tighter">
+                                {gameState === "RUSH_PLAYING" && "❤️".repeat(rushLives)}
+                             </span>
                         </div>
                         <div className="flex justify-between items-center p-6 border-b border-white/40 bg-white/20">
                             <div><h2 className={`text-2xl font-bold ${currentTheme.text}`}>{t('phase_' + getCurrentPhaseData().key)}</h2><p className="text-sm text-gray-600 mt-1">{getInstructionText()}</p></div>
@@ -666,6 +704,21 @@ function App() {
                                 <IconArrowLeft size={18}/> {t('btn_undo')}
                             </button>
                         </div>
+                    </div> 
+                )}
+
+                {gameState === "RUSH_ERROR" && ( 
+                    <div className="text-center p-10 bg-white rounded-win shadow-fluent animate-slide-up mx-4 max-w-md w-full border-t-8 border-rush-400">
+                        <div className="text-xl mb-4 text-rush-900 tracking-widest font-bold">
+                            {"❤️".repeat(rushLives)}
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('res_fail_title')}</h2>
+                        <div className={`bg-red-50 p-4 rounded-win text-left text-sm text-red-600 mb-8 border border-red-100 max-h-40 overflow-y-auto custom-scroll ${scrollClass}`}>
+                            {errorDetails.map((e, i) => <div key={i} className="mb-1 pb-1 border-b border-red-100 last:border-0">• {e}</div>)}
+                        </div>
+                        <button onClick={consumeRushLife} className="w-full bg-rush-500 text-white px-6 py-4 rounded-win font-bold text-xl hover:bg-rush-900 transition-colors shadow-lg flex items-center justify-center gap-2 animate-pulse-fast">
+                           {t('btn_continue')}
+                        </button>
                     </div> 
                 )}
 

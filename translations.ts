@@ -1,4 +1,3 @@
-
 export const TRANSLATIONS = {
     pt: {
         // Home & Sidebar
@@ -16,6 +15,7 @@ export const TRANSLATIONS = {
         btn_undo: "Desfazer",
         btn_home_tooltip: "Voltar ao Início",
         score_label: "Pontos",
+        btn_continue: "Continuar",
         
         // Phases Titles
         phase_size: "Tamanho",
@@ -45,6 +45,11 @@ export const TRANSLATIONS = {
         res_rush_fail_title: "Fim do Lodo!",
         btn_menu: "Menu Principal",
         btn_retry: "Tentar Novamente",
+
+        // Rush Selection
+        rush_select_title: "O lodo hoje será na loja:",
+        rush_btn_douradores: "🌊Douradores🌊",
+        rush_btn_colombo: "🔥Colombo🔥",
 
         // Custom Bowl Dialogs
         cb_intro: "Olá! Me chamo {name}. Já conhece a Poke House? Vou ajudar-te a escolher a bowl perfeita. Queres criar a tua?",
@@ -95,6 +100,7 @@ export const TRANSLATIONS = {
         btn_undo: "Undo",
         btn_home_tooltip: "Back to Home",
         score_label: "Score",
+        btn_continue: "Continue",
         
         // Phases Titles
         phase_size: "Size",
@@ -124,6 +130,11 @@ export const TRANSLATIONS = {
         res_rush_fail_title: "Rush Over!",
         btn_menu: "Main Menu",
         btn_retry: "Try Again",
+
+        // Rush Selection
+        rush_select_title: "The rush today will be at:",
+        rush_btn_douradores: "🌊Douradores🌊",
+        rush_btn_colombo: "🔥Colombo🔥",
 
         // Custom Bowl Dialogs
         cb_intro: "Hi! My name is {name}. Do you know Poke House? I'll help you choose the perfect bowl. Want to create your own?",
