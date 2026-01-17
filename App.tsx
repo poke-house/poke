@@ -45,6 +45,7 @@ function App() {
 
     // University Mode States
     const [uniSteps, setUniSteps] = useState<{phase: string, item: string, count: number}[]>([]);
+    const [uniStepsLarge, setUniStepsLarge] = useState<{phase: string, item: string, count: number}[]>([]);
     const [uniCurrentStep, setUniCurrentStep] = useState(0);
 
     const handleEasterEggClick = () => { if (window.innerWidth < 768) { setEasterEggTrigger(prev => prev + 1); } };
@@ -253,48 +254,56 @@ function App() {
     const startUniversityLevel = (recipe: Recipe) => {
         setSelectedRecipe(recipe);
         
-        // Flatten recipe for learning mode with grouping
-        let steps: {phase: string, item: string, count: number}[] = [];
-        const phases = recipe.category === "SMOOTHIE" ? PHASES_SMOOTHIE : PHASES_BOWL;
-        const validPhases = phases.filter(p => p.key !== "size"); // Skip size selection for learning, assume regular
+        // Helper to generate steps for a specific variant
+        const generateLevelSteps = (variantName: string | null) => {
+             let steps: {phase: string, item: string, count: number}[] = [];
+             const phases = recipe.category === "SMOOTHIE" ? PHASES_SMOOTHIE : PHASES_BOWL;
+             const validPhases = phases.filter(p => p.key !== "size");
 
-        validPhases.forEach(phase => {
-            let items: string[] = [];
-            if (recipe.category === "SMOOTHIE") {
-                items = (recipe as any)[phase.key] || [];
-            } else {
-                // Default to Regular for University Mode
-                items = recipe.variants && recipe.variants["Regular"] ? recipe.variants["Regular"][phase.key] : [];
-            }
-            
-            items.forEach(item => {
-                // Check if we can group with the last step
-                if (steps.length > 0) {
-                    const lastStep = steps[steps.length - 1];
-                    if (lastStep.phase === phase.title && lastStep.item === item) {
-                        lastStep.count += 1;
-                        return;
-                    }
+             validPhases.forEach(phase => {
+                let items: string[] = [];
+                if (recipe.category === "SMOOTHIE") {
+                    items = (recipe as any)[phase.key] || [];
+                } else {
+                    const vName = variantName || "Regular";
+                    items = recipe.variants && recipe.variants[vName] ? recipe.variants[vName][phase.key] : [];
                 }
                 
-                steps.push({
-                    phase: phase.title,
-                    item: item,
-                    count: 1
+                items.forEach(item => {
+                    // Check if we can group with the last step
+                    if (steps.length > 0) {
+                        const lastStep = steps[steps.length - 1];
+                        if (lastStep.phase === phase.title && lastStep.item === item) {
+                            lastStep.count += 1;
+                            return;
+                        }
+                    }
+                    steps.push({ phase: phase.title, item: item, count: 1 });
                 });
-            });
-        });
+             });
+             return steps;
+        };
 
-        setUniSteps(steps);
+        const stepsRegular = generateLevelSteps("Regular");
+        setUniSteps(stepsRegular);
+
+        if (recipe.category !== "SMOOTHIE") {
+            const stepsLarge = generateLevelSteps("Large");
+            setUniStepsLarge(stepsLarge);
+        } else {
+            setUniStepsLarge([]);
+        }
+
         setUniCurrentStep(0);
         setGameState("UNIVERSITY_PLAYING");
     };
 
     const handleUniNext = () => {
-        if (uniCurrentStep < uniSteps.length) {
+        const maxSteps = Math.max(uniSteps.length, uniStepsLarge.length);
+        if (uniCurrentStep < maxSteps) {
             setUniCurrentStep(prev => prev + 1);
             playSound("happy");
-            if (uniCurrentStep === uniSteps.length - 1) {
+            if (uniCurrentStep === maxSteps - 1) {
                  if (window.confetti) {
                     window.confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
                 }
@@ -774,7 +783,7 @@ function App() {
             <FoodRain trigger={easterEggTrigger} quantity={1} />
             {showPopup && <PopupModal message={showPopup.msg} onConfirm={showPopup.callback} />}
 
-            <div className={`p-6 md:w-80 flex flex-col gap-4 z-10 shadow-fluent transition-colors duration-300 ${getSidebarClass()} ${gameState === "HOME" ? "w-full h-full" : (gameState === "CUSTOM_BOWL" || gameState === "UNIVERSITY_PLAYING" || gameState === "UNIVERSITY_SUCCESS" ? "hidden" : "hidden md:flex h-full")} overflow-hidden custom-scroll ${sidebarScrollClass}`}>
+            <div className={`p-6 md:w-80 flex flex-col gap-4 z-10 shadow-fluent transition-colors duration-300 ${getSidebarClass()} ${(gameState === "HOME" || gameState === "UNIVERSITY_SELECT") ? "w-full h-full" : (gameState === "CUSTOM_BOWL" || gameState === "UNIVERSITY_PLAYING" || gameState === "UNIVERSITY_SUCCESS" ? "hidden" : "hidden md:flex h-full")} overflow-hidden custom-scroll ${sidebarScrollClass}`}>
                 <div className="flex-shrink flex justify-center min-h-[50px] transition-all duration-300">
                     <img src="https://i.imgur.com/ILFq2UI.png" alt="Poke House" className="max-h-24 w-auto h-auto object-contain transition-all duration-300" />
                 </div>
@@ -819,84 +828,99 @@ function App() {
 
             <div className={`flex-1 relative z-10 flex flex-col items-center justify-center p-4 pb-12 md:p-4 transition-colors duration-500 ${(gameState === "PLAYING" || gameState === "RUSH_PLAYING" || gameState === "QUIZ_PLAYING" || gameState === "QUIZ_FEEDBACK" || gameState === "UNIVERSITY_PLAYING") ? currentTheme.bg : "bg-[#efbeb1]"} ${gameState === "HOME" ? "hidden md:flex" : "flex h-full"}`}>
                 
-                {/* University Playing Layout - UPDATED: 3D Card Stack */}
+                {/* University Playing Layout - UPDATED: 3D Card Stack (Side by Side or Single) */}
                 {gameState === "UNIVERSITY_PLAYING" && selectedRecipe && (
-                     <div className="w-full h-full md:h-auto md:max-h-[90vh] md:aspect-[3/4] max-w-xl bg-white/90 backdrop-blur-xl rounded-win shadow-fluent flex flex-col overflow-hidden animate-slide-up relative border border-white">
+                     <div className="w-full h-full md:h-auto md:max-h-[90vh] md:aspect-[3/4] max-w-4xl bg-white/90 backdrop-blur-xl rounded-win shadow-fluent flex flex-col animate-slide-up relative border border-white">
                         {/* Header */}
-                        <div className={`p-6 border-b ${currentTheme.border} bg-white/50 flex flex-col items-center justify-center shrink-0 z-20`}>
-                             <span className="text-2xl font-bold uppercase tracking-tight text-brand-dark">{selectedRecipe.name}</span>
-                             <div className="w-full bg-gray-200 h-1.5 mt-4 rounded-full overflow-hidden">
-                                <div className="bg-brand-blue h-full transition-all duration-500" style={{ width: `${((uniCurrentStep + 1) / uniSteps.length) * 100}%` }}></div>
+                        <div className={`p-4 md:p-6 border-b ${currentTheme.border} bg-white/50 flex flex-col items-center justify-center shrink-0 z-20`}>
+                             <span className="text-xl md:text-2xl font-bold uppercase tracking-tight text-brand-dark">{selectedRecipe.name}</span>
+                             <div className="w-full max-w-md bg-gray-200 h-1.5 mt-4 rounded-full overflow-hidden">
+                                <div className="bg-brand-blue h-full transition-all duration-500" style={{ width: `${((uniCurrentStep + 1) / Math.max(uniSteps.length, uniStepsLarge.length || 0)) * 100}%` }}></div>
                              </div>
                              <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">
-                                {t('uni_step_progress', {current: uniCurrentStep + 1, total: uniSteps.length})}
+                                {t('uni_step_progress', {current: uniCurrentStep + 1, total: Math.max(uniSteps.length, uniStepsLarge.length || 0)})}
                              </div>
                         </div>
 
                         {/* Interactive Area - Stacked Cards */}
-                        <div className="flex-1 relative w-full flex justify-center items-center overflow-hidden">
-                            <div className="relative w-64 h-80">
-                                {uniSteps.map((step, index) => {
-                                    // Only render a few cards around the current one for performance
-                                    if (index > uniCurrentStep) return null; // Future cards
-                                    const offset = uniCurrentStep - index;
-                                    if (offset > 4) return null; // Too old, hide them
+                        <div className="flex-1 relative w-full flex justify-center items-center gap-2 md:gap-8 px-2 md:px-4">
+                            {/* Render Logic: If we have Large steps, show 2 columns. Otherwise (Smoothies), 1 column */}
+                            {[
+                                { title: uniStepsLarge.length > 0 ? "REGULAR" : "", steps: uniSteps },
+                                ...(uniStepsLarge.length > 0 ? [{ title: "LARGE", steps: uniStepsLarge }] : [])
+                            ].map((group, colIndex) => (
+                                <div key={colIndex} className="flex flex-col items-center">
+                                    {group.title && <h3 className="mb-2 md:mb-4 font-black text-brand-dark tracking-widest text-xs md:text-sm">{group.title}</h3>}
+                                    <div className="relative w-[42vw] md:w-56 h-56 md:h-80">
+                                        {group.steps.map((step, index) => {
+                                            // Only render a few cards around the current one for performance
+                                            if (index > uniCurrentStep) return null; // Future cards
+                                            const offset = uniCurrentStep - index;
+                                            if (offset > 4) return null; // Too old, hide them
 
-                                    const isCurrent = offset === 0;
+                                            const isCurrent = offset === 0;
 
-                                    // Dynamic styles for the 3D stack effect
-                                    const style = {
-                                        transform: `translateY(${offset * 12}px) scale(${1 - offset * 0.05})`,
-                                        zIndex: 50 - offset,
-                                        opacity: Math.max(0, 1 - offset * 0.2),
-                                        filter: isCurrent ? 'none' : 'grayscale(100%)',
-                                    };
+                                            // Dynamic styles for the 3D stack effect
+                                            const style = {
+                                                transform: `translateY(${offset * 12}px) scale(${1 - offset * 0.05})`,
+                                                zIndex: 50 - offset,
+                                                opacity: Math.max(0, 1 - offset * 0.2),
+                                                filter: isCurrent ? 'none' : 'grayscale(100%)',
+                                            };
 
-                                    return (
-                                        <div 
-                                            key={index}
-                                            className="absolute top-0 left-0 w-full h-full transition-all duration-500 ease-out"
-                                            style={style}
-                                        >
-                                            <div className={`
-                                                w-full h-full p-6 rounded-win shadow-xl border 
-                                                flex flex-col items-center justify-center text-center
-                                                bg-white
-                                                ${isCurrent ? 'border-brand-blue ring-4 ring-brand-blue/10' : 'border-gray-300'}
-                                            `}>
-                                                <div className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">{step.phase}</div>
-                                                <div className={`text-2xl font-bold leading-tight ${isCurrent ? 'text-brand-dark scale-110' : 'text-gray-400'}`}>
-                                                    {step.item}
-                                                </div>
-                                                {step.count > 1 && (
-                                                    <div className={`text-4xl font-black mt-2 ${isCurrent ? 'text-brand-blue' : 'text-gray-300'}`}>
-                                                        {step.count}X
+                                            return (
+                                                <div 
+                                                    key={index}
+                                                    className="absolute top-0 left-0 w-full h-full transition-all duration-500 ease-out"
+                                                    style={style}
+                                                >
+                                                    <div className={`
+                                                        w-full h-full p-3 md:p-6 rounded-win shadow-xl border 
+                                                        flex flex-col items-center justify-center text-center
+                                                        bg-white
+                                                        ${isCurrent ? 'border-brand-blue ring-4 ring-brand-blue/10' : 'border-gray-300'}
+                                                    `}>
+                                                        <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 md:mb-4">{step.phase}</div>
+                                                        <div className={`text-sm md:text-2xl font-bold leading-tight ${isCurrent ? 'text-brand-dark scale-110' : 'text-gray-400'}`}>
+                                                            {step.item}
+                                                        </div>
+                                                        {step.count > 1 && (
+                                                            <div className={`text-xl md:text-4xl font-black mt-2 ${isCurrent ? 'text-brand-blue' : 'text-gray-300'}`}>
+                                                                {step.count}X
+                                                            </div>
+                                                        )}
+                                                        {isCurrent && <div className="mt-4 md:mt-6 text-brand-blue animate-bounce"><IconCheck size={24} className="md:w-8 md:h-8" /></div>}
                                                     </div>
-                                                )}
-                                                {isCurrent && <div className="mt-6 text-brand-blue animate-bounce"><IconCheck size={32} /></div>}
+                                                </div>
+                                            );
+                                        })}
+                                        {/* Show Placeholder if this column is finished but the other is not */}
+                                        {uniCurrentStep >= group.steps.length && (
+                                            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-win">
+                                                <IconCheck size={32} className="text-gray-300 md:w-12 md:h-12" />
                                             </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         {/* Controls */}
-                        <div className="p-6 bg-white/80 border-t border-gray-100 flex items-center justify-between gap-4 shrink-0 z-20">
+                        <div className="p-4 md:p-6 bg-white/80 border-t border-gray-100 flex items-center justify-between gap-4 shrink-0 z-20">
                              <button onClick={resetToHome} className="p-3 text-gray-400 hover:text-brand-pink transition-colors"><IconHome size={24}/></button>
                              <div className="flex items-center gap-4 flex-1 justify-end">
                                 <button 
                                     onClick={handleUniPrev} 
                                     disabled={uniCurrentStep === 0}
-                                    className="p-4 rounded-win bg-gray-100 text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200 transition-all font-bold shadow-sm"
+                                    className="p-3 md:p-4 rounded-win bg-gray-100 text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200 transition-all font-bold shadow-sm"
                                 >
                                     <IconArrowLeft size={24} />
                                 </button>
                                 <button 
                                     onClick={handleUniNext}
-                                    className={`px-8 py-4 rounded-win bg-brand-blue text-white font-bold shadow-md hover:bg-blue-600 transition-all flex items-center gap-2 transform active:scale-95 ${uniCurrentStep === uniSteps.length - 1 ? 'bg-green-500 hover:bg-green-600' : ''}`}
+                                    className={`px-6 py-3 md:px-8 md:py-4 rounded-win bg-brand-blue text-white font-bold shadow-md hover:bg-blue-600 transition-all flex items-center gap-2 transform active:scale-95 ${uniCurrentStep === Math.max(uniSteps.length, uniStepsLarge.length) - 1 ? 'bg-green-500 hover:bg-green-600' : ''}`}
                                 >
-                                    {uniCurrentStep === uniSteps.length - 1 ? <span>{t('btn_continue')}</span> : <IconArrowRight size={24} />}
+                                    {uniCurrentStep === Math.max(uniSteps.length, uniStepsLarge.length) - 1 ? <span>{t('btn_continue')}</span> : <IconArrowRight size={24} />}
                                 </button>
                              </div>
                         </div>
