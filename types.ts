@@ -69,6 +69,19 @@ export interface PaPersona {
   emoji: string;
 }
 
+export interface RushScore {
+  id?: string;
+  player_name: string;
+  store_name: string;
+  score: number;
+  created_at?: string;
+}
+
+export interface RushPlayer {
+  name: string;
+  store: string;
+}
+
 export interface BilingualMessage {
     pt: string;
     en: string;
