@@ -34,41 +34,41 @@ export const RushEntryModal = ({
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-rush-500 transition-colors">
                     <IconX size={20} />
                 </button>
-                <div className="p-8">
-                    <h2 className="text-2xl font-black text-rush-900 mb-2 text-center uppercase tracking-tighter">Identificação</h2>
-                    <p className="text-rush-300 text-center mb-8 font-bold uppercase text-xs tracking-widest">Quem está no comando?</p>
+                <div className="p-6 md:p-8">
+                    <h2 className="text-xl md:text-2xl font-black text-rush-900 mb-1 md:mb-2 text-center uppercase tracking-tighter">Identificação</h2>
+                    <p className="text-rush-300 text-center mb-6 md:mb-8 font-bold uppercase text-[10px] md:text-xs tracking-widest">Quem está no comando?</p>
                     
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4">
                         <div>
-                            <label className="block text-xs font-bold text-rush-900 uppercase mb-1">Seu Nome</label>
+                            <label className="block text-[10px] md:text-xs font-bold text-rush-900 uppercase mb-1">Seu Nome</label>
                             <input 
                                 type="text" 
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="Ex: Marcelo"
-                                className="w-full p-3 bg-rush-100/30 border-2 border-rush-100 rounded-win focus:border-rush-500 outline-none transition-all font-bold text-rush-900"
+                                className="w-full p-2.5 md:p-3 bg-rush-100/30 border-2 border-rush-100 rounded-win focus:border-rush-500 outline-none transition-all font-bold text-rush-900 text-sm md:text-base"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-rush-900 uppercase mb-1">Sua Loja</label>
+                            <label className="block text-[10px] md:text-xs font-bold text-rush-900 uppercase mb-1">Sua Loja</label>
                             <input 
                                 type="text" 
                                 value={store}
                                 onChange={(e) => setStore(e.target.value)}
                                 placeholder="Ex: Colombo"
-                                className="w-full p-3 bg-rush-100/30 border-2 border-rush-100 rounded-win focus:border-rush-500 outline-none transition-all font-bold text-rush-900"
+                                className="w-full p-2.5 md:p-3 bg-rush-100/30 border-2 border-rush-100 rounded-win focus:border-rush-500 outline-none transition-all font-bold text-rush-900 text-sm md:text-base"
                             />
                         </div>
                         <button 
                             onClick={handleStart}
                             disabled={!name.trim() || !store.trim()}
-                            className="w-full bg-rush-500 text-white py-4 rounded-win font-black uppercase tracking-widest hover:bg-rush-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg active:scale-95"
+                            className="w-full bg-rush-500 text-white py-3 md:py-4 rounded-win font-black uppercase tracking-widest hover:bg-rush-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg active:scale-95 text-sm md:text-base"
                         >
                             Iniciar Treino
                         </button>
                         <button 
                             onClick={onClose}
-                            className="w-full bg-gray-100 text-gray-500 py-3 rounded-win font-bold uppercase text-xs tracking-widest hover:bg-gray-200 transition-all"
+                            className="w-full bg-gray-100 text-gray-500 py-2.5 md:py-3 rounded-win font-bold uppercase text-[10px] md:text-xs tracking-widest hover:bg-gray-200 transition-all"
                         >
                             Sair
                         </button>

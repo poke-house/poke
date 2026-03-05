@@ -233,9 +233,34 @@ function App() {
             return;
         }
         try {
-            const { data: top } = await supabase.from('rush_scores').select('*').order('score', { ascending: false }).limit(5);
-            const { data: last } = await supabase.from('rush_scores').select('*').order('created_at', { ascending: false }).limit(5);
-            if (top) setTopScores(top);
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+            const { data: topRaw } = await supabase
+                .from('rush_scores')
+                .select('*')
+                .gte('created_at', thirtyDaysAgo.toISOString())
+                .order('score', { ascending: false })
+                .limit(50);
+
+            const { data: last } = await supabase
+                .from('rush_scores')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(10);
+
+            if (topRaw) {
+                // Filter to keep only the highest score per player
+                const uniquePlayers = new Map<string, any>();
+                for (const score of topRaw) {
+                    const key = score.player_name.toLowerCase().trim();
+                    if (!uniquePlayers.has(key)) {
+                        uniquePlayers.set(key, score);
+                    }
+                }
+                const top = Array.from(uniquePlayers.values()).slice(0, 3);
+                setTopScores(top);
+            }
             if (last) setLastScores(last);
         } catch (err) {
             console.error("Error fetching leaderboard:", err);
@@ -586,20 +611,20 @@ function App() {
             <div className={`p-6 md:w-80 flex flex-col gap-4 z-10 shadow-fluent transition-colors duration-300 ${getSidebarClass()} ${(gameState === "HOME" || gameState === "UNIVERSITY_SELECT") ? "w-full h-full" : (gameState === "CUSTOM_BOWL" || gameState === "UNIVERSITY_PLAYING" || gameState === "UNIVERSITY_SUCCESS" ? "hidden" : "hidden md:flex h-full")} overflow-hidden custom-scroll ${sidebarScrollClass}`}>
                 <div className="flex-shrink flex justify-center min-h-[50px]"><img src="https://i.imgur.com/ILFq2UI.png" alt="Poke House" className="max-h-24 w-auto h-auto object-contain" /></div>
                 {menuCategory === null && gameState !== "CUSTOM_BOWL" && gameState !== "UNIVERSITY_SELECT" ? ( 
-                    <div className="flex-1 flex flex-col gap-3 justify-center md:justify-start overflow-y-auto custom-scroll">
+                    <div className="flex-1 flex flex-col gap-3 md:gap-2 justify-center md:justify-start overflow-y-auto custom-scroll">
                         <div onClick={handleEasterEggClick} className="md:hidden text-5xl text-center py-4 cursor-pointer animate-bounce">🥗</div>
-                        <button onClick={initCustomGame} className="bg-gradient-to-r from-brand-pink to-pink-500 text-white p-4 rounded-win shadow-fluent hover:shadow-fluent-hover font-bold text-lg flex items-center justify-center gap-2 transform hover:scale-[1.02]">✨ {t('btn_create_bowl')} ✨</button> 
-                        <button onClick={startUniversityMode} className="group bg-purple-100 text-purple-900 p-5 rounded-win shadow-sm hover:bg-purple-200 transition-all font-semibold text-lg flex items-center gap-3 relative">
-                            <span className="text-2xl group-hover:animate-dance">🎓</span> {t('menu_university')}
-                            <div className="absolute bottom-2 right-2 bg-yellow-400 text-yellow-900 text-[10px] font-black px-2 py-0.5 -rotate-6 shadow-sm border border-white rounded-sm z-10">NEW MODE</div>
+                        <button onClick={initCustomGame} className="bg-gradient-to-r from-brand-pink to-pink-500 text-white p-4 md:p-3 rounded-win shadow-fluent hover:shadow-fluent-hover font-bold text-lg md:text-base flex items-center justify-center gap-2 transform hover:scale-[1.02]">✨ {t('btn_create_bowl')} ✨</button> 
+                        <button onClick={startUniversityMode} className="group bg-purple-100 text-purple-900 p-5 md:p-3 rounded-win shadow-sm hover:bg-purple-200 transition-all font-semibold text-lg md:text-base flex items-center gap-3 md:gap-2 relative">
+                            <span className="text-2xl md:text-xl group-hover:animate-dance">🎓</span> {t('menu_university')}
+                            <div className="absolute bottom-1 right-2 bg-yellow-400 text-yellow-900 text-[9px] md:text-[8px] font-black px-1.5 py-0.5 -rotate-6 shadow-sm border border-white rounded-sm z-10">NEW MODE</div>
                         </button>
-                        <button onClick={() => setMenuCategory("HOUSE")} className="group bg-pastel-blue-50 text-pastel-blue-text p-5 rounded-win shadow-sm hover:bg-pastel-blue-100 transition-all font-semibold text-lg flex items-center gap-3"><span className="text-2xl group-hover:animate-dance">🐟</span> {t('menu_house')}</button>
-                        <button onClick={() => setMenuCategory("GREEN")} className="group bg-pastel-pink-50 text-pastel-pink-text p-5 rounded-win shadow-sm hover:bg-pastel-pink-100 transition-all font-semibold text-lg flex items-center gap-3"><span className="text-2xl group-hover:animate-dance">🥗</span> {t('menu_green')}</button>
-                        <button onClick={() => setMenuCategory("SMOOTHIE")} className="group bg-pastel-yellow-50 text-pastel-yellow-text p-5 rounded-win shadow-sm hover:bg-pastel-yellow-100 transition-all font-semibold text-lg flex items-center gap-3"><span className="text-2xl group-hover:animate-dance">🥤</span> {t('menu_smoothie')}</button>
-                        <button onClick={startRushMode} className="group bg-rush-100 text-rush-900 p-5 rounded-win shadow-sm hover:bg-rush-200 transition-all font-semibold text-lg flex items-center gap-3"><span className="text-2xl group-hover:animate-dance">😰</span> {t('menu_rush')}</button>
-                        <button onClick={startQuizMode} className="group bg-emerald-100 text-emerald-900 p-5 rounded-win shadow-sm hover:bg-emerald-200 transition-all font-semibold text-lg flex items-center gap-3 relative">
-                            <span className="text-2xl group-hover:animate-dance">⁉️</span> {t('menu_quiz')}
-                            <div className="absolute bottom-2 right-2 bg-yellow-400 text-yellow-900 text-[10px] font-black px-2 py-0.5 -rotate-6 shadow-sm border border-white rounded-sm z-10">NEW MODE</div>
+                        <button onClick={() => setMenuCategory("HOUSE")} className="group bg-pastel-blue-50 text-pastel-blue-text p-5 md:p-3 rounded-win shadow-sm hover:bg-pastel-blue-100 transition-all font-semibold text-lg md:text-base flex items-center gap-3 md:gap-2"><span className="text-2xl md:text-xl group-hover:animate-dance">🐟</span> {t('menu_house')}</button>
+                        <button onClick={() => setMenuCategory("GREEN")} className="group bg-pastel-pink-50 text-pastel-pink-text p-5 md:p-3 rounded-win shadow-sm hover:bg-pastel-pink-100 transition-all font-semibold text-lg md:text-base flex items-center gap-3 md:gap-2"><span className="text-2xl md:text-xl group-hover:animate-dance">🥗</span> {t('menu_green')}</button>
+                        <button onClick={() => setMenuCategory("SMOOTHIE")} className="group bg-pastel-yellow-50 text-pastel-yellow-text p-5 md:p-3 rounded-win shadow-sm hover:bg-pastel-yellow-100 transition-all font-semibold text-lg md:text-base flex items-center gap-3 md:gap-2"><span className="text-2xl md:text-xl group-hover:animate-dance">🥤</span> {t('menu_smoothie')}</button>
+                        <button onClick={startRushMode} className="group bg-rush-100 text-rush-900 p-5 md:p-3 rounded-win shadow-sm hover:bg-rush-200 transition-all font-semibold text-lg md:text-base flex items-center gap-3 md:gap-2"><span className="text-2xl md:text-xl group-hover:animate-dance">😰</span> {t('menu_rush')}</button>
+                        <button onClick={startQuizMode} className="group bg-emerald-100 text-emerald-900 p-5 md:p-3 rounded-win shadow-sm hover:bg-emerald-200 transition-all font-semibold text-lg md:text-base flex items-center gap-3 md:gap-2 relative">
+                            <span className="text-2xl md:text-xl group-hover:animate-dance">⁉️</span> {t('menu_quiz')}
+                            <div className="absolute bottom-1 right-2 bg-yellow-400 text-yellow-900 text-[9px] md:text-[8px] font-black px-1.5 py-0.5 -rotate-6 shadow-sm border border-white rounded-sm z-10">NEW MODE</div>
                         </button>
                     </div> 
                 ) : gameState !== "CUSTOM_BOWL" && ( 
@@ -625,27 +650,28 @@ function App() {
             <div className={`flex-1 relative z-10 flex flex-col items-center justify-center p-4 pb-12 transition-colors duration-500 ${(gameState === "PLAYING" || gameState === "RUSH_PLAYING" || gameState === "QUIZ_PLAYING" || gameState === "QUIZ_FEEDBACK" || gameState === "UNIVERSITY_PLAYING") ? currentTheme.bg : "bg-[#efbeb1]"} ${gameState === "HOME" ? "hidden md:flex" : "flex h-full"}`}>
                 
                 {gameState === "RUSH_SELECT" && (
-                    <div className="w-full max-w-4xl bg-white rounded-win shadow-fluent flex flex-col md:flex-row overflow-hidden animate-slide-up border-t-8 border-rush-500">
+                    <div className="w-full max-w-4xl bg-white rounded-win shadow-fluent flex flex-col md:flex-row overflow-hidden animate-slide-up border-t-8 border-rush-500 max-h-[90vh] md:max-h-none">
                         {/* Leaderboard Side */}
-                        <div className="md:w-1/2 bg-gray-50 p-6 md:p-8 border-r border-gray-100">
-                            <div className="space-y-8">
+                        <div className="md:w-1/2 bg-gray-50 p-6 md:p-8 border-r border-gray-100 overflow-y-auto max-h-[300px] md:max-h-none custom-scroll">
+                            <div className="space-y-6 md:space-y-8">
                                 <div>
-                                    <h3 className="flex items-center gap-2 text-sm font-black text-rush-900 uppercase mb-4">
-                                        🥇 Melhores Jogadores
+                                    <h3 className="flex items-center justify-between text-sm font-black text-rush-900 uppercase mb-4">
+                                        <span>🥇 Melhores (30 dias)</span>
+                                        <span className="text-[9px] opacity-40 font-bold">Reseta mensalmente</span>
                                     </h3>
                                     <div className="space-y-2">
                                         {topScores.length > 0 ? topScores.map((score, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-win border border-gray-100 shadow-sm">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-xl w-8 text-center">
+                                            <div key={idx} className="flex items-center justify-between p-2 md:p-3 bg-white rounded-win border border-gray-100 shadow-sm">
+                                                <div className="flex items-center gap-2 md:gap-3">
+                                                    <span className="text-lg md:text-xl w-6 md:w-8 text-center">
                                                         {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `${idx + 1}.`}
                                                     </span>
                                                     <div className="flex flex-col">
-                                                        <span className="text-xs font-black text-rush-900 truncate max-w-[120px]">{score.player_name}</span>
-                                                        <span className="text-[10px] text-gray-400 uppercase font-bold">{score.store_name}</span>
+                                                        <span className="text-[10px] md:text-xs font-black text-rush-900 truncate max-w-[100px] md:max-w-[120px]">{score.player_name}</span>
+                                                        <span className="text-[8px] md:text-[10px] text-gray-400 uppercase font-bold">{score.store_name}</span>
                                                     </div>
                                                 </div>
-                                                <span className="font-black text-rush-500">{score.score}</span>
+                                                <span className="text-sm md:text-base font-black text-rush-500">{score.score}</span>
                                             </div>
                                         )) : (
                                             <p className="text-xs text-gray-400 italic">Nenhum recorde ainda...</p>
@@ -675,39 +701,39 @@ function App() {
                         </div>
 
                         {/* Selection Side */}
-                        <div className="md:w-1/2 p-8 flex flex-col justify-center text-center">
-                            <h2 className="text-3xl font-black text-rush-900 mb-2 uppercase tracking-tighter">🔥 Hora do Lodo 🔥</h2>
-                            <p className="text-rush-300 mb-8 font-bold uppercase text-xs tracking-widest">{t('rush_select_title')}</p>
+                        <div className="md:w-1/2 p-4 md:p-8 flex flex-col justify-center text-center overflow-y-auto custom-scroll">
+                            <h2 className="text-xl md:text-3xl font-black text-rush-900 mb-1 md:mb-2 uppercase tracking-tighter">🔥 Hora do Lodo 🔥</h2>
+                            <p className="text-rush-300 mb-4 md:mb-8 font-bold uppercase text-[9px] md:text-xs tracking-widest">{t('rush_select_title')}</p>
                             
-                            <div className="space-y-4">
+                            <div className="space-y-2 md:space-y-4">
                                 <button 
                                     onClick={() => { setPendingRushLives(3); setShowRushEntry(true); }}
-                                    className="w-full group relative overflow-hidden bg-white border-2 border-rush-100 p-6 rounded-win hover:border-rush-500 transition-all shadow-sm hover:shadow-md"
+                                    className="w-full group relative overflow-hidden bg-white border-2 border-rush-100 p-3 md:p-6 rounded-win hover:border-rush-500 transition-all shadow-sm hover:shadow-md"
                                 >
                                     <div className="relative z-10">
-                                        <div className="text-2xl mb-1">{t('rush_btn_douradores')}</div>
-                                        <div className="text-xs font-black text-rush-300 uppercase tracking-widest">3 VIDAS • MODO NORMAL</div>
+                                        <div className="text-lg md:text-2xl mb-0.5 md:mb-1">{t('rush_btn_douradores')}</div>
+                                        <div className="text-[9px] md:text-xs font-black text-rush-300 uppercase tracking-widest">3 VIDAS • MODO NORMAL</div>
                                     </div>
                                     <div className="absolute inset-0 bg-rush-50 opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </button>
 
                                 <button 
                                     onClick={() => { setPendingRushLives(1); setShowRushEntry(true); }}
-                                    className="w-full group relative overflow-hidden bg-white border-2 border-rush-100 p-6 rounded-win hover:border-rush-500 transition-all shadow-sm hover:shadow-md"
+                                    className="w-full group relative overflow-hidden bg-white border-2 border-rush-100 p-3 md:p-6 rounded-win hover:border-rush-500 transition-all shadow-sm hover:shadow-md"
                                 >
                                     <div className="relative z-10">
-                                        <div className="text-2xl mb-1">{t('rush_btn_colombo')}</div>
-                                        <div className="text-xs font-black text-red-500 uppercase tracking-widest">1 VIDA • MODO HARDCORE</div>
+                                        <div className="text-lg md:text-2xl mb-0.5 md:mb-1">{t('rush_btn_colombo')}</div>
+                                        <div className="text-[9px] md:text-xs font-black text-red-500 uppercase tracking-widest">1 VIDA • MODO HARDCORE</div>
                                     </div>
                                     <div className="absolute inset-0 bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </button>
 
-                                <div className="pt-8">
+                                <div className="pt-4 md:pt-8">
                                     <button 
                                         onClick={resetToHome}
                                         className="text-gray-400 hover:text-rush-500 font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 mx-auto transition-colors"
                                     >
-                                        <IconHome size={16} /> {t('btn_menu')} (SAIR)
+                                        <IconHome size={16} /> {t('btn_menu_main')} (SAIR)
                                     </button>
                                 </div>
                             </div>
