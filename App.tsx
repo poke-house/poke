@@ -516,14 +516,14 @@ function App() {
         const popupTrigger = (msg: string) => setShowPopup({ msg, callback: () => { setShowPopup(null); addCustomItem(item, type); } }); 
         const size = (allSelections['size'] as string) || "Regular";
         if (type === 'base' && item === "Espinafres") return popupTrigger(t('popup_base_oil')); 
-        if (type === 'base' && item === "Winter Salad") return popupTrigger(t('popup_base_vinaigrette')); 
+        if (type === 'base' && item === "Mix Salad") return popupTrigger(t('popup_base_vinaigrette')); 
         if (type === 'green') {
             const limit = size === "Large" ? 5 : 4;
             const currentCount = currentSelections.length;
-            const isAbacate = item === "Abacate";
+            const isAbacate = item === "Abacate" || item === "Guacamole";
             const isOtherPremium = ["Philadelphia", "Wakame", "Manga"].includes(item);
-            if (currentCount >= limit) return popupTrigger(t(isAbacate ? 'popup_extra_premium' : isOtherPremium ? 'popup_extra_premium' : 'popup_extra', {val: isAbacate ? '1' : '0.80'}));
-            if (isAbacate) return popupTrigger(t('popup_premium', {val: '0.50'}));
+            if (currentCount >= limit) return popupTrigger(t(isAbacate ? 'popup_extra_premium' : isOtherPremium ? 'popup_extra_premium' : 'popup_extra', {val: isAbacate ? '1.00' : '0.80'}));
+            if (isAbacate) return popupTrigger(t('popup_premium', {val: '1.00'}));
             if (isOtherPremium) return popupTrigger(t('popup_premium', {val: '0.30'}));
         }
         if (type === 'sauce') {
@@ -532,7 +532,7 @@ function App() {
         }
         if (type === 'protein') {
             const limit = size === "Large" ? 3 : 2;
-            const isExpensive = item === "Salmão Braseado" || item === "Filé de Salmão";
+            const isExpensive = item === "Salmão Braseado" || item === "Miso Glazed Salmon";
              if (currentSelections.length >= limit) return popupTrigger(t('popup_generic_extra', {val: isExpensive ? '2.00' : '1.50'}));
              else if (isExpensive) return popupTrigger(t('popup_protein_expensive')); 
         }
@@ -575,7 +575,7 @@ function App() {
                     {ing}{currentSelections.filter(i => i === ing).length > 0 && <div className="absolute top-0 right-0 bg-brand-blue text-white w-8 h-8 flex items-center justify-center font-bold text-lg shadow-sm">{currentSelections.filter(i => i === ing).length}</div>}
                 </button>
             ))}</div></div> );
-            case 5: return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-pink-50 text-pastel-pink-text" text={t('cb_greens_q', {limit: size === "Large" ? 5 : 4})} isTitle={true} /></div><div className={`flex-1 overflow-y-auto pb-20 custom-scroll ${scrollClass}`}>{renderGreenSection(t('sec_naturals'), ["Hummus", "Abacaxi", "Edamame", "Tomate Cherry", "Couve roxa", "Courgette", "Cenoura", "Grana Padano", "Pepino", "Feta", "Jalapeños", "Pickle Cebola", "Azeitonas", "Beterraba"])}{renderGreenSection(t('sec_cooked'), ["Batata Doce com Alecrim", "Brócolis", "Milho", "Cenoura c/ Soja"])}{renderGreenSection(t('sec_premium'), ["Abacate", "Philadelphia", "Wakame", "Manga"])}</div></div> );
+            case 5: return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-pink-50 text-pastel-pink-text" text={t('cb_greens_q', {limit: size === "Large" ? 5 : 4})} isTitle={true} /></div><div className={`flex-1 overflow-y-auto pb-20 custom-scroll ${scrollClass}`}>{renderGreenSection(t('sec_naturals'), ["Hummus", "Abacaxi", "Edamame", "Tomate Cherry", "Couve roxa", "Courgette", "Cenoura", "Grana Padano", "Pepino", "Feta", "Azeitonas", "Cebola Roxa", "Morangos"])}{renderGreenSection(t('sec_cooked'), ["Batata Doce com Alecrim", "Brócolis", "Milho", "Espargos Grelhados"])}{renderGreenSection(t('sec_premium'), ["Abacate", "Guacamole", "Philadelphia", "Wakame", "Manga"])}</div></div> );
             case 6: return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-blue-50 text-pastel-blue-text" text={t('cb_protein_q', {limit: size === "Large" ? 3 : 2})} isTitle={true} /></div><div className={`flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20 custom-scroll ${scrollClass}`}>{INGREDIENTS_DB.proteins.filter(p => p !== "Wakame").map(ing => (
                 <button key={ing} onClick={() => handleCustomSelection(ing, 'protein')} className={`relative p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 text-pastel-blue-text' : 'bg-white text-gray-700 hover:bg-pastel-blue-50 hover:text-pastel-blue-text'}`}>
                     {ing}{currentSelections.filter(i => i === ing).length > 0 && <div className="absolute top-0 right-0 bg-brand-blue text-white w-8 h-8 flex items-center justify-center font-bold text-lg shadow-sm">{currentSelections.filter(i => i === ing).length}</div>}
