@@ -89,10 +89,9 @@ function App() {
         if(key === 'crispy') return INGREDIENTS_DB.crispies; 
         if(key === 'sesame') return INGREDIENTS_DB.sesame; 
         if(key === 'smoothie_liquid') return INGREDIENTS_DB.smoothie_liquid; 
-        if(key === 'smoothie_amount') return INGREDIENTS_DB.smoothie_amount; 
         if(key === 'smoothie_ingredients') return INGREDIENTS_DB.smoothie_ingredients; 
-        if(key === 'smoothie_ice') return INGREDIENTS_DB.smoothie_ice; 
         if(key === 'smoothie_mode') return INGREDIENTS_DB.smoothie_mode; 
+        if(key === 'smoothie_marbling') return INGREDIENTS_DB.smoothie_marbling; 
         return []; 
     };
     const getCurrentPhaseData = () => { if(!selectedRecipe) return { key: '', title: '' }; const phases = getCurrentPhases(); return phases[currentPhaseIndex]; };
@@ -432,7 +431,16 @@ function App() {
         if (currentSelections.length >= requiredList.length && !requiredList.includes(ingredient)) return;
         const newSelections = [...currentSelections, ingredient]; 
         setCurrentSelections(newSelections);
-        if (newSelections.length === requiredList.length) {
+
+        let shouldAdvance = newSelections.length === requiredList.length;
+        if (selectedRecipe?.name.includes("Nutty Fit") && phaseKey === "smoothie_ingredients") {
+            const hasGotas = newSelections.includes("Gotas de Chocolate 1 TBSP 15 ml");
+            if (!hasGotas && newSelections.length === requiredList.length - 1) {
+                shouldAdvance = true;
+            }
+        }
+
+        if (shouldAdvance) {
             const updatedAll = { ...allSelections, [phaseKey]: newSelections }; 
             setAllSelections(updatedAll);
             if (currentPhaseIndex < activePhases.length - 1) { 
@@ -449,9 +457,22 @@ function App() {
         const phasesToValidate = activePhases.filter(p => p.key !== "size"); 
         phasesToValidate.forEach(phase => { 
             let required: string[] = []; 
-            if (selectedRecipe?.category === "SMOOTHIE") required = (selectedRecipe as any)[phase.key]; 
+            if (selectedRecipe?.category === "SMOOTHIE") required = (selectedRecipe as any)[phase.key] || []; 
             else required = selectedRecipe?.variants ? selectedRecipe.variants[selectedSize || "Regular"][phase.key] : []; 
-            if (JSON.stringify([...required].sort()) !== JSON.stringify([...finalSelections[phase.key]].sort())) { 
+            
+            const actualStr = JSON.stringify([...(finalSelections[phase.key] || [])].sort());
+            const reqStr = JSON.stringify([...required].sort());
+            
+            let isValid = actualStr === reqStr;
+            
+            if (!isValid && selectedRecipe?.name.includes("Nutty Fit") && phase.key === "smoothie_ingredients") {
+                const reqWithoutGotas = required.filter(i => i !== "Gotas de Chocolate 1 TBSP 15 ml");
+                if (actualStr === JSON.stringify([...reqWithoutGotas].sort())) {
+                    isValid = true;
+                }
+            }
+
+            if (!isValid) { 
                 errors.push(t('instr_error_prefix', {phase: t('phase_' + phase.key), required: required.join(", ")})); 
             } 
         }); 
@@ -809,6 +830,11 @@ function App() {
                         <div className="text-6xl mb-6 animate-bounce">🎓</div>
                         <h2 className="text-3xl font-bold text-purple-900 mb-2">{t('res_uni_success_title')}</h2>
                         <p className="text-gray-600 mb-8">{t('res_uni_success_msg')}</p>
+                        {selectedRecipe?.name.includes("Nutty Fit") && (
+                            <p className="text-amber-600 font-bold mb-8 bg-amber-50 p-4 rounded-win">
+                                Nota: Gotas de Chocolate é opcional. Quantidade: 1 TBSP 15 ml.
+                            </p>
+                        )}
                         <button onClick={() => setGameState("UNIVERSITY_SELECT")} className="w-full bg-purple-600 text-white px-6 py-3 rounded-win font-semibold hover:bg-purple-700 mb-3 transition-all">{t('btn_continue')}</button>
                         <button onClick={resetToHome} className="w-full bg-gray-100 text-gray-600 px-6 py-3 rounded-win font-semibold hover:bg-gray-200 transition-all">{t('btn_menu')}</button>
                     </div>

@@ -104,14 +104,16 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     { id: 62, question: "Qual a base da \"Lime & Mango Shrimp\"?", options: ["Mix Salad", "Arroz de Sushi", "Quinoa", "Arroz Basmati"] },
     { id: 63, question: "Quantos scoops de Hummus leva o Appetizer \"Hummus & Croutons\"?", options: ["4 scoops", "2 scoops", "3 scoops", "5 scoops"] },
     { id: 64, question: "Na \"Avocado House Toast\", o que se usa para espalhar o abacate?", options: ["Um garfo", "Uma faca", "Uma colher", "Uma espátula"] },
-    { id: 65, question: "Quantas bananas leva o Smoothie \"Into The Sun\"?", options: ["1 banana", "Metade de uma banana", "2 bananas", "Nenhuma"] },
-    { id: 66, question: "Qual a quantidade de gelo para os Smoothies?", options: ["1/3 do copo", "Copo cheio", "2 cubos", "Metade do copo"] },
-    { id: 67, question: "Quantas pinças de frango leva a bowl \"The Caesar\"?", options: ["3 pinças", "2 pinças", "1 pinça", "4 pinças"] },
-    { id: 68, question: "Que ingrediente é adicionado ao Smoothie \"Into The Sun\" além das frutas?", options: ["Leite de Coco", "Iogurte", "Mel", "Hortelã"] },
-    { id: 69, question: "Quantos filetes de salmão leva a \"Exotic Salmon\"?", options: ["3 filetes", "2 filetes", "1 filete", "4 filetes"] },
-    { id: 70, question: "Qual o líquido base do Smoothie \"So Green\"?", options: ["Sumo de Maçã", "Leite", "Água de Coco", "Sumo de Laranja"] },
-    { id: 71, question: "Qual o líquido base do Smoothie \"Sweet Pink\"?", options: ["Leite", "Leite de Coco", "Sumo de Maçã", "Água"] },
-    { id: 72, question: "Qual aplicativo usamos para imprimir labels?", options: ["iFlares", "Jolt", "Labely", "iFlares BackOffice"] }
+    { id: 65, question: "Quantas vezes o Green Glow bate no Programa E?", options: ["2 vezes", "1 vez", "3 vezes", "4 vezes"] },
+    { id: 66, question: "Qual smoothie leva Raspberry Cream na marmorização?", options: ["Tropical Boost", "Nutty Fit", "Green Glow", "Pink Crush"] },
+    { id: 67, question: "Quantas pinças de frango leva a bowl \"The Caesar\"?", options: ["2 pinças", "3 pinças", "1 pinça", "4 pinças"] },
+    { id: 68, question: "Qual smoothie tem Gotas de Chocolate como ingrediente opcional?", options: ["Nutty Fit", "Tropical Boost", "Green Glow", "Pink Crush"] },
+    { id: 69, question: "Quantos filetes de salmão leva a \"Exotic Salmon\"?", options: ["2 filetes", "3 filetes", "1 filete", "4 filetes"] },
+    { id: 70, question: "Qual smoothie bate 3 vezes no Programa E?", options: ["Tropical Boost", "Green Glow", "Nutty Fit", "Pink Crush"] },
+    { id: 71, question: "Qual smoothie não leva marmorização?", options: ["Green Glow", "Tropical Boost", "Nutty Fit", "Pink Crush"] },
+    { id: 72, question: "Qual aplicativo usamos para imprimir labels?", options: ["iFlares", "Jolt", "Labely", "iFlares BackOffice"] },
+    { id: 73, question: "Qual smoothie leva Leite de Coco?", options: ["Tropical Boost", "Green Glow", "Nutty Fit", "Pink Crush"] },
+    { id: 74, question: "Qual smoothie leva Leite de Aveia e Yogurt na marmorização?", options: ["Pink Crush", "Nutty Fit", "Green Glow", "Tropical Boost"] }
 ];
 
 export const INGREDIENTS_DB: IngredientDB = {
@@ -123,11 +125,10 @@ export const INGREDIENTS_DB: IngredientDB = {
     sauces_final: ["Creamy Caesar", "Creme de Abacate", "Spicy Peanuts", "Mel", "Chipotle", "Sésamo Shoyu", "Sriracha Mayo", "Azeite", "Azeite de Limão", "Manjericão e Hortelã", "Vinagrete", "Soja", "Teriyaki", "Ponzu", "Iogurte com Ervas", "Miso"],
     crispies: ["Ervilhas Wasabi", "Algas Nori", "Amêndoa", "Lima", "Bacon", "Croutons", "Batata Doce Crocante", "Cebola Crocante", "Chilli Flakes", "Nozes com Mel", "Ceboleto", "Não leva"],
     sesame: ["Sim", "Não"],
-    smoothie_liquid: ["Leite de Coco", "Leite", "Suco de Maçã"],
-    smoothie_amount: ["150ml", "250ml", "200ml"],
-    smoothie_ingredients: ["Morango", "Banana 90g", "Manga 40g", "Ananás 30g", "Pepino 20g", "Abacate 45g", "Espinafre 30g", "Sumo de Lima 25g", "Gengibre 5g"],
-    smoothie_ice: ["Gelo 60g", "Gelo 40g", "Gelo 90g"],
-    smoothie_mode: ["Modo A", "Modo B", "Modo C", "Modo D", "Modo E", "Modo F"]
+    smoothie_liquid: ["Água 100 ml", "Leite de Aveia 200 ml", "Leite de Coco 200 ml"],
+    smoothie_ingredients: ["Espinafre 30 g", "Pepino 20 g", "Gengibre em fatias 10 g", "Tâmara sem caroço 20 g", "Colagénio 1 TSP 5 ml", "Lima 1 metade espremida", "Green Glow mix 1 pack", "Sedano 30 g", "Sal 1 volta", "Canela 4 golpes", "Peanut Butter 3 voltas", "Vanilla Protein 1 TSP 5 ml", "Flocos de Aveia TBSP 15 ml", "Gotas de Chocolate 1 TBSP 15 ml", "Nutty Fit 1 pack", "Pink Crush 1 pack", "Tropical Boost 1 pack"],
+    smoothie_mode: ["Programa E"],
+    smoothie_marbling: ["Não leva", "Yogurt 1 volta", "Peanut Butter 1 volta", "Raspberry Cream 1 volta"]
 };
 
 export const RECIPES: Recipe[] = [
@@ -143,13 +144,14 @@ export const RECIPES: Recipe[] = [
     { id: 10, category: "GREEN", name: "Exotic Salmon 🥗", variants: { "Regular": { base: ["Coconut Basmati", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Batata Doce com Alecrim", "Batata Doce com Alecrim", "Brócolis", "Abacate"], protein: ["Miso Glazed Salmon", "Miso Glazed Salmon"], sauce_final: ["Sriracha Mayo"], crispy: ["Não leva"], sesame: ["Não"] } } },
     { id: 11, category: "GREEN", name: "Grilled Halloumi 🥗", variants: { "Regular": { base: ["Mix Salad", "Mix Salad", "Mix Salad"], sauce_base: ["Vinagrete"], greens: ["Espargos Grelhados", "Abacate", "Tomate Cherry", "Azeitonas"], protein: ["Baked Halloumi", "Baked Halloumi", "Baked Halloumi"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Nozes com Mel"], sesame: ["Não"] } } },
     { id: 12, category: "GREEN", name: "Lime & Mango Shrimp 🥗", variants: { "Regular": { base: ["Mix Salad", "Mix Salad", "Mix Salad"], sauce_base: ["Azeite + Sal"], greens: ["Manga", "Abacate", "Pepino", "Edamame"], protein: ["Camarão c/ Lima e Tomilho", "Camarão c/ Lima e Tomilho"], sauce_final: ["Iogurte com Ervas"], crispy: ["Não leva"], sesame: ["Sim"] } } },
-    { id: 13, category: "SMOOTHIE", name: "Into the Sun 💛", smoothie_liquid: ["Leite de Coco"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Manga 40g", "Manga 40g", "Ananás 30g", "Ananás 30g", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
-    { id: 14, category: "SMOOTHIE", name: "Sweet Pink 🩷", smoothie_liquid: ["Leite"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Morango", "Morango", "Morango", "Morango", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
-    { id: 15, category: "SMOOTHIE", name: "So Green 💚", smoothie_liquid: ["Suco de Maçã"], smoothie_amount: ["250ml"], smoothie_ingredients: ["Pepino 20g", "Abacate 45g", "Espinafre 30g", "Sumo de Lima 25g", "Gengibre 5g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] }
+    { id: 13, category: "SMOOTHIE", name: "Green Glow 💚", smoothie_liquid: ["Água 100 ml"], smoothie_ingredients: ["Espinafre 30 g", "Pepino 20 g", "Pepino 20 g", "Gengibre em fatias 10 g", "Tâmara sem caroço 20 g", "Colagénio 1 TSP 5 ml", "Lima 1 metade espremida", "Green Glow mix 1 pack", "Sedano 30 g"], smoothie_mode: ["Programa E", "Programa E"], smoothie_marbling: ["Não leva"] },
+    { id: 14, category: "SMOOTHIE", name: "Nutty Fit 🥜", smoothie_liquid: ["Leite de Aveia 200 ml"], smoothie_ingredients: ["Sal 1 volta", "Canela 4 golpes", "Peanut Butter 3 voltas", "Vanilla Protein 1 TSP 5 ml", "Flocos de Aveia TBSP 15 ml", "Flocos de Aveia TBSP 15 ml", "Gotas de Chocolate 1 TBSP 15 ml", "Nutty Fit 1 pack"], smoothie_mode: ["Programa E", "Programa E"], smoothie_marbling: ["Yogurt 1 volta", "Peanut Butter 1 volta"] },
+    { id: 15, category: "SMOOTHIE", name: "Pink Crush 🩷", smoothie_liquid: ["Leite de Aveia 200 ml"], smoothie_ingredients: ["Vanilla Protein 1 TSP 5 ml", "Tâmara sem caroço 20 g", "Pink Crush 1 pack"], smoothie_mode: ["Programa E", "Programa E"], smoothie_marbling: ["Yogurt 1 volta"] },
+    { id: 16, category: "SMOOTHIE", name: "Tropical Boost 🌴", smoothie_liquid: ["Leite de Coco 200 ml"], smoothie_ingredients: ["Colagénio 1 TSP 5 ml", "Lima 1 metade espremida", "Tropical Boost 1 pack"], smoothie_mode: ["Programa E", "Programa E", "Programa E"], smoothie_marbling: ["Yogurt 1 volta", "Raspberry Cream 1 volta"] }
 ];
 
 export const PHASES_BOWL: Phase[] = [{ key: "size", title: "Tamanho" }, { key: "base", title: "Base" }, { key: "sauce_base", title: "Molho da base" }, { key: "greens", title: "Greens" }, { key: "protein", title: "Proteína" }, { key: "sauce_final", title: "Molho final" }, { key: "crispy", title: "Crispy" }, { key: "sesame", title: "Sésamo" }];
-export const PHASES_SMOOTHIE: Phase[] = [{ key: "smoothie_liquid", title: "Líquido" }, { key: "smoothie_amount", title: "Quantidade" }, { key: "smoothie_ingredients", title: "Ingredientes" }, { key: "smoothie_ice", title: "Gelo" }, { key: "smoothie_mode", title: "Blender" }];
+export const PHASES_SMOOTHIE: Phase[] = [{ key: "smoothie_liquid", title: "Líquido base" }, { key: "smoothie_ingredients", title: "Ingredientes" }, { key: "smoothie_mode", title: "Modo do Blender" }, { key: "smoothie_marbling", title: "Marmorização" }];
 
 export const THEMES: { [key: string]: Theme } = {
     HOUSE: {

@@ -30,11 +30,10 @@ export const TRANSLATIONS = {
         phase_sauce_final: "Molho final",
         phase_crispy: "Crispy",
         phase_sesame: "Sésamo",
-        phase_smoothie_liquid: "Líquido",
-        phase_smoothie_amount: "Quantidade",
+        phase_smoothie_liquid: "Líquido base",
         phase_smoothie_ingredients: "Ingredientes",
-        phase_smoothie_ice: "Gelo",
-        phase_smoothie_mode: "Blender",
+        phase_smoothie_mode: "Modo Blender",
+        phase_smoothie_marbling: "Marmorização",
 
         // Instructions
         instr_house_size: "Selecione um dos tamanhos:",
@@ -126,11 +125,10 @@ export const TRANSLATIONS = {
         phase_sauce_final: "Dressing",
         phase_crispy: "Crispy",
         phase_sesame: "Sesame",
-        phase_smoothie_liquid: "Liquid",
-        phase_smoothie_amount: "Amount",
+        phase_smoothie_liquid: "Base Liquid",
         phase_smoothie_ingredients: "Ingredients",
-        phase_smoothie_ice: "Ice",
-        phase_smoothie_mode: "Blender",
+        phase_smoothie_mode: "Blender Mode",
+        phase_smoothie_marbling: "Marbling",
 
         // Instructions
         instr_house_size: "Select one of the sizes:",

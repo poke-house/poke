@@ -20,10 +20,9 @@ export interface Recipe {
     [key: string]: Variant;
   };
   smoothie_liquid?: string[];
-  smoothie_amount?: string[];
   smoothie_ingredients?: string[];
-  smoothie_ice?: string[];
   smoothie_mode?: string[];
+  smoothie_marbling?: string[];
 }
 
 export interface Theme {
@@ -51,10 +50,9 @@ export interface IngredientDB {
   crispies: string[];
   sesame: string[];
   smoothie_liquid: string[];
-  smoothie_amount: string[];
   smoothie_ingredients: string[];
-  smoothie_ice: string[];
   smoothie_mode: string[];
+  smoothie_marbling: string[];
 }
 
 export type GameState = "HOME" | "PLAYING" | "RESULT_SUCCESS" | "RESULT_FAIL" | "CUSTOM_BOWL" | "RUSH_SELECT" | "RUSH_PLAYING" | "RUSH_ERROR" | "RUSH_GAME_OVER" | "QUIZ_PLAYING" | "QUIZ_FEEDBACK" | "UNIVERSITY_SELECT" | "UNIVERSITY_PLAYING" | "UNIVERSITY_SUCCESS";
