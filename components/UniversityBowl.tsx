@@ -1,9 +1,5 @@
 // @ts-nocheck
-/**
- * UniversityBowl — bowl isométrica que se monta passo a passo. Visual idêntico ao mockup aprovado.
- * Componente puro: dado (steps, step) produz o mesmo SVG.
- *   <UniversityBowl steps={stepsR} step={passo} zigLines={15} isSalad={isSalad} scale={0.86} />
- */
+/** UniversityBowl — bowl que se monta passo a passo (visual idêntico ao mockup aprovado). Componente puro. */
 import React, { useMemo } from "react";
 
 const CSS = `@keyframes sprinkle {
@@ -364,6 +360,7 @@ function renderBowlInner(steps, current, zigLines, isSalad, scale){
   let contents = "";
   baseItems.forEach((b,i)=> contents += baseFill(b.item, b.isNew, i>0));
   // MOLHO DA BASE — sobre a base, por baixo dos greens/proteína
+  baseDrizzles.sort((a,b)=>(a.pattern==="spiral"?0:1)-(b.pattern==="spiral"?0:1));
   baseDrizzles.forEach((d,i)=> contents += (d.pattern==="spiral" ? svgSpiral(d.color,d.isNew,i) : svgZigzag(d.color,d.isNew,i,zigLines)));
 
   const RI=0.36, RO=0.97, startA=-Math.PI/2;
@@ -431,6 +428,7 @@ function renderBowlInner(steps, current, zigLines, isSalad, scale){
   }
 
   // MOLHO FINAL (sobre os toppings, sob os crispy)
+  drizzles.sort((a,b)=>(a.pattern==="spiral"?0:1)-(b.pattern==="spiral"?0:1));
   drizzles.forEach((d,i)=> contents += (d.pattern==="spiral" ? svgSpiral(d.color,d.isNew,i) : svgZigzag(d.color,d.isNew,i,zigLines)));
 
   // CRISPY (por cima dos molhos)
@@ -451,28 +449,12 @@ function renderBowlInner(steps, current, zigLines, isSalad, scale){
 
 
 let _cssDone = false;
-function ensureCSS(){
-  if (_cssDone || typeof document === "undefined") return;
-  _cssDone = true;
-  const s = document.createElement("style");
-  s.textContent = CSS;
-  document.head.appendChild(s);
-}
-
+function ensureCSS(){ if (_cssDone || typeof document === "undefined") return; _cssDone = true; const s = document.createElement("style"); s.textContent = CSS; document.head.appendChild(s); }
 export interface BowlColumnStep { phase: string; item: string; count: number; }
-
-export default function UniversityBowl({
-  steps, step, zigLines = 15, isSalad = false, scale = 1, className = "",
-}: {
+export default function UniversityBowl({ steps, step, zigLines = 15, isSalad = false, scale = 1, className = "" }:{
   steps: BowlColumnStep[]; step: number; zigLines?: number; isSalad?: boolean; scale?: number; className?: string;
 }) {
   ensureCSS();
-  const inner = useMemo(
-    () => renderBowlInner(steps, step, zigLines, isSalad, scale),
-    [steps, step, zigLines, isSalad, scale]
-  );
-  return (
-    <svg viewBox="0 0 200 175" className={"uni-sprinkle " + className} style={{ width: "100%" }}
-      dangerouslySetInnerHTML={{ __html: inner }} />
-  );
+  const inner = useMemo(() => renderBowlInner(steps, step, zigLines, isSalad, scale), [steps, step, zigLines, isSalad, scale]);
+  return <svg viewBox="0 0 200 175" className={"uni-sprinkle " + className} style={{ width: "100%" }} dangerouslySetInnerHTML={{ __html: inner }} />;
 }

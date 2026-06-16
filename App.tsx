@@ -609,7 +609,7 @@ function App() {
                 });
                 return ( <div className="flex flex-col h-full p-4 animate-fade-in"><div className="mb-4"><MessageBubble className="bg-pastel-blue-50 text-pastel-blue-text" text={t('cb_base_q')} isTitle={true} /></div><div className={`flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20 custom-scroll ${scrollClass}`}>{filteredBases.map(ing => (
                     <button key={ing} onClick={() => handleCustomSelection(ing, 'base')} className={`relative p-4 rounded-win shadow-sm font-medium text-left btn-transition ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 text-pastel-blue-text' : 'bg-white text-gray-700 hover:bg-pastel-blue-50 hover:text-pastel-blue-text'}`}>
-                        {ing}{currentSelections.filter(i => i === ing).length > 0 && <div className="absolute top-0 right-0 bg-brand-blue text-white w-8 h-8 flex items-center justify-center font-bold text-lg shadow-sm">{currentSelections.filter(i => i === ing).length}</div>}
+                        {ing.includes("Arroz de sushi") ? "Arroz de sushi" : ing}{currentSelections.filter(i => i === ing).length > 0 && <div className="absolute top-0 right-0 bg-brand-blue text-white w-8 h-8 flex items-center justify-center font-bold text-lg shadow-sm">{currentSelections.filter(i => i === ing).length}</div>}
                     </button>
                 ))}</div></div> );
             }
