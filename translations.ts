@@ -51,6 +51,7 @@ export const TRANSLATIONS = {
         res_uni_success_title: "Parabéns!",
         res_uni_success_msg: "Você completou o estudo desta receita.",
         btn_menu: "Menu Principal",
+        btn_menu_main: "Menu Principal",
         btn_retry: "Tentar Novamente",
 
         // Rush Selection
@@ -146,6 +147,7 @@ export const TRANSLATIONS = {
         res_uni_success_title: "Congratulations!",
         res_uni_success_msg: "You have completed studying this recipe.",
         btn_menu: "Main Menu",
+        btn_menu_main: "Main Menu",
         btn_retry: "Try Again",
 
         // Rush Selection

@@ -15,6 +15,8 @@ import { IconHome, IconArrowLeft, IconArrowRight, IconCheck, IconRotate } from '
 import { FoodRain } from './components/FoodRain';
 import { PopupModal, ChangelogModal, RushEntryModal } from './components/Modals';
 import { MessageBubble } from './components/MessageBubble';
+import UniversityBowl from "./components/UniversityBowl";
+import { buildBowlSteps, columnSteps } from "./utils/bowlSteps";
 
 function App() {
     const [gameState, setGameState] = useState<GameState>("HOME");
@@ -55,6 +57,10 @@ function App() {
     const [uniSteps, setUniSteps] = useState<{phase: string, item: string, count: number}[]>([]);
     const [uniStepsLarge, setUniStepsLarge] = useState<{phase: string, item: string, count: number}[]>([]);
     const [uniCurrentStep, setUniCurrentStep] = useState(0);
+
+    const bowl = React.useMemo(() => selectedRecipe ? buildBowlSteps(selectedRecipe) : null, [selectedRecipe]);
+    const stepsR = React.useMemo(() => bowl ? columnSteps(bowl.steps, "R") : [], [bowl]);
+    const stepsL = React.useMemo(() => bowl ? columnSteps(bowl.steps, "L") : [], [bowl]);
 
     const handleEasterEggClick = () => { if (window.innerWidth < 768) { setEasterEggTrigger(prev => prev + 1); } };
     
@@ -300,14 +306,14 @@ function App() {
     };
 
     const handleUniNext = () => {
-        const maxSteps = Math.max(uniSteps.length, uniStepsLarge.length);
-        if (uniCurrentStep < maxSteps) {
+        const maxSteps = bowl ? bowl.total : Math.max(uniSteps.length, uniStepsLarge.length);
+        if (uniCurrentStep < maxSteps - 1) {
             setUniCurrentStep(prev => prev + 1);
             playSound("happy");
-            if (uniCurrentStep === maxSteps - 1) {
-                if (window.confetti) window.confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                setTimeout(() => setGameState("UNIVERSITY_SUCCESS"), 1000);
-            }
+        } else if (uniCurrentStep === maxSteps - 1) {
+            playSound("happy");
+            if (window.confetti) window.confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            setGameState("UNIVERSITY_SUCCESS");
         }
     };
 
@@ -778,34 +784,42 @@ function App() {
                         <div className={`p-4 md:p-6 border-b ${currentTheme.border} bg-white/50 flex flex-col items-center justify-center shrink-0 z-20`}>
                              <span className="text-xl md:text-2xl font-bold uppercase tracking-tight text-brand-dark">{selectedRecipe.name}</span>
                              <div className="w-full max-w-md bg-gray-200 h-1.5 mt-4 rounded-full overflow-hidden">
-                                <div className="bg-brand-blue h-full transition-all duration-500" style={{ width: `${((uniCurrentStep + 1) / Math.max(uniSteps.length, uniStepsLarge.length || 0)) * 100}%` }}></div>
+                                <div className="bg-brand-blue h-full transition-all duration-500" style={{ width: `${((uniCurrentStep + 1) / (bowl ? bowl.total : 1)) * 100}%` }}></div>
                              </div>
-                             <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">{t('uni_step_progress', {current: uniCurrentStep + 1, total: Math.max(uniSteps.length, uniStepsLarge.length || 0)})}</div>
+                             <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">{t('uni_step_progress', {current: uniCurrentStep + 1, total: bowl ? bowl.total : 0})}</div>
                         </div>
 
                         <div className="flex-1 relative w-full flex justify-center items-center gap-2 md:gap-8 px-2 md:px-4">
                             {[
-                                { title: uniStepsLarge.length > 0 ? "REGULAR" : "", steps: uniSteps },
-                                ...(uniStepsLarge.length > 0 ? [{ title: "LARGE", steps: uniStepsLarge }] : [])
+                                { title: (bowl && bowl.hasLarge) ? "REGULAR" : "", steps: stepsR, stepsBowl: stepsR, zig: 15, scale: 0.86 },
+                                ...((bowl && bowl.hasLarge) ? [{ title: "LARGE", steps: stepsL, stepsBowl: stepsL, zig: 20, scale: 1 }] : [])
                             ].map((group, colIndex) => (
                                 <div key={colIndex} className="flex flex-col items-center">
                                     {group.title && <h3 className="mb-2 md:mb-4 font-black text-brand-dark tracking-widest text-xs md:text-sm">{group.title}</h3>}
                                     <div className="relative w-[42vw] md:w-56 h-56 md:h-80">
                                         {group.steps.map((step, index) => {
-                                            if (index > uniCurrentStep) return null;
-                                            const offset = uniCurrentStep - index;
-                                            if (offset > 4) return null;
-                                            const isCurrent = offset === 0;
-                                            return (
-                                                <div key={index} className="absolute top-0 left-0 w-full h-full transition-all duration-500 ease-out" style={{ transform: `translateY(${offset * 12}px) scale(${1 - offset * 0.05})`, zIndex: 50 - offset, opacity: Math.max(0, 1 - offset * 0.2), filter: isCurrent ? 'none' : 'grayscale(100%)' }}>
-                                                    <div className={`w-full h-full p-3 md:p-6 rounded-win shadow-xl border flex flex-col items-center justify-center text-center bg-white ${isCurrent ? 'border-brand-blue ring-4 ring-brand-blue/10' : 'border-gray-300'}`}>
-                                                        <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 md:mb-4">{step.phase}</div>
-                                                        <div className={`text-sm md:text-2xl font-bold leading-tight ${isCurrent ? 'text-brand-dark scale-110' : 'text-gray-400'}`}>{step.item}</div>
-                                                        {step.count > 1 && <div className={`text-xl md:text-4xl font-black mt-2 ${isCurrent ? 'text-brand-blue' : 'text-gray-300'}`}>{step.count}X</div>}
-                                                        {isCurrent && <div className="mt-4 md:mt-6 text-brand-blue animate-bounce"><IconCheck size={24} className="md:w-8 md:h-8" /></div>}
-                                                    </div>
-                                                </div>
-                                            );
+                                             if (index > uniCurrentStep) return null;
+                                             const offset = uniCurrentStep - index;
+                                             if (offset > 4) return null;
+                                             const isCurrent = offset === 0;
+                                             const phasesList = selectedRecipe.category === "SMOOTHIE" ? PHASES_SMOOTHIE : PHASES_BOWL;
+                                             const phaseTitle = phasesList.find(p => p.key === step.phase)?.title || step.phase;
+                                             const displayedItem = step.count === 0 ? "Não leva" : step.item;
+                                             return (
+                                                 <div key={index} className="absolute top-0 left-0 w-full h-full transition-all duration-500 ease-out" style={{ transform: `translateY(${offset * 12}px) scale(${1 - offset * 0.05})`, zIndex: 50 - offset, opacity: Math.max(0, 1 - offset * 0.2), filter: isCurrent ? 'none' : 'grayscale(100%)' }}>
+                                                     <div className={`w-full h-full p-3 md:p-6 rounded-win shadow-xl border flex flex-col items-center justify-center text-center bg-white ${isCurrent ? 'border-brand-blue ring-4 ring-brand-blue/10' : 'border-gray-300'}`}>
+                                                         <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 md:mb-4">{phaseTitle}</div>
+                                                         <div className={`text-sm md:text-2xl font-bold leading-tight ${isCurrent ? 'text-brand-dark scale-110' : 'text-gray-400'}`}>{displayedItem}</div>
+                                                         {step.count > 1 && <div className={`text-xl md:text-4xl font-black mt-2 ${isCurrent ? 'text-brand-blue' : 'text-gray-300'}`}>{step.count}X</div>}
+                                                         {isCurrent && <div className="mt-4 md:mt-6 text-brand-blue animate-bounce"><IconCheck size={24} className="md:w-8 md:h-8" /></div>}
+                                                         {isCurrent && bowl && !bowl.isSmoothie && (
+                                                             <div className="w-28 h-28 md:w-40 md:h-40 mt-1 flex items-center justify-center">
+                                                                 <UniversityBowl steps={group.stepsBowl} step={Math.min(uniCurrentStep + 1, bowl.total)} zigLines={group.zig} isSalad={bowl.isSalad} scale={group.scale} />
+                                                             </div>
+                                                         )}
+                                                     </div>
+                                                 </div>
+                                             );
                                         })}
                                         {uniCurrentStep >= group.steps.length && (
                                             <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-win"><IconCheck size={32} className="text-gray-300" /></div>
@@ -819,7 +833,7 @@ function App() {
                              <button onClick={resetToHome} className="p-3 text-gray-400 hover:text-brand-pink transition-colors"><IconHome size={24}/></button>
                              <div className="flex items-center gap-4 flex-1 justify-end">
                                 <button onClick={handleUniPrev} disabled={uniCurrentStep === 0} className="p-3 md:p-4 rounded-win bg-gray-100 text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200 transition-all font-bold shadow-sm"><IconArrowLeft size={24} /></button>
-                                <button onClick={handleUniNext} className={`px-6 py-3 md:px-8 md:py-4 rounded-win bg-brand-blue text-white font-bold shadow-md hover:bg-blue-600 transition-all flex items-center gap-2 transform active:scale-95 ${uniCurrentStep === Math.max(uniSteps.length, uniStepsLarge.length) - 1 ? 'bg-green-500 hover:bg-green-600' : ''}`}>{uniCurrentStep === Math.max(uniSteps.length, uniStepsLarge.length) - 1 ? <span>{t('btn_continue')}</span> : <IconArrowRight size={24} />}</button>
+                                <button onClick={handleUniNext} className={`px-6 py-3 md:px-8 md:py-4 rounded-win bg-brand-blue text-white font-bold shadow-md hover:bg-blue-600 transition-all flex items-center gap-2 transform active:scale-95 ${uniCurrentStep === (bowl ? bowl.total : 0) - 1 ? 'bg-green-500 hover:bg-green-600' : ''}`}>{uniCurrentStep === (bowl ? bowl.total : 0) - 1 ? <span>{t('btn_continue')}</span> : <IconArrowRight size={24} />}</button>
                              </div>
                         </div>
                      </div>
