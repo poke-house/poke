@@ -1,90 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PH - Bora treinar?</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕹️</text></svg>">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Segoe UI"', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            pink: '#E91E63',
-                            blue: '#2196F3',
-                            dark: '#212121',
-                        },
-                        pastel: {
-                            blue: { 50: '#E1F5FE', 100: '#B3E5FC', 200: '#81D4FA', 300: '#4FC3F7', 500: '#29B6F6', text: '#01579B' },
-                            pink: { 50: '#FCE4EC', 100: '#F8BBD0', 200: '#F48FB1', 300: '#F06292', 500: '#EC407A', text: '#880E4F' },
-                            yellow: { 50: '#FFFDE7', 100: '#FFF9C4', 200: '#FFF59D', 300: '#FFF176', 500: '#FFEE58', text: '#F57F17' },
-                        },
-                        rush: {
-                            100: '#ffc592', // color5 (Mais clara - Botão)
-                            200: '#fd9d71', // color4
-                            300: '#fc7451', // color3
-                            400: '#fa4c30', // color2
-                            500: '#f8230f', // color1 (Principal vibrante)
-                            900: '#4d0000', // color6 (Escura - Texto)
-                        }
-                    },
-                    boxShadow: {
-                        'fluent': '0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)',
-                        'fluent-hover': '0 8px 16px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)',
-                    },
-                    borderRadius: { 'win': '0px' },
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out forwards',
-                        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'dance': 'dance 0.6s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-                        dance: { 
-                            '0%, 100%': { transform: 'rotate(0deg) scale(1)' }, 
-                            '25%': { transform: 'rotate(-15deg) scale(1.1)' }, 
-                            '75%': { transform: 'rotate(15deg) scale(1.1)' } 
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { margin: 0; overflow: hidden; background-color: #F3F3F3; color: #212121; touch-action: manipulation; }
-        
-        /* Scrollbar Global Styles */
-        .custom-scroll::-webkit-scrollbar { width: 8px; }
-        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 0px; }
-        
-        /* Themed Scrollbars */
-        .scroll-blue::-webkit-scrollbar-thumb { background: #4FC3F7; }
-        .scroll-pink::-webkit-scrollbar-thumb { background: #F06292; }
-        .scroll-yellow::-webkit-scrollbar-thumb { background: #FFEE58; }
-        .scroll-red::-webkit-scrollbar-thumb { background: #EF5350; }
-        .scroll-rush::-webkit-scrollbar-thumb { background: #f8230f; }
-
-        .glass-panel { backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.6); }
-        .btn-transition { transition: all 0.2s cubic-bezier(0.33, 1, 0.68, 1); }
-    </style>
-<script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.1/",
-    "react": "https://esm.sh/react@^19.2.1",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.1/"
-  }
-}
-</script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23FF83AF%22/><path d=%22M25 45h50c0 13.8-11.2 25-25 25S25 58.8 25 45z%22 fill=%22%23F3E39F%22/><path d=%22M35 45c0-4 4-7 15-7s15 3 15 7H35z%22 fill=%22%2399CA5C%22/><circle cx=%2242%22 cy=%2255%22 r=%223%22 fill=%22%23080D09%22/><circle cx=%2258%22 cy=%2255%22 r=%223%22 fill=%22%23080D09%22/><circle cx=%2250%22 cy=%2260%22 r=%223%22 fill=%22%23F65300%22/></svg>">
+    <link rel="preload" href="/assets/fonts/SpecialGothic-VariableFont_wdth,wght.ttf" as="font" type="font/ttf" crossorigin>
 </head>
 <body>
     <div id="root"></div>

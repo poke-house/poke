@@ -2,15 +2,26 @@ import React, { useEffect, useRef } from 'react';
 
 const EASTER_EGG_EMOJIS = ['🥑','🍅','🫛','🥕','🫒','🌽','🧅','🥦','🍓','🥭','🍍','🍣','🍤','🍪','🥗','🧀','🥚','🥔'];
 
+interface Particle {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    gravity: number;
+    emoji: string;
+    size: number;
+    life: number;
+}
+
 export const FoodRain = ({ trigger, quantity = 1 }: { trigger: number; quantity?: number }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const particlesRef = useRef<any[]>([]);
+    const particlesRef = useRef<Particle[]>([]);
 
     useEffect(() => {
         if (!trigger || trigger === 0) return;
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const newParticles = [];
+        const newParticles: Particle[] = [];
         for (let i = 0; i < quantity; i++) {
             const size = 24 + Math.random() * 16;
             newParticles.push({

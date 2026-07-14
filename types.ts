@@ -2,6 +2,20 @@
 
 export type Language = 'pt' | 'en';
 
+export type RecipePhaseKey =
+  | "size"
+  | "base"
+  | "sauce_base"
+  | "greens"
+  | "protein"
+  | "sauce_final"
+  | "crispy"
+  | "sesame"
+  | "smoothie_liquid"
+  | "smoothie_ingredients"
+  | "smoothie_mode"
+  | "smoothie_marbling";
+
 export interface Variant {
   base: string[];
   sauce_base: string[];
@@ -55,10 +69,10 @@ export interface IngredientDB {
   smoothie_marbling: string[];
 }
 
-export type GameState = "HOME" | "PLAYING" | "RESULT_SUCCESS" | "RESULT_FAIL" | "CUSTOM_BOWL" | "RUSH_SELECT" | "RUSH_PLAYING" | "RUSH_ERROR" | "RUSH_GAME_OVER" | "QUIZ_PLAYING" | "QUIZ_FEEDBACK" | "UNIVERSITY_SELECT" | "UNIVERSITY_PLAYING" | "UNIVERSITY_SUCCESS";
+export type GameState = "HOME" | "PLAYING" | "RESULT_SUCCESS" | "RESULT_FAIL" | "CUSTOM_BOWL" | "RUSH_SELECT" | "RUSH_PLAYING" | "RUSH_ERROR" | "RUSH_GAME_OVER" | "QUIZ_PLAYING" | "QUIZ_FEEDBACK" | "UNIVERSITY_SELECT" | "UNIVERSITY_PLAYING" | "UNIVERSITY_SUCCESS" | "HOUSE_ARENA";
 
 export interface Phase {
-  key: string;
+  key: RecipePhaseKey;
   title: string;
 }
 
@@ -73,12 +87,17 @@ export interface RushScore {
   store_name: string;
   score: number;
   created_at?: string;
+  submission_id?: string;
 }
 
 export interface RushPlayer {
   name: string;
   store: string;
 }
+
+export type SupabaseAvailability = "available" | "unconfigured" | "unavailable";
+
+export type ScoreSubmitStatus = "success" | "pending" | "saving" | "failed" | "unconfigured";
 
 export interface BilingualMessage {
     pt: string;
@@ -88,7 +107,7 @@ export interface BilingualMessage {
 declare global {
   // Correctly extend the global Window interface by using uppercase 'Window'
   interface Window {
-    confetti: any;
+    confetti?: (options?: Record<string, unknown>) => Promise<null> | void;
     webkitAudioContext: typeof AudioContext;
   }
 }

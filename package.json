@@ -11,11 +11,19 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
+    "@tailwindcss/vite": "^4.3.2",
+    "canvas-confetti": "^1.9.4",
+    "lucide-react": "^1.23.0",
+    "motion": "^12.42.2",
     "react": "^19.2.1",
-    "react-dom": "^19.2.1"
+    "react-dom": "^19.2.1",
+    "tailwindcss": "^4.3.2"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^22.14.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"

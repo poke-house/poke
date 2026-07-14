@@ -23,4 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
-migrated_prompt_history
+migrated_prompt_history/
+prompt_history/
+*.prompt-history.json
+.env.local
+.env.*.local

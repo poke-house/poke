@@ -2,22 +2,30 @@ import React, { useState } from 'react';
 import { IconList, IconX, IconClock, IconTrophy } from './Icons';
 import { CHANGELOG } from '../constants';
 import { RushScore } from '../types';
+import { TranslationKey } from '../translations';
 
-export const PopupModal = ({ message, onConfirm }: { message: string; onConfirm: () => void }) => (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
-        <div className="bg-white p-8 rounded-win shadow-fluent-hover border border-gray-200 max-w-sm w-full mx-4 text-center transform scale-100 animate-slide-up">
-            <p className="text-lg font-medium text-brand-dark mb-8">{message}</p>
-            <button onClick={onConfirm} className="bg-brand-blue text-white px-6 py-2 rounded-win font-semibold hover:bg-blue-600 transition-colors shadow-sm">Entendido</button>
+export const PopupModal = ({ message, onConfirm, t }: { message: string; onConfirm: () => void; t: (key: TranslationKey, params?: Record<string, string | number>) => string }) => (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-charcoal/40 backdrop-blur-sm animate-fade-in p-4">
+        <div className="bg-white p-8 rounded-modal shadow-elevated border-4 border-brand-charcoal max-w-sm w-full text-center transform scale-100 animate-slide-up">
+            <p className="text-lg font-body font-bold text-brand-charcoal mb-8 leading-snug">{message}</p>
+            <button 
+                onClick={onConfirm} 
+                className="bg-brand-mochi text-brand-charcoal px-6 py-3 rounded-button font-display font-bold border-2 border-brand-charcoal hover:bg-brand-mochi/90 transition-all shadow-sm active:translate-y-0.5"
+            >
+                {t('btn_understood')}
+            </button>
         </div>
     </div>
 );
 
 export const RushEntryModal = ({ 
     onStart,
-    onClose
+    onClose,
+    t
 }: { 
     onStart: (name: string, store: string) => void;
     onClose: () => void;
+    t: (key: TranslationKey, params?: Record<string, string | number>) => string;
 }) => {
     const [name, setName] = useState("");
     const [store, setStore] = useState("");
@@ -29,49 +37,67 @@ export const RushEntryModal = ({
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md animate-fade-in p-4">
-            <div className="bg-white rounded-win shadow-2xl border-t-8 border-rush-500 max-w-sm w-full animate-slide-up overflow-hidden relative">
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-rush-500 transition-colors">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-charcoal/50 backdrop-blur-sm animate-fade-in p-4">
+            <div className="bg-white rounded-modal shadow-elevated border-4 border-brand-charcoal max-w-sm w-full animate-slide-up overflow-hidden relative">
+                <button 
+                    onClick={onClose} 
+                    aria-label="Close"
+                    className="absolute top-4 right-4 text-brand-charcoal/50 hover:text-brand-tomato transition-colors z-20 bg-white/80 p-1.5 rounded-full"
+                >
                     <IconX size={20} />
                 </button>
-                <div className="p-6 md:p-8">
-                    <h2 className="text-xl md:text-2xl font-black text-rush-900 mb-1 md:mb-2 text-center uppercase tracking-tighter">Identificação</h2>
-                    <p className="text-rush-300 text-center mb-6 md:mb-8 font-bold uppercase text-[10px] md:text-xs tracking-widest">Quem está no comando?</p>
-                    
-                    <div className="space-y-3 md:space-y-4">
+                
+                <div className="bg-brand-tomato/10 border-b-4 border-brand-charcoal p-6 text-center pt-8">
+                    <h2 className="text-xl md:text-2xl font-display font-black text-brand-charcoal mb-1 leading-tight">
+                        {t('rush_entry_identification')}
+                    </h2>
+                    <p className="text-brand-tomato font-condensed font-bold text-xs tracking-wide uppercase">
+                        {t('rush_entry_subtitle')}
+                    </p>
+                </div>
+
+                <div className="p-6 md:p-8 space-y-4">
+                    <div className="space-y-4">
                         <div>
-                            <label className="block text-[10px] md:text-xs font-bold text-rush-900 uppercase mb-1">Seu Nome</label>
+                            <label className="block text-xs font-condensed font-black text-brand-charcoal uppercase mb-1.5">
+                                {t('rush_entry_your_name')}
+                            </label>
                             <input 
                                 type="text" 
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="Ex: Marcelo"
-                                className="w-full p-2.5 md:p-3 bg-rush-100/30 border-2 border-rush-100 rounded-win focus:border-rush-500 outline-none transition-all font-bold text-rush-900 text-sm md:text-base"
+                                placeholder={t('rush_entry_name_placeholder')}
+                                className="w-full p-3 bg-brand-linen border-2 border-brand-charcoal rounded-button focus:ring-2 focus:ring-brand-mochi outline-none transition-all font-body font-semibold text-brand-charcoal text-sm"
                             />
                         </div>
                         <div>
-                            <label className="block text-[10px] md:text-xs font-bold text-rush-900 uppercase mb-1">Sua Loja</label>
+                            <label className="block text-xs font-condensed font-black text-brand-charcoal uppercase mb-1.5">
+                                {t('rush_entry_your_store')}
+                            </label>
                             <input 
                                 type="text" 
                                 value={store}
                                 onChange={(e) => setStore(e.target.value)}
-                                placeholder="Ex: Colombo"
-                                className="w-full p-2.5 md:p-3 bg-rush-100/30 border-2 border-rush-100 rounded-win focus:border-rush-500 outline-none transition-all font-bold text-rush-900 text-sm md:text-base"
+                                placeholder={t('rush_entry_store_placeholder')}
+                                className="w-full p-3 bg-brand-linen border-2 border-brand-charcoal rounded-button focus:ring-2 focus:ring-brand-mochi outline-none transition-all font-body font-semibold text-brand-charcoal text-sm"
                             />
                         </div>
-                        <button 
-                            onClick={handleStart}
-                            disabled={!name.trim() || !store.trim()}
-                            className="w-full bg-rush-500 text-white py-3 md:py-4 rounded-win font-black uppercase tracking-widest hover:bg-rush-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg active:scale-95 text-sm md:text-base"
-                        >
-                            Iniciar Treino
-                        </button>
-                        <button 
-                            onClick={onClose}
-                            className="w-full bg-gray-100 text-gray-500 py-2.5 md:py-3 rounded-win font-bold uppercase text-[10px] md:text-xs tracking-widest hover:bg-gray-200 transition-all"
-                        >
-                            Sair
-                        </button>
+                        
+                        <div className="pt-2 space-y-2">
+                            <button 
+                                onClick={handleStart}
+                                disabled={!name.trim() || !store.trim()}
+                                className="w-full bg-brand-mochi hover:bg-brand-mochi/90 text-brand-charcoal py-4 rounded-button font-display font-black border-2 border-brand-charcoal shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all active:translate-y-0.5 text-sm md:text-base"
+                            >
+                                {t('rush_entry_start_btn')}
+                            </button>
+                            <button 
+                                onClick={onClose}
+                                className="w-full bg-brand-linen hover:bg-brand-linen/80 text-brand-charcoal py-3 rounded-button font-body font-bold border-2 border-brand-charcoal transition-all text-xs uppercase"
+                            >
+                                {t('rush_entry_exit_btn')}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -79,16 +105,42 @@ export const RushEntryModal = ({
     );
 };
 
-export const ChangelogModal = ({ onClose }: { onClose: () => void }) => (
-    <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-        <div className="bg-white rounded-win p-6 max-w-md w-full max-h-[80vh] overflow-y-auto shadow-fluent-hover relative animate-slide-up">
-            <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-xl text-brand-dark flex items-center gap-2"><IconList /> Histórico</h3>
-                <button onClick={onClose} className="text-gray-400 hover:text-brand-dark transition-colors"><IconX /></button>
+export const ChangelogModal = ({ onClose, t }: { onClose: () => void; t: (key: TranslationKey, params?: Record<string, string | number>) => string }) => (
+    <div className="fixed inset-0 z-[100] bg-brand-charcoal/40 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white rounded-modal p-6 max-w-md w-full max-h-[80vh] overflow-y-auto custom-scroll shadow-elevated border-4 border-brand-charcoal relative animate-slide-up">
+            <div className="flex justify-between items-center mb-6 border-b-2 border-brand-charcoal pb-4">
+                <h3 className="font-display font-black text-xl text-brand-charcoal flex items-center gap-2">
+                    <IconList size={22} /> {t('changelog_history')}
+                </h3>
+                <button 
+                    onClick={onClose} 
+                    aria-label="Close"
+                    className="text-brand-charcoal/50 hover:text-brand-charcoal transition-colors p-1"
+                >
+                    <IconX size={20} />
+                </button>
             </div>
-            <div className="space-y-6">{CHANGELOG.slice(0, 5).map((item, index) => (<div key={index} className="border-l-2 border-brand-blue pl-4"><div className="flex justify-between items-baseline mb-1"><span className="font-semibold text-brand-dark">v{item.version}</span><span className="text-xs text-gray-500 uppercase">{item.date}</span></div><ul className="list-disc list-inside text-sm text-gray-600 space-y-1">{item.changes.map((change, i) => (<li key={i}>{change}</li>))}</ul></div>))}</div>
-            <div className="mt-8 pt-4 border-t border-gray-100 text-center">
-                 <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Dev Marcelo Requião</h4>
+            
+            <div className="space-y-6">
+                {CHANGELOG.slice(0, 5).map((item, index) => (
+                    <div key={index} className="border-l-4 border-brand-mochi pl-4 py-1">
+                        <div className="flex justify-between items-baseline mb-2">
+                            <span className="font-display font-bold text-brand-charcoal">v{item.version}</span>
+                            <span className="text-xs font-condensed font-black text-brand-charcoal/50 uppercase">{item.date}</span>
+                        </div>
+                        <ul className="list-disc list-inside text-sm font-body text-brand-charcoal/80 space-y-1.5 pl-1">
+                            {item.changes.map((change, i) => (
+                                <li key={i} className="leading-relaxed">{change}</li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </div>
+            
+            <div className="mt-8 pt-4 border-t-2 border-brand-charcoal text-center">
+                 <h4 className="text-xs font-condensed font-black text-brand-charcoal/50 uppercase tracking-widest">
+                     Dev Marcelo Requião
+                 </h4>
             </div>
         </div>
     </div>

@@ -3,23 +3,15 @@
 // mostram o MESMO ingrediente no mesmo passo (muda só a quantidade).
 // A base é um passo único (item difere por variante: 180g vs 270g).
 
-type PhaseArrays = Partial<Record<
-  "base" | "sauce_base" | "greens" | "protein" | "sauce_final" | "crispy" | "sesame",
-  string[]
->>;
-
-interface RecipeLike {
-  category: string; // "HOUSE" | "GREEN" | "SMOOTHIE"
-  variants: { Regular?: PhaseArrays; Large?: PhaseArrays };
-}
+import { Recipe, Variant, RecipePhaseKey } from '../types';
 
 export interface BowlStep {
-  phase: string;
+  phase: RecipePhaseKey;
   itemR: string; cntR: number;
   itemL: string; cntL: number;
 }
 
-const PHASES = ["base", "sauce_base", "greens", "protein", "sauce_final", "crispy", "sesame"] as const;
+const PHASES: readonly (keyof Variant)[] = ["base", "sauce_base", "greens", "protein", "sauce_final", "crispy", "sesame"] as const;
 
 // [item, count] por ordem de primeira aparição, agrupado por total
 function grouped(arr?: string[]): [string, number][] {
@@ -32,16 +24,15 @@ function grouped(arr?: string[]): [string, number][] {
   return order.map((it) => [it, c[it]] as [string, number]);
 }
 
-export function buildBowlSteps(recipe: RecipeLike) {
+export function buildBowlSteps(recipe: Recipe) {
   const isSmoothie = recipe.category === "SMOOTHIE" || !recipe.variants;
   const isSalad = recipe.category === "GREEN";
 
   if (isSmoothie) {
     const PHASES_SMOOTHIE_KEYS = ["smoothie_liquid", "smoothie_ingredients", "smoothie_mode", "smoothie_marbling"] as const;
-    const rData = recipe as any;
     const steps: BowlStep[] = [];
     for (const ph of PHASES_SMOOTHIE_KEYS) {
-      const cr = grouped(rData[ph]);
+      const cr = grouped(recipe[ph]);
       for (const it of cr) {
         steps.push({
           phase: ph,
@@ -53,14 +44,14 @@ export function buildBowlSteps(recipe: RecipeLike) {
     return { steps, hasLarge: false, isSalad: false, isSmoothie: true, total: steps.length };
   }
 
-  const R = recipe.variants?.Regular || {};
-  const L = recipe.variants?.Large;
+  const R: Partial<Variant> = recipe.variants?.Regular || {};
+  const L: Partial<Variant> | undefined = recipe.variants?.Large;
   const hasLarge = !!L;
   const steps: BowlStep[] = [];
 
   for (const ph of PHASES) {
-    const cr = grouped((R as any)[ph]);
-    const cl = grouped((L as any)?.[ph]);
+    const cr = grouped(R[ph]);
+    const cl = grouped(L?.[ph]);
 
     if (ph === "base") {
       // pode haver mais do que uma base (ex. Coconut Basmati + Espinafre) → 1 passo por base, alinhado por posição
