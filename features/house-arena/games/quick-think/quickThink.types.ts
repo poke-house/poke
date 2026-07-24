@@ -14,6 +14,8 @@ export interface QuickThinkQuestionState {
   questionOrder: number | null;
   questionPt: string | null;
   questionEn: string | null;
+  category?: string | null;
+  difficulty?: string | null;
   options: QuickThinkQuestionOption[] | null;
   remainingQuestionSeconds: number;
   remainingRoundSeconds: number;

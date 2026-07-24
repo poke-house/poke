@@ -5,9 +5,10 @@ import { arenaResultsService } from '../services/arenaResults.service';
 interface UseArenaFinalResultsProps {
   roomCode: string;
   reconnectToken: string | null;
+  participantId: string | null;
 }
 
-export function useArenaFinalResults({ roomCode, reconnectToken }: UseArenaFinalResultsProps) {
+export function useArenaFinalResults({ roomCode, reconnectToken, participantId }: UseArenaFinalResultsProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resultsData, setResultsData] = useState<ArenaFinalResultsData | null>(null);
@@ -23,7 +24,7 @@ export function useArenaFinalResults({ roomCode, reconnectToken }: UseArenaFinal
       if (!isSilent) {
         setIsLoading(true);
       }
-      const data = await arenaResultsService.getFinalResults(roomCode, reconnectToken);
+      const data = await arenaResultsService.getFinalResults(roomCode, reconnectToken, participantId);
       setResultsData(data);
       setError(null);
     } catch (err) {
@@ -34,7 +35,7 @@ export function useArenaFinalResults({ roomCode, reconnectToken }: UseArenaFinal
         setIsLoading(false);
       }
     }
-  }, [roomCode, reconnectToken]);
+  }, [roomCode, reconnectToken, participantId]);
 
   // Initial fetch on mount
   useEffect(() => {

@@ -25,24 +25,28 @@ export class HouseArenaRoomService {
    * Creates a new tournament room with a unique random alphanumeric code.
    * Registers the host as the first participant.
    */
-  async createRoom(request: ArenaRoomCreateRequest): Promise<ArenaRoomCreateResult> {
+  async createRoom(displayName: string, storeName: string, gameType: string): Promise<ArenaRoomCreateResult> {
     try {
-      if (!request.displayName.trim()) {
+      if (!displayName.trim()) {
         return { status: 'invalid_name' };
       }
-      if (!request.storeName.trim()) {
+      if (!storeName.trim()) {
         return { status: 'invalid_store' };
       }
 
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[HouseArenaRoomService] Supabase not available, using high-fidelity offline mock fallback');
-        return this.createRoomMock(request);
+        if (import.meta.env.DEV) {
+          console.log('[HouseArenaRoomService] Supabase not available, using high-fidelity offline mock fallback');
+          return this.createRoomMock(displayName, storeName, gameType);
+        }
+        return { status: 'unexpected_error', message: 'Supabase is not configured.' };
       }
 
       const { data, error } = await supabase.rpc('create_arena_room', {
-        p_display_name: request.displayName.trim(),
-        p_store_name: request.storeName.trim()
+        p_display_name: displayName.trim(),
+        p_store_name: storeName.trim(),
+        p_game_type: gameType
       });
 
       if (error) {
@@ -82,14 +86,15 @@ export class HouseArenaRoomService {
         activeParticipantCount: 1,
         currentRoundNumber: roomData.current_round_number,
         currentGameType: roomData.current_game_type,
-        createdByParticipantId: roomData.created_by_participant_id
+        createdByParticipantId: roomData.created_by_participant_id,
+        selectedGameType: roomData.selected_game_type || row.selected_game_type || gameType
       };
 
       const host: ArenaParticipant = {
         id: row.participant_id,
         roomId: room.id,
-        displayName: request.displayName.trim(),
-        storeName: request.storeName.trim(),
+        displayName: displayName.trim(),
+        storeName: storeName.trim(),
         avatarId: row.avatar_asset_key,
         joinedAt: room.createdAt,
         lastSeenAt: room.createdAt,
@@ -132,8 +137,11 @@ export class HouseArenaRoomService {
 
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[HouseArenaRoomService] Supabase not available, using offline mock join');
-        return this.joinRoomMock(request);
+        if (import.meta.env.DEV) {
+          console.log('[HouseArenaRoomService] Supabase not available, using offline mock join');
+          return this.joinRoomMock(request);
+        }
+        return { status: 'unexpected_error', message: 'Supabase is not configured.' };
       }
 
       const { data, error } = await supabase.rpc('join_arena_room', {
@@ -210,8 +218,11 @@ export class HouseArenaRoomService {
 
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[HouseArenaRoomService] Supabase unconfigured, executing offline mock reconnect');
-        return this.reconnectMock(roomCode, token);
+        if (import.meta.env.DEV) {
+          console.log('[HouseArenaRoomService] Supabase unconfigured, executing offline mock reconnect');
+          return this.reconnectMock(roomCode, token);
+        }
+        return { status: 'unexpected_error', message: 'Supabase is not configured.' };
       }
 
       const { data, error } = await supabase.rpc('reconnect_arena_participant', {
@@ -267,30 +278,27 @@ export class HouseArenaRoomService {
     }
   }
 
-  /**
-   * Moves a room status to 'closed'.
-   */
-  async closeRoom(roomId: string, reason: string): Promise<boolean> {
+  async leaveRoom(roomCode: string, reconnectToken: string): Promise<boolean> {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log(`[HouseArenaRoomService] Mock Room ${roomId} closed. Reason: ${reason}`);
-        localStorage.removeItem(MOCK_STORAGE_KEY_ROOM);
-        return true;
+        if (import.meta.env.DEV) {
+          localStorage.removeItem(MOCK_STORAGE_KEY_ROOM);
+          return true;
+        }
+        return false;
       }
-
-      const { error } = await supabase
-        .from('arena_rooms')
-        .update({ status: 'closed', closed_at: new Date().toISOString(), close_reason: reason })
-        .eq('id', roomId);
-
+      const { error } = await supabase.rpc('leave_arena_room', {
+        p_room_code: roomCode.trim().toUpperCase(),
+        p_reconnect_token: reconnectToken.trim()
+      });
       if (error) {
-        console.error('[HouseArenaRoomService] closeRoom database error:', error);
+        console.error('[HouseArenaRoomService] leave_arena_room error:', error);
         return false;
       }
       return true;
     } catch (err) {
-      console.error('[HouseArenaRoomService] closeRoom error:', err);
+      console.error('[HouseArenaRoomService] leaveRoom error:', err);
       return false;
     }
   }
@@ -302,7 +310,10 @@ export class HouseArenaRoomService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        return this.getRoomStateMock(roomId);
+        if (import.meta.env.DEV) {
+          return this.getRoomStateMock(roomId);
+        }
+        return null;
       }
 
       const { data, error } = await supabase
@@ -328,7 +339,8 @@ export class HouseArenaRoomService {
         activeParticipantCount: 0, // Will be updated on count
         currentRoundNumber: data.current_round_number,
         currentGameType: data.current_game_type,
-        createdByParticipantId: data.created_by_participant_id
+        createdByParticipantId: data.created_by_participant_id,
+        selectedGameType: data.selected_game_type
       };
     } catch (err) {
       console.error('[HouseArenaRoomService] getRoomState error:', err);
@@ -352,88 +364,91 @@ export class HouseArenaRoomService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        const mockRoom = this.getRoomStateMockByCode(roomCode);
-        if (!mockRoom) return null;
-        
-        const lobbyEnds = new Date(mockRoom.lobbyEndsAt).getTime();
-        const now = Date.now();
-        const lobbyCountdown = Math.max(0, Math.floor((lobbyEnds - now) / 1000));
-        
-        if (mockRoom.status === 'lobby' && lobbyCountdown <= 0) {
-          const savedPartsStr = localStorage.getItem('poke_house_mock_participants') || '[]';
-          const parts = JSON.parse(savedPartsStr) as any[];
-          if (parts.length >= 2) {
-            mockRoom.status = 'starting';
-            mockRoom.tournamentStartedAt = new Date().toISOString();
-            localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
-          } else {
-            mockRoom.status = 'closed';
-            (mockRoom as any).closed_at = new Date().toISOString();
-            (mockRoom as any).close_reason = 'insufficient_lobby_participants';
-            localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
-          }
-        } else if (mockRoom.status === 'starting') {
-          const startedAt = new Date(mockRoom.tournamentStartedAt!).getTime();
-          if (now >= startedAt + 5000) {
-            mockRoom.status = 'active';
-            mockRoom.currentRoundNumber = 1;
-            mockRoom.currentGameType = 'slop_clock';
-            const roundEnds = new Date(Date.now() + 600 * 1000).toISOString();
-            localStorage.setItem('poke_house_mock_round_ends', roundEnds);
-            localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
-          }
-        } else if (mockRoom.status === 'active') {
-          const roundEndsStr = localStorage.getItem('poke_house_mock_round_ends');
-          if (roundEndsStr) {
-            const ends = new Date(roundEndsStr).getTime();
-            if (now >= ends) {
-              if (mockRoom.currentRoundNumber === 1) {
-                mockRoom.currentGameType = null;
-                localStorage.setItem('poke_house_mock_round_completed_at', new Date().toISOString());
-                localStorage.removeItem('poke_house_mock_round_ends');
-                localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
-              } else if (mockRoom.currentRoundNumber === 2) {
-                mockRoom.currentGameType = null;
-                localStorage.setItem('poke_house_mock_round_completed_at', new Date().toISOString());
-                localStorage.removeItem('poke_house_mock_round_ends');
-                localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
-              }
+        if (import.meta.env.DEV) {
+          const mockRoom = this.getRoomStateMockByCode(roomCode);
+          if (!mockRoom) return null;
+          
+          const lobbyEnds = new Date(mockRoom.lobbyEndsAt).getTime();
+          const now = Date.now();
+          const lobbyCountdown = Math.max(0, Math.floor((lobbyEnds - now) / 1000));
+          
+          if (mockRoom.status === 'lobby' && lobbyCountdown <= 0) {
+            const savedPartsStr = localStorage.getItem('poke_house_mock_participants') || '[]';
+            const parts = JSON.parse(savedPartsStr) as any[];
+            if (parts.length >= 2) {
+              mockRoom.status = 'starting';
+              mockRoom.tournamentStartedAt = new Date().toISOString();
+              localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
+            } else {
+              mockRoom.status = 'closed';
+              (mockRoom as any).closed_at = new Date().toISOString();
+              (mockRoom as any).close_reason = 'insufficient_lobby_participants';
+              localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
             }
-          } else {
-            const completedAtStr = localStorage.getItem('poke_house_mock_round_completed_at');
-            if (completedAtStr) {
-              const compAt = new Date(completedAtStr).getTime();
-              if (now >= compAt + 10000) {
+          } else if (mockRoom.status === 'starting') {
+            const startedAt = new Date(mockRoom.tournamentStartedAt!).getTime();
+            if (now >= startedAt + 5000) {
+              mockRoom.status = 'active';
+              mockRoom.currentRoundNumber = 1;
+              mockRoom.currentGameType = 'slop_clock';
+              const roundEnds = new Date(Date.now() + 600 * 1000).toISOString();
+              localStorage.setItem('poke_house_mock_round_ends', roundEnds);
+              localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
+            }
+          } else if (mockRoom.status === 'active') {
+            const roundEndsStr = localStorage.getItem('poke_house_mock_round_ends');
+            if (roundEndsStr) {
+              const ends = new Date(roundEndsStr).getTime();
+              if (now >= ends) {
                 if (mockRoom.currentRoundNumber === 1) {
-                  mockRoom.currentRoundNumber = 2;
-                  mockRoom.currentGameType = 'quick_think';
-                  localStorage.setItem('poke_house_mock_round_ends', new Date(Date.now() + 300 * 1000).toISOString());
-                  localStorage.removeItem('poke_house_mock_round_completed_at');
+                  mockRoom.currentGameType = null;
+                  localStorage.setItem('poke_house_mock_round_completed_at', new Date().toISOString());
+                  localStorage.removeItem('poke_house_mock_round_ends');
                   localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
                 } else if (mockRoom.currentRoundNumber === 2) {
-                  mockRoom.status = 'results';
-                  mockRoom.tournamentEndedAt = new Date().toISOString();
-                  localStorage.removeItem('poke_house_mock_round_completed_at');
+                  mockRoom.currentGameType = null;
+                  localStorage.setItem('poke_house_mock_round_completed_at', new Date().toISOString());
+                  localStorage.removeItem('poke_house_mock_round_ends');
                   localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
+                }
+              }
+            } else {
+              const completedAtStr = localStorage.getItem('poke_house_mock_round_completed_at');
+              if (completedAtStr) {
+                const compAt = new Date(completedAtStr).getTime();
+                if (now >= compAt + 10000) {
+                  if (mockRoom.currentRoundNumber === 1) {
+                    mockRoom.currentRoundNumber = 2;
+                    mockRoom.currentGameType = 'quick_think';
+                    localStorage.setItem('poke_house_mock_round_ends', new Date(Date.now() + 300 * 1000).toISOString());
+                    localStorage.removeItem('poke_house_mock_round_completed_at');
+                    localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
+                  } else if (mockRoom.currentRoundNumber === 2) {
+                    mockRoom.status = 'results';
+                    mockRoom.tournamentEndedAt = new Date().toISOString();
+                    localStorage.removeItem('poke_house_mock_round_completed_at');
+                    localStorage.setItem('poke_house_mock_room', JSON.stringify(mockRoom));
+                  }
                 }
               }
             }
           }
-        }
-        
-        const roundEndsStr = localStorage.getItem('poke_house_mock_round_ends');
-        const remainingRoundSeconds = roundEndsStr ? Math.max(0, Math.floor((new Date(roundEndsStr).getTime() - now) / 1000)) : 0;
+          
+          const roundEndsStr = localStorage.getItem('poke_house_mock_round_ends');
+          const remainingRoundSeconds = roundEndsStr ? Math.max(0, Math.floor((new Date(roundEndsStr).getTime() - now) / 1000)) : 0;
 
-        return {
-          roomCode: mockRoom.roomCode,
-          status: mockRoom.status,
-          lobbyCountdownSeconds: lobbyCountdown,
-          activeParticipantCount: mockRoom.activeParticipantCount,
-          currentRoundNumber: mockRoom.currentRoundNumber,
-          currentGameType: mockRoom.currentGameType as ArenaGameType | null,
-          remainingRoundSeconds,
-          isJoinable: mockRoom.status === 'lobby'
-        };
+          return {
+            roomCode: mockRoom.roomCode,
+            status: mockRoom.status,
+            lobbyCountdownSeconds: lobbyCountdown,
+            activeParticipantCount: mockRoom.activeParticipantCount,
+            currentRoundNumber: mockRoom.currentRoundNumber,
+            currentGameType: mockRoom.currentGameType as ArenaGameType | null,
+            remainingRoundSeconds,
+            isJoinable: mockRoom.status === 'lobby'
+          };
+        }
+        return null;
       }
 
       const { data, error } = await supabase.rpc('get_arena_room_public_state', {
@@ -468,7 +483,10 @@ export class HouseArenaRoomService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        return this.getRoomStateMockByCode(roomCode);
+        if (import.meta.env.DEV) {
+          return this.getRoomStateMockByCode(roomCode);
+        }
+        return null;
       }
 
       const { data, error } = await supabase
@@ -495,7 +513,8 @@ export class HouseArenaRoomService {
         activeParticipantCount: 0,
         currentRoundNumber: data.current_round_number,
         currentGameType: data.current_game_type,
-        createdByParticipantId: data.created_by_participant_id
+        createdByParticipantId: data.created_by_participant_id,
+        selectedGameType: data.selected_game_type
       };
     } catch (err) {
       console.error('[HouseArenaRoomService] getRoomStateByCode error:', err);
@@ -510,7 +529,10 @@ export class HouseArenaRoomService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        return this.getParticipantsMock(roomId);
+        if (import.meta.env.DEV) {
+          return this.getParticipantsMock(roomId);
+        }
+        return [];
       }
 
       const { data, error } = await supabase
@@ -564,7 +586,7 @@ export class HouseArenaRoomService {
   // HIGH FIDELITY OFFLINE MOCKS
   // ============================================================================
 
-  private createRoomMock(request: ArenaRoomCreateRequest): ArenaRoomCreateResult {
+  private createRoomMock(displayName: string, storeName: string, gameType: string): ArenaRoomCreateResult {
     const mockRoomId = 'room_' + Math.random().toString(36).substr(2, 9);
     const mockParticipantId = 'part_' + Math.random().toString(36).substr(2, 9);
     const roomCode = generateRoomCode();
@@ -585,14 +607,15 @@ export class HouseArenaRoomService {
       activeParticipantCount: 1,
       currentRoundNumber: 0,
       currentGameType: null,
-      createdByParticipantId: mockParticipantId
+      createdByParticipantId: mockParticipantId,
+      selectedGameType: gameType || 'slop_clock'
     };
 
     const host: ArenaParticipant = {
       id: mockParticipantId,
       roomId: mockRoomId,
-      displayName: request.displayName,
-      storeName: request.storeName,
+      displayName: displayName,
+      storeName: storeName,
       avatarId: 'avatar_mochi_ninja',
       joinedAt: now,
       lastSeenAt: now,

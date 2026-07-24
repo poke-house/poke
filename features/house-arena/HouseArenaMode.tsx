@@ -423,6 +423,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
             reconnectToken={reconnectToken} 
             language={language}
             onReturnHome={handleExit}
+            localParticipantId={localPlayer?.id || null}
           />
         </div>
       );

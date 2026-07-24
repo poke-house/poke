@@ -6,7 +6,7 @@ import { Sparkles, Trophy, Users, ShieldAlert, ArrowRight, RotateCw, RefreshCw }
 
 interface ArenaHomeProps {
   onBack: () => void;
-  onCreateRoom: (request: ArenaRoomCreateRequest) => Promise<void>;
+  onCreateRoom: (request: ArenaRoomCreateRequest, gameType: string) => Promise<void>;
   onJoinRoom: (request: ArenaRoomJoinRequest) => Promise<void>;
   onReconnect: (roomCode: string, token: string) => Promise<void>;
   isLoading: boolean;
@@ -15,14 +15,35 @@ interface ArenaHomeProps {
 }
 
 const STORES = [
-  { id: 'chiado', name: 'Chiado' },
-  { id: 'colombo', name: 'Colombo' },
-  { id: 'douradores', name: 'Douradores' },
-  { id: 'saldanha', name: 'Saldanha' },
-  { id: 'clerigos', name: 'Clérigos' },
-  { id: 'norteshopping', name: 'Norte Shopping' },
-  { id: 'cascais', name: 'Cascais Surf' },
-  { id: 'faro', name: 'Faro Sun' }
+  { id: 'PT028', name: 'Alegro Sintra' },
+  { id: 'PT012', name: 'Alfragide' },
+  { id: 'PT030', name: 'Algarve Shopping' },
+  { id: 'PT018', name: 'Almada' },
+  { id: 'PT009', name: 'Alvalade' },
+  { id: 'PT010', name: 'Amoreiras' },
+  { id: 'PT013', name: 'Arrábida' },
+  { id: 'PT017', name: 'Braga Parque' },
+  { id: 'PT005', name: 'Cascais' },
+  { id: 'PT020', name: 'Cascais Kiosk' },
+  { id: 'PT001', name: 'Chiado' },
+  { id: 'PT004', name: 'Colombo' },
+  { id: 'PT007', name: 'Comporta' },
+  { id: 'PT023', name: 'Douradores' },
+  { id: 'PT026', name: 'Forum Algarve' },
+  { id: 'PT016', name: 'Guimarães' },
+  { id: 'PT008', name: 'Infante Santo' },
+  { id: 'PT024', name: 'Mar Shopping' },
+  { id: 'PT006', name: 'Miraflores' },
+  { id: 'PT014', name: 'Norte Shopping' },
+  { id: 'PT022', name: 'Nova' },
+  { id: 'PT011', name: 'Oeiras Parque' },
+  { id: 'PT019', name: 'Rua das Flores' },
+  { id: 'PT002', name: 'Saldanha' },
+  { id: 'PT021', name: 'Santa Catarina' },
+  { id: 'PT015', name: 'Spacio' },
+  { id: 'PT003', name: 'Strada' },
+  { id: 'PT031', name: 'UBBO' },
+  { id: 'PT029', name: 'Vasco da Gama' }
 ];
 
 export const ArenaHome: React.FC<ArenaHomeProps> = ({
@@ -38,6 +59,7 @@ export const ArenaHome: React.FC<ArenaHomeProps> = ({
   const [playerName, setPlayerName] = useState('');
   const [selectedStore, setSelectedStore] = useState(STORES[0].name);
   const [roomCodeInput, setRoomCodeInput] = useState('');
+  const [selectedGame, setSelectedGame] = useState<'slop_clock' | 'quick_think' | 'memory_match'>('slop_clock');
   const [localSession, setLocalSession] = useState<ReturnType<typeof houseArenaSessionStorage.getSession>>(null);
 
   // Load existing local session for one-click reconnection
@@ -54,7 +76,7 @@ export const ArenaHome: React.FC<ArenaHomeProps> = ({
     await onCreateRoom({
       displayName: playerName.trim(),
       storeName: selectedStore
-    });
+    }, selectedGame);
   };
 
   const handleJoin = async (e: React.FormEvent) => {
@@ -227,6 +249,37 @@ export const ArenaHome: React.FC<ArenaHomeProps> = ({
               ))}
             </select>
           </div>
+
+          {activeTab === 'create' && (
+            <div className="space-y-2 animate-fade-in">
+              <label className="block text-xs font-black uppercase tracking-wider text-brand-burgundy">
+                {t('Jogo da Arena', 'Arena Game')}
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  { value: 'slop_clock', pt: 'Hora do Lodo', en: 'Slop Clock' },
+                  { value: 'quick_think', pt: 'Pensa Rápido', en: 'Quick Think' },
+                  { value: 'memory_match', pt: 'Memory Match', en: 'Memory Match' }
+                ].map((g) => {
+                  const isSelected = selectedGame === g.value;
+                  return (
+                    <button
+                      key={g.value}
+                      type="button"
+                      onClick={() => setSelectedGame(g.value as any)}
+                      className={`w-full p-3.5 rounded-button border-2 border-brand-charcoal text-left transition-all font-display font-black text-sm cursor-pointer ${
+                        isSelected
+                          ? 'bg-brand-mochi text-brand-charcoal shadow-[2px_2px_0px_0px_#080D09]'
+                          : 'bg-white text-brand-charcoal/75 hover:bg-brand-linen/40'
+                      }`}
+                    >
+                      {t(g.pt, g.en)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {activeTab === 'join' && (
             <div className="animate-fade-in">

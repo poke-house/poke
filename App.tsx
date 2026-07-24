@@ -70,7 +70,7 @@ function App() {
     const [selectedSize, setSelectedSize] = useState<string | null>(null); 
     const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
     const [currentSelections, setCurrentSelections] = useState<string[]>([]);
-    const [allSelections, setAllSelections] = useState<{[key: string]: string | string[]}>({});
+    const [allSelections, setAllSelections] = useState<Record<string, string[]>>({});
     const [phaseOptions, setPhaseOptions] = useState<string[]>([]);
     const [timer, setTimer] = useState(20);
     const [errorDetails, setErrorDetails] = useState<string[]>([]);
@@ -519,7 +519,7 @@ function App() {
                         <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
                             {t('nav_section_arena')}
                         </span>
-                        {renderNavItem(t('house_arena_title'), <Trophy size={16} />, gameState === "HOUSE_ARENA", () => setGameState("HOUSE_ARENA"), "MULTIPLAYER", "bg-brand-mochi text-white")}
+                        {renderNavItem(t('house_arena_title'), <Trophy size={16} />, (gameState as string) === "HOUSE_ARENA", () => setGameState("HOUSE_ARENA"), "MULTIPLAYER", "bg-brand-mochi text-white")}
                     </div>
 
                     {/* Mobile Utility Area */}
@@ -560,7 +560,7 @@ function App() {
                             <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
                                 {t('nav_section_training')}
                             </span>
-                            {renderNavItem(t('btn_create_bowl'), <Sparkles size={16} />, gameState === "CUSTOM_BOWL", () => setGameState("CUSTOM_BOWL"))}
+                            {renderNavItem(t('btn_create_bowl'), <Sparkles size={16} />, (gameState as string) === "CUSTOM_BOWL", () => setGameState("CUSTOM_BOWL"))}
                             {renderNavItem(t('menu_university'), <BookOpen size={16} />, gameState.startsWith("UNIVERSITY_"), startUniversityMode)}
                             {renderNavItem(t('menu_house'), <Fish size={16} />, menuCategory === "HOUSE", () => setMenuCategory("HOUSE"))}
                             {renderNavItem(t('menu_green'), <Leaf size={16} />, menuCategory === "GREEN", () => setMenuCategory("GREEN"))}
@@ -579,7 +579,7 @@ function App() {
                             <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
                                 {t('nav_section_arena')}
                             </span>
-                            {renderNavItem(t('house_arena_title'), <Trophy size={16} />, gameState === "HOUSE_ARENA", () => setGameState("HOUSE_ARENA"), "MULTIPLAYER", "bg-brand-mochi text-white")}
+                            {renderNavItem(t('house_arena_title'), <Trophy size={16} />, (gameState as string) === "HOUSE_ARENA", () => setGameState("HOUSE_ARENA"), "MULTIPLAYER", "bg-brand-mochi text-white")}
                         </div>
                     </div> 
                 ) : gameState !== "CUSTOM_BOWL" && ( 

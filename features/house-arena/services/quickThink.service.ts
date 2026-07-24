@@ -23,8 +23,11 @@ export class QuickThinkService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[QuickThinkService] Supabase unconfigured. Invoking local mock engine.');
-        return this.getActiveQuestionMock();
+        if (import.meta.env.DEV) {
+          console.log('[QuickThinkService] Supabase unconfigured. Invoking local mock engine.');
+          return this.getActiveQuestionMock();
+        }
+        return null;
       }
 
       const { data, error } = await supabase.rpc('get_active_quick_think_question', {
@@ -98,8 +101,20 @@ export class QuickThinkService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[QuickThinkService] Supabase unconfigured. Submitting to local mock validator.');
-        return this.submitAnswerMock(roundQuestionId, selectedOptionId);
+        if (import.meta.env.DEV) {
+          console.log('[QuickThinkService] Supabase unconfigured. Submitting to local mock validator.');
+          return this.submitAnswerMock(roundQuestionId, selectedOptionId);
+        }
+        return {
+          isAccepted: false,
+          isCorrect: false,
+          scoreAwarded: 0,
+          updatedRoundScore: 0,
+          updatedTotalScore: 0,
+          correctOptionId: '',
+          explanationPt: 'Supabase is not configured.',
+          explanationEn: 'Supabase is not configured.'
+        };
       }
 
       const { data, error } = await supabase.rpc('submit_quick_think_answer', {

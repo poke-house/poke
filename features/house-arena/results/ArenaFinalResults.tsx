@@ -13,17 +13,20 @@ interface ArenaFinalResultsProps {
   reconnectToken: string | null;
   language: 'pt' | 'en';
   onReturnHome: () => void;
+  localParticipantId?: string | null;
 }
 
 export const ArenaFinalResults: React.FC<ArenaFinalResultsProps> = ({
   roomCode,
   reconnectToken,
   language,
-  onReturnHome
+  onReturnHome,
+  localParticipantId = null
 }) => {
   const { isLoading, error, resultsData, refresh } = useArenaFinalResults({
     roomCode,
-    reconnectToken
+    reconnectToken,
+    participantId: localParticipantId
   });
 
   const t = (pt: string, en: string) => (language === 'pt' ? pt : en);

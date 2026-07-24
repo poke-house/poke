@@ -83,6 +83,7 @@ export interface ArenaRoom {
   createdByParticipantId: string;
   remainingRoundSeconds?: number;
   lobbyCountdownSeconds?: number;
+  selectedGameType?: string | null;
 }
 
 /**

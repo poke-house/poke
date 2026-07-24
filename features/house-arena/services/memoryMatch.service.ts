@@ -31,8 +31,11 @@ export class MemoryMatchService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[MemoryMatchService] Supabase unconfigured. Invoking local mock engine.');
-        return this.getRoundStateMock();
+        if (import.meta.env.DEV) {
+          console.log('[MemoryMatchService] Supabase unconfigured. Invoking local mock engine.');
+          return this.getRoundStateMock();
+        }
+        return null;
       }
 
       const { data, error } = await supabase.rpc('get_memory_match_round_state', {
@@ -83,8 +86,11 @@ export class MemoryMatchService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[MemoryMatchService] Supabase unconfigured. Revealing card via local mock.');
-        return this.revealCardMock(cardId);
+        if (import.meta.env.DEV) {
+          console.log('[MemoryMatchService] Supabase unconfigured. Revealing card via local mock.');
+          return this.revealCardMock(cardId);
+        }
+        return null;
       }
 
       const { data, error } = await supabase.rpc('reveal_memory_match_card', {
@@ -129,8 +135,19 @@ export class MemoryMatchService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[MemoryMatchService] Supabase unconfigured. Evaluating pair via local mock.');
-        return this.submitPairMock(firstCardId, secondCardId);
+        if (import.meta.env.DEV) {
+          console.log('[MemoryMatchService] Supabase unconfigured. Evaluating pair via local mock.');
+          return this.submitPairMock(firstCardId, secondCardId);
+        }
+        return {
+          isMatch: false,
+          scoreAwarded: 0,
+          updatedRoundScore: 0,
+          updatedTotalScore: 0,
+          boardCompleted: false,
+          firstPairId: '',
+          secondPairId: ''
+        };
       }
 
       const { data, error } = await supabase.rpc('submit_memory_match_pair', {

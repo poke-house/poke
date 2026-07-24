@@ -136,26 +136,29 @@ export const useSlopClockGameplay = ({
     const limit = getPhaseLimit();
 
     let newList: string[];
-    if (currentList.includes(item)) {
-      newList = currentList.filter((i) => i !== item);
+    if (limit === 1) {
+      // Single-select phase: tapping replaces; tapping the same one clears it
+      newList = currentList[0] === item ? [] : [item];
     } else {
-      if (limit === 1) {
-        // Single select, replace existing
-        newList = [item];
-      } else {
-        // Multi select, respect limit
-        if (currentList.length >= limit) {
-          // Replace oldest or do nothing (we will do nothing to encourage precision)
-          return;
-        }
-        newList = [...currentList, item];
+      // Multi-select: each tap adds one more unit, up to the limit.
+      // Duplicates are allowed (multiset).
+      if (currentList.length >= limit) {
+        return; // at limit, ignore further taps
       }
+      newList = [...currentList, item];
     }
 
-    setSelections((prev) => ({
-      ...prev,
-      [phaseKey]: newList
-    }));
+    setSelections((prev) => ({ ...prev, [phaseKey]: newList }));
+  };
+
+  const handleRemoveOneItem = (item: string) => {
+    if (!currentPhase) return;
+    const phaseKey = currentPhase.key;
+    const currentList = selections[phaseKey] || [];
+    const idx = currentList.indexOf(item);
+    if (idx === -1) return;
+    const newList = [...currentList.slice(0, idx), ...currentList.slice(idx + 1)];
+    setSelections((prev) => ({ ...prev, [phaseKey]: newList }));
   };
 
   const handleNextPhase = () => {
@@ -255,6 +258,7 @@ export const useSlopClockGameplay = ({
     feedback,
     clearFeedback,
     handleSelectItem,
+    handleRemoveOneItem,
     handleNextPhase,
     handlePrevPhase,
     handleClearSelections,

@@ -21,8 +21,11 @@ export class SlopClockService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[SlopClockService] Supabase unconfigured. Invoking local mock engine.');
-        return this.getOrCreateActiveChallengeMock();
+        if (import.meta.env.DEV) {
+          console.log('[SlopClockService] Supabase unconfigured. Invoking local mock engine.');
+          return this.getOrCreateActiveChallengeMock();
+        }
+        return null;
       }
 
       const { data, error } = await supabase.rpc('get_or_create_active_challenge', {
@@ -71,8 +74,26 @@ export class SlopClockService {
     try {
       const supabase = this.getSupabase();
       if (!supabase) {
-        console.log('[SlopClockService] Supabase unconfigured. Submitting to local mock validator.');
-        return this.submitBowlCompletionMock(challengeId, selectedItems);
+        if (import.meta.env.DEV) {
+          console.log('[SlopClockService] Supabase unconfigured. Submitting to local mock validator.');
+          return this.submitBowlCompletionMock(challengeId, selectedItems);
+        }
+        return {
+          isAccepted: false,
+          reasonCategory: 'unexpected_error',
+          awardedScore: 0,
+          updatedRoundScore: 0,
+          updatedTotalScore: 0,
+          nextChallengeId: null,
+          nextChallengeSequence: null,
+          nextRecipeId: null,
+          nextRecipeName: null,
+          nextRecipeSize: null,
+          nextRecipeCategory: null,
+          nextRequiredIngredients: null,
+          remainingRoundSeconds: 0,
+          challengeCompletionCount: 0
+        };
       }
 
       const { data, error } = await supabase.rpc('submit_slop_clock_bowl_completion', {

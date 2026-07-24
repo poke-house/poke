@@ -9,6 +9,10 @@ interface ArenaRoundSummaryListProps {
 }
 
 export const ArenaRoundSummaryList: React.FC<ArenaRoundSummaryListProps> = ({ roundSummaries, language }) => {
+  if (roundSummaries.length === 0) {
+    return null;
+  }
+
   return (
     <div className="w-full bg-white border-4 border-brand-charcoal rounded-card p-5 shadow-soft flex flex-col gap-4">
       <h4 className="font-display font-black text-sm text-brand-charcoal uppercase tracking-wider">

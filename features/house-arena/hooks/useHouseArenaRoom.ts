@@ -56,11 +56,11 @@ export function useHouseArenaRoom() {
   /**
    * Invokes the creation pipeline to provision a new room lobby.
    */
-  const createRoom = useCallback(async (request: ArenaRoomCreateRequest) => {
+  const createRoom = useCallback(async (request: ArenaRoomCreateRequest, gameType: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await roomService.createRoom(request);
+      const result = await roomService.createRoom(request.displayName, request.storeName, gameType);
       if (result.status === 'created') {
         setActiveRoom(result.room);
         setLocalPlayer(result.host);
@@ -169,13 +169,11 @@ export function useHouseArenaRoom() {
    * Leave the current room
    */
   const leaveRoom = useCallback(async () => {
-    if (localPlayer?.id && activeRoom?.id) {
+    if (activeRoom?.roomCode && reconnectToken) {
       try {
-        // Safe disconnection mark
-        const { presenceService } = await import('../services/houseArenaPresence.service');
-        await presenceService.markParticipantDisconnected(localPlayer.id);
+        await roomService.leaveRoom(activeRoom.roomCode, reconnectToken);
       } catch (e) {
-        console.error('[useHouseArenaRoom] Error marking participant disconnected:', e);
+        console.error('[useHouseArenaRoom] Error leaving room:', e);
       }
     }
     houseArenaSessionStorage.clearSession();
@@ -184,7 +182,7 @@ export function useHouseArenaRoom() {
     setParticipants([]);
     setReconnectToken(null);
     setError(null);
-  }, [localPlayer?.id, activeRoom?.id]);
+  }, [activeRoom?.roomCode, reconnectToken, roomService]);
 
   /**
    * Resets state back to initial.
@@ -255,6 +253,9 @@ export function useHouseArenaRoom() {
 
     const supabase = getSupabase();
     if (!supabase) {
+      if (!import.meta.env.DEV) {
+        return;
+      }
       // Setup mock player joins timer for offline simulation!
       let timer: NodeJS.Timeout;
       const mockNames = ['Salmon Shogun', 'Mango Samurai', 'Avocado Alchemist', 'Wasabi Warrior'];

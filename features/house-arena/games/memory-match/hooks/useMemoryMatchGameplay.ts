@@ -113,10 +113,10 @@ export const useMemoryMatchGameplay = ({
 
       // Update card in local cards state
       setCards((prev) =>
-        prev.map((c) => (c.id === card.id ? { ...c, status: 'revealed', labelPt: revealedCard.labelPt, labelEn: revealedCard.labelEn } : c))
+        prev.map((c) => (c.id === card.id ? { ...c, status: 'revealed' as const, labelPt: revealedCard.labelPt, labelEn: revealedCard.labelEn } : c))
       );
 
-      const nextSelection = [...selectedCards, { ...card, status: 'revealed', labelPt: revealedCard.labelPt, labelEn: revealedCard.labelEn }];
+      const nextSelection: MemoryMatchCard[] = [...selectedCards, { ...card, status: 'revealed' as const, labelPt: revealedCard.labelPt, labelEn: revealedCard.labelEn }];
       setSelectedCards(nextSelection);
 
       // If this is the second card, evaluate the match

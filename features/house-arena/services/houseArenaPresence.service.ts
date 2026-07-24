@@ -52,33 +52,6 @@ export class HouseArenaPresenceService {
   }
 
   /**
-   * Explicitly marks a participant as disconnected. Triggered on tab close or networking failure.
-   */
-  async markParticipantDisconnected(participantId: string): Promise<boolean> {
-    try {
-      const supabase = this.getSupabase();
-      if (!supabase) {
-        console.log(`[PresenceService] Player ${participantId} declared disconnected (Mock).`);
-        return true;
-      }
-
-      const { error } = await supabase
-        .from('arena_participants')
-        .update({ is_active: false, status: 'disconnected' })
-        .eq('id', participantId);
-
-      if (error) {
-        console.error('[PresenceService] Disconnect update error:', error);
-        return false;
-      }
-      return true;
-    } catch (err) {
-      console.error('[PresenceService] Unexpected disconnect error:', err);
-      return false;
-    }
-  }
-
-  /**
    * Computes the total number of connected players in a room.
    */
   async getActiveParticipantCount(roomId: string): Promise<number> {
@@ -105,37 +78,6 @@ export class HouseArenaPresenceService {
       return count || 0;
     } catch (err) {
       console.error('[PresenceService] getActiveParticipantCount unexpected error:', err);
-      return 0;
-    }
-  }
-
-  /**
-   * DB Cron task simulation to clean up players that have failed to send heartbeats for 60s.
-   */
-  async cleanupInactiveParticipants(roomId: string): Promise<number> {
-    try {
-      const supabase = this.getSupabase();
-      if (!supabase) {
-        return 0;
-      }
-
-      const sixtySecondsAgo = new Date(Date.now() - 60 * 1000).toISOString();
-      const { data, error } = await supabase
-        .from('arena_participants')
-        .update({ is_active: false, status: 'disconnected' })
-        .eq('room_id', roomId)
-        .eq('is_active', true)
-        .lt('last_seen_at', sixtySecondsAgo)
-        .select();
-
-      if (error) {
-        console.error('[PresenceService] cleanupInactiveParticipants error:', error);
-        return 0;
-      }
-
-      return data ? data.length : 0;
-    } catch (err) {
-      console.error('[PresenceService] cleanupInactiveParticipants error:', err);
       return 0;
     }
   }
