@@ -2,12 +2,17 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseClientResult } from './types';
 
 let supabaseInstance: SupabaseClient | null = null;
+let loggedMissingConfig = false;
 
 export const getSupabaseClient = (): SupabaseClientResult => {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (!loggedMissingConfig) {
+      console.warn('[Supabase] Config missing: VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY');
+      loggedMissingConfig = true;
+    }
     return { status: "unconfigured", client: null };
   }
 
@@ -26,14 +31,19 @@ export const getSupabaseClient = (): SupabaseClientResult => {
     supabaseAnonKey.includes("REPLACE_");
 
   if (isPlaceholderUrl || isPlaceholderKey) {
+    if (!loggedMissingConfig) {
+      console.warn('[Supabase] Placeholder credentials detected for VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY');
+      loggedMissingConfig = true;
+    }
     return { status: "unconfigured", client: null };
   }
 
   if (!supabaseInstance) {
     try {
       supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+      console.info('[Supabase] Client initialized successfully for URL:', supabaseUrl);
     } catch (e) {
-      console.warn("Failed to create Supabase client:", e);
+      console.error('[Supabase] Failed to create Supabase client:', e);
       return { status: "unconfigured", client: null };
     }
   }

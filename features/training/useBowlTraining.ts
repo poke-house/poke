@@ -78,7 +78,18 @@ export function useBowlTraining(
     const fullList = getFullIngredientList(phaseKey);
     const distractors = fullList.filter(ing => !requiredSet.has(ing));
 
-    // Weight Distractor Logic
+    // Fixed recipe rule: exactly max 4 distinct base options total
+    if (phaseKey === "base") {
+      const uniqueDistractors = distractors.filter(d => !requiredSet.has(d));
+      const neededDistractors = Math.max(0, 4 - requiredUnique.length);
+      const selectedDistractors = shuffleArray(uniqueDistractors).slice(0, neededDistractors);
+      const combined = [...requiredUnique, ...selectedDistractors];
+      const finalOptions = shuffleArray([...new Set(combined)]);
+      setPhaseOptions(finalOptions);
+      return;
+    }
+
+    // Weight Distractor Logic for other phases
     const hasWeight = requiredUnique.some(ing => /\d+g/.test(ing));
     let finalDistractors: string[] = [];
     if (hasWeight) {

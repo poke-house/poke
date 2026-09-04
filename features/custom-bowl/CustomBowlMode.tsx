@@ -5,6 +5,7 @@ import { INGREDIENTS_DB } from '../../constants';
 import { IconArrowLeft, IconArrowRight, IconHome, IconCheck, IconX, IconBowl } from '../../components/Icons';
 import { PopupModal } from '../../components/Modals';
 import { MessageBubble } from '../../components/MessageBubble';
+import { SpeechBubble } from '../../components/SpeechBubble';
 import { Language } from '../../types';
 
 interface CustomBowlModeProps {
@@ -673,17 +674,17 @@ export function CustomBowlMode({
                         {/* Left Column: Customer Request and Running Order Summary */}
                         <div className="lg:col-span-4 flex flex-col gap-4 overflow-y-auto custom-scroll pr-1 pb-4">
                             {/* Customer Request Speech bubble */}
-                            <div className="bg-white border-2 border-brand-charcoal rounded-button p-4 shadow-[4px_4px_0px_0px_#080D09] space-y-3">
-                                <h3 className="font-display font-black text-xs text-brand-charcoal/50 uppercase tracking-wider">
+                            <div className="space-y-2">
+                                <h3 className="font-display font-black text-xs text-brand-charcoal/60 uppercase tracking-wider px-1">
                                     {t('custom_bowl_customer_request')}
                                 </h3>
-                                <div className="flex items-start gap-3">
-                                    <span className="text-3xl shrink-0">{paPersona.emoji}</span>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-display font-black text-sm text-brand-charcoal leading-tight">
-                                            {paPersona.name}
-                                        </h4>
-                                        <div className="mt-2 text-sm font-body font-bold text-brand-charcoal/90 leading-relaxed bg-brand-linen border border-brand-charcoal/10 rounded-button p-3">
+                                <SpeechBubble
+                                    speakerName={paPersona.name}
+                                    speakerEmoji={paPersona.emoji}
+                                    speakerRole={t('customer') || "Cliente"}
+                                    variant="butter"
+                                    message={
+                                        <div>
                                             {customPhase === 2 && t('cb_here_togo')}
                                             {customPhase === 3 && t('cb_size_q')}
                                             {customPhase === 4 && t('cb_base_q')}
@@ -694,8 +695,8 @@ export function CustomBowlMode({
                                             {customPhase === 9 && t('cb_sesame_q')}
                                             {customPhase === 10 && t('custom_bowl_review_order')}
                                         </div>
-                                    </div>
-                                </div>
+                                    }
+                                />
                             </div>
 
                             {/* Running Order Summary Card */}

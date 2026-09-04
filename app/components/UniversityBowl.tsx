@@ -1,6 +1,6 @@
 // @ts-nocheck
 /** UniversityBowl — bowl que se monta passo a passo (visual idêntico ao mockup aprovado). Componente puro. */
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 
 const CSS = `@keyframes sprinkle {
   0%   { transform: translate(var(--sx,0px), -64px) rotate(var(--sr,0deg)) scale(.5); opacity:0; }
@@ -8,12 +8,30 @@ const CSS = `@keyframes sprinkle {
   72%  { transform: translate(0,3px) rotate(0deg) scale(1.08); }
   100% { transform: translate(0,0) rotate(0deg) scale(1); opacity:1; }
 }
-.uni-sprinkle .sprinkle { transform-box: fill-box; transform-origin:center; animation: sprinkle .7s cubic-bezier(.4,.7,.5,1) both; }
-.uni-sprinkle .fadein { animation: fadein .6s ease both; }
+.uni-sprinkle .sprinkle { 
+  transform-box: fill-box; 
+  transform-origin: center; 
+  animation: sprinkle .7s cubic-bezier(.4,.7,.5,1) 1 forwards !important; 
+  animation-iteration-count: 1 !important; 
+}
+.uni-sprinkle .fadein { 
+  animation: fadein .6s ease 1 forwards !important; 
+  animation-iteration-count: 1 !important; 
+}
 @keyframes fadein { from{opacity:0} to{opacity:1} }
 @keyframes draw { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
-.uni-sprinkle .sauce-draw { stroke-dasharray:1; stroke-dashoffset:1; animation: draw 2.5s ease both; }
-@media (prefers-reduced-motion: reduce){ .uni-sprinkle .sprinkle,.uni-sprinkle .fadein,.uni-sprinkle .sauce-draw{ animation:none !important; stroke-dashoffset:0 !important; } }`;
+.uni-sprinkle .sauce-draw { 
+  stroke-dasharray:1; 
+  stroke-dashoffset:1; 
+  animation: draw 1.2s ease 1 forwards !important; 
+  animation-iteration-count: 1 !important; 
+}
+@media (prefers-reduced-motion: reduce){ 
+  .uni-sprinkle .sprinkle, .uni-sprinkle .fadein, .uni-sprinkle .sauce-draw { 
+    animation: none !important; 
+    stroke-dashoffset: 0 !important; 
+  } 
+}`;
 
 const ART = {
   "180g Arroz de sushi": { kind:"grain", color:"#E6D279" },   // amarelado
@@ -335,14 +353,14 @@ function protShapes(p){
   return [gShape(p.kind,p.color)];
 }
 
-function renderBowlInner(steps, current, zigLines, isSalad, scale){
-  const newStepIdx = current-1;
+function renderBowlInner(steps, current, zigLines, isSalad, scale, animatingStepIndex = null){
+  const newStepIdx = animatingStepIndex;
   // total greens of THIS recipe → fixed number of equal wedges (layout stays put)
   const totalGreens = steps.filter(s=>s.phase==="greens" && s.item!=="Hummus").reduce((n,s)=>n+s.count,0);
 
   let baseItems=[], greens=[], proteins=[], baseDrizzles=[], drizzles=[], crispy=[], showSesame=false, sesameNew=false;
   for(let i=0;i<current;i++){
-    const st=steps[i], art=ART[st.item]||{kind:"none"}, isNew=(i===newStepIdx);
+    const st=steps[i], art=ART[st.item]||{kind:"none"}, isNew=(newStepIdx !== null && i===newStepIdx);
     if(st.phase==="base"){ baseItems.push({item:st.item, isNew}); }
     else if(st.phase==="greens"){
       if(st.item==="Hummus"){ for(let c=0;c<st.count;c++) proteins.push({kind:art.kind,color:art.color,isNew}); }   // hummus = proteína (centro)
@@ -455,6 +473,41 @@ export default function UniversityBowl({ steps, step, zigLines = 15, isSalad = f
   steps: BowlColumnStep[]; step: number; zigLines?: number; isSalad?: boolean; scale?: number; className?: string;
 }) {
   ensureCSS();
-  const inner = useMemo(() => renderBowlInner(steps, step, zigLines, isSalad, scale), [steps, step, zigLines, isSalad, scale]);
-  return <svg viewBox="0 0 200 175" className={"uni-sprinkle " + className} style={{ width: "100%" }} dangerouslySetInnerHTML={{ __html: inner }} />;
+
+  // State to track the step currently performing its finite entry animation
+  const [animatingStep, setAnimatingStep] = useState<number | null>(null);
+  const prevStepRef = useRef<number>(step);
+
+  useEffect(() => {
+    if (step > prevStepRef.current) {
+      // Step incremented: trigger a single-flight animation for the newly added step
+      const targetStep = step - 1;
+      setAnimatingStep(targetStep);
+      prevStepRef.current = step;
+
+      const timer = setTimeout(() => {
+        setAnimatingStep(curr => (curr === targetStep ? null : curr));
+      }, 750);
+      return () => clearTimeout(timer);
+    } else {
+      // Step decremented, reset, or unchanged: ingredients are static
+      prevStepRef.current = step;
+      setAnimatingStep(null);
+    }
+  }, [step]);
+
+  const inner = useMemo(
+    () => renderBowlInner(steps, step, zigLines, isSalad, scale, animatingStep),
+    [steps, step, zigLines, isSalad, scale, animatingStep]
+  );
+
+  return (
+    <svg 
+      viewBox="0 0 200 175" 
+      className={"uni-sprinkle " + className} 
+      style={{ width: "100%" }} 
+      dangerouslySetInnerHTML={{ __html: inner }} 
+      onAnimationEnd={() => setAnimatingStep(null)}
+    />
+  );
 }

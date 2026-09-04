@@ -19,6 +19,7 @@ export async function getRushLeaderboard(limit: number = 3): Promise<GetRushLead
   }
 
   const supabase = result.client;
+  console.info('[Supabase] Fetching leaderboard (limit: %d)...', limit);
 
   try {
     const { data, error } = await supabase
@@ -30,7 +31,7 @@ export async function getRushLeaderboard(limit: number = 3): Promise<GetRushLead
       .limit(limit);
 
     if (error) {
-      console.warn('Error fetching rush leaderboard (non-fatal):', error);
+      console.error('[Supabase] Error fetching leaderboard:', { code: error.code, message: error.message, details: error.details });
       return {
         success: false,
         data: [],
@@ -39,12 +40,13 @@ export async function getRushLeaderboard(limit: number = 3): Promise<GetRushLead
       };
     }
 
+    console.info('[Supabase] Fetched %d leaderboard rows successfully', (data || []).length);
     return {
       success: true,
       data: (data || []) as RushScore[],
     };
   } catch (err) {
-    console.warn('Unexpected error in getRushLeaderboard service (non-fatal):', err);
+    console.error('[Supabase] Unexpected error in getRushLeaderboard:', err);
     const message = err instanceof Error ? err.message : 'An unexpected error occurred.';
     return {
       success: false,
@@ -70,6 +72,7 @@ export async function getRecentRushScores(limit: number = 10): Promise<GetRecent
   }
 
   const supabase = result.client;
+  console.info('[Supabase] Fetching recent rush scores (limit: %d)...', limit);
 
   try {
     const { data, error } = await supabase
@@ -79,7 +82,7 @@ export async function getRecentRushScores(limit: number = 10): Promise<GetRecent
       .limit(limit);
 
     if (error) {
-      console.warn('Error fetching recent rush scores (non-fatal):', error);
+      console.error('[Supabase] Error fetching recent rush scores:', { code: error.code, message: error.message, details: error.details });
       return {
         success: false,
         data: [],
@@ -88,12 +91,13 @@ export async function getRecentRushScores(limit: number = 10): Promise<GetRecent
       };
     }
 
+    console.info('[Supabase] Fetched %d recent rush scores successfully', (data || []).length);
     return {
       success: true,
       data: (data || []) as RushScore[],
     };
   } catch (err) {
-    console.warn('Unexpected error in getRecentRushScores service (non-fatal):', err);
+    console.error('[Supabase] Unexpected error in getRecentRushScores:', err);
     const message = err instanceof Error ? err.message : 'An unexpected error occurred.';
     return {
       success: false,

@@ -458,8 +458,8 @@ export const RushMode: React.FC<RushModeProps> = ({
           </div>
 
           {/* Interactive Option Selection Grid */}
-          <div className={`flex-1 overflow-y-auto p-4 md:p-6 custom-scroll ${scrollClass} bg-brand-linen/40`}>
-            <div className={`grid gap-3 w-full ${phaseOptions.length > 6 ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3'}`}>
+          <div className={`flex-1 overflow-y-auto p-4 md:p-6 custom-scroll ${scrollClass} bg-brand-linen/40 pb-6`}>
+            <div className={getCurrentPhaseKey() === 'base' ? "base-options" : `grid gap-3 w-full p-1 ${phaseOptions.length > 6 ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3'}`}>
               {phaseOptions.map((ing, idx) => {
                 const count = currentSelections.filter(i => i === ing).length;
                 let isChosen = count > 0;
@@ -476,10 +476,10 @@ export const RushMode: React.FC<RushModeProps> = ({
                   <button 
                     key={idx} 
                     onClick={() => handleSelection(ing)} 
-                    className={`relative p-3 rounded-win font-body font-bold text-xs md:text-sm border-2 transition-all flex items-center justify-center text-center h-20 md:h-24 btn-transition min-h-[50px] select-none ${activeBtnClass}`}
+                    className={`relative p-3 sm:p-4 rounded-win font-body font-bold text-xs md:text-sm border-2 transition-all flex items-center justify-center text-center min-h-[5.5rem] h-auto btn-transition select-none cursor-pointer ${activeBtnClass}`}
                     aria-label={`Selecionar ingrediente ${ing}. Atualmente selecionado ${count} vezes.`}
                   >
-                    <span className="hyphens-auto leading-tight px-1">{ing}</span>
+                    <span className="leading-snug break-words px-1">{ing}</span>
                     {count > 0 && (
                       <span className="absolute -top-2.5 -right-2.5 bg-brand-tomato text-white border-2 border-brand-charcoal text-[11px] font-display font-black w-6 h-6 flex items-center justify-center rounded-full shadow-soft animate-scale-increase">
                         {count}
@@ -491,8 +491,8 @@ export const RushMode: React.FC<RushModeProps> = ({
             </div>
           </div>
 
-          {/* Active Control Action Row */}
-          <div className="p-4 border-t-4 border-brand-charcoal bg-white flex justify-between items-center">
+          {/* Active Control Action Row (Sticky and accessible) */}
+          <div className="sticky bottom-0 z-20 p-4 border-t-4 border-brand-charcoal bg-white/95 backdrop-blur-sm flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
             <button 
               onClick={handleOpenExitModal} 
               aria-label="Voltar ao início do lodo"

@@ -372,8 +372,8 @@ export function BowlTrainingMode({
         )}
 
         {/* Ingredient Selection Area */}
-        <div className="flex-1 p-4 md:p-6 bg-white min-h-[16rem]">
-          <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 w-full">
+        <div className="flex-1 p-4 md:p-6 bg-white min-h-[16rem] overflow-y-auto custom-scroll pb-6">
+          <div className={currentPhase?.key === 'base' ? "base-options" : "grid gap-3 grid-cols-2 sm:grid-cols-3 w-full p-1"}>
             {phaseOptions.map((ing, idx) => {
               const count = currentSelections.filter(i => i === ing).length;
               const isSelected = count > 0;
@@ -390,9 +390,9 @@ export function BowlTrainingMode({
                 <button
                   key={idx}
                   onClick={() => handleSelection(ing)}
-                  className={`relative p-4 rounded-button border-2 border-brand-charcoal font-body font-bold text-sm text-brand-charcoal transition-all flex flex-col items-center justify-center text-center h-24 shadow-[3px_3px_0px_0px_#080D09] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#080D09] active:scale-95 cursor-pointer ${cardBgClass}`}
+                  className={`relative p-3 sm:p-4 rounded-button border-2 border-brand-charcoal font-body font-bold text-sm text-brand-charcoal transition-all flex flex-col items-center justify-center text-center min-h-[5.5rem] h-auto shadow-[3px_3px_0px_0px_#080D09] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#080D09] active:scale-95 cursor-pointer ${cardBgClass}`}
                 >
-                  <span className="line-clamp-2 leading-tight select-none">
+                  <span className="leading-snug break-words select-none">
                     {ing}
                   </span>
                   
@@ -417,8 +417,8 @@ export function BowlTrainingMode({
           </div>
         )}
 
-        {/* Selected Ingredients & Undo Row */}
-        <div className="p-4 bg-brand-linen/35 border-t-4 border-brand-charcoal flex flex-col sm:flex-row gap-4 items-center justify-between">
+        {/* Selected Ingredients & Undo Row (Sticky and accessible) */}
+        <div className="sticky bottom-0 z-20 bg-brand-linen/95 backdrop-blur-sm border-t-4 border-brand-charcoal p-4 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
           <div className="w-full sm:flex-1 text-left">
             <h4 className="text-xs font-condensed font-black text-brand-charcoal/50 uppercase mb-2">
               {t('training_selected')}
