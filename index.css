@@ -31,11 +31,27 @@
 
 @import "tailwindcss";
 
+:root {
+  --pink-mochi: #ff83af;
+  --butter-yellow: #f3e39f;
+  --olives-green: #99ca5c;
+  --icy-water: #819ec5;
+  --burgundy-cherry: #561621;
+  --rose-sorbet: #ffd7e8;
+  --tomato-soup: #f65300;
+  --white-linen: #f5f6e6;
+  --charcoal-black: #080d09;
+
+  --font-display: "Special Gothic Expanded One", "Special Gothic", system-ui, sans-serif;
+  --font-body: "Special Gothic Variable", "Special Gothic", system-ui, sans-serif;
+  --font-functional: "Bebas Neue", sans-serif;
+}
+
 @theme {
-  --font-sans: "Special Gothic Variable", system-ui, -apple-system, sans-serif;
-  --font-body: "Special Gothic Variable", system-ui, -apple-system, sans-serif;
+  --font-sans: "Special Gothic Variable", "Special Gothic", system-ui, -apple-system, sans-serif;
+  --font-body: "Special Gothic Variable", "Special Gothic", system-ui, -apple-system, sans-serif;
   --font-display: "Special Gothic Expanded One", "Special Gothic Variable", system-ui, sans-serif;
-  --font-condensed: "Special Gothic Condensed One", "Special Gothic Variable", system-ui, sans-serif;
+  --font-condensed: "Bebas Neue", "Special Gothic Condensed One", "Special Gothic Variable", system-ui, sans-serif;
 
   /* Official Poke House Brand Palette */
   --color-brand-mochi: #FF83AF;
@@ -121,8 +137,8 @@
   /* Animation overrides */
   --animate-fade-in: fadeIn 0.3s ease-out forwards;
   --animate-slide-up: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  --animate-pulse-fast: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-dance: dance 0.6s ease-in-out infinite;
+  --animate-pulse-fast: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) 2;
+  --animate-dance: dance 0.6s ease-in-out 2;
 
   @keyframes fadeIn {
     0% { opacity: 0; }
@@ -217,6 +233,251 @@ html, body, #root {
   transition: all 0.15s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
+.home-canvas {
+  background-color: #F3E39F;
+  background-image:
+    radial-gradient(circle at 9% 12%, rgba(255, 131, 175, 0.72) 0 7rem, transparent 7.1rem),
+    radial-gradient(circle at 92% 8%, rgba(255, 215, 232, 0.92) 0 10rem, transparent 10.1rem),
+    linear-gradient(135deg, rgba(245, 246, 230, 0.78), rgba(243, 227, 159, 0.72));
+}
+
+.brand-feature-card {
+  background:
+    radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.32) 0 4.5rem, transparent 4.6rem),
+    linear-gradient(118deg, #FF83AF 0%, #FF83AF 56%, #F3E39F 56%, #F3E39F 100%);
+}
+
+.brand-action {
+  font-family: "Bebas Neue", "Special Gothic Condensed One", sans-serif;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+/* Typography Hierarchy Standards */
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 4.25rem);
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  line-height: 1.05;
+}
+
+.body-copy {
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+  line-height: 1.55;
+}
+
+.eyebrow,
+.button-label {
+  font-family: var(--font-functional);
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+}
+
+/* Brand Buttons */
+.brand-button--primary {
+  background: var(--butter-yellow);
+  color: var(--charcoal-black);
+  border: 2px solid var(--charcoal-black);
+  box-shadow: 5px 5px 0 var(--charcoal-black);
+  border-radius: 999px;
+  font-family: var(--font-functional);
+  font-size: 1.125rem;
+  line-height: 1;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.75rem 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.33, 1, 0.68, 1), box-shadow 0.15s cubic-bezier(0.33, 1, 0.68, 1), background-color 0.15s ease;
+  user-select: none;
+}
+.brand-button--primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 var(--charcoal-black);
+  background: #f8ebb3;
+}
+.brand-button--primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--charcoal-black);
+}
+
+.brand-button--secondary {
+  background: var(--rose-sorbet);
+  color: var(--burgundy-cherry);
+  border: 2px solid var(--burgundy-cherry);
+  box-shadow: 4px 4px 0 var(--burgundy-cherry);
+  border-radius: 999px;
+  font-family: var(--font-functional);
+  font-size: 1.125rem;
+  line-height: 1;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.75rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.33, 1, 0.68, 1), box-shadow 0.15s cubic-bezier(0.33, 1, 0.68, 1), background-color 0.15s ease;
+  user-select: none;
+}
+.brand-button--secondary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--burgundy-cherry);
+  background: #ffe3f0;
+}
+.brand-button--secondary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--burgundy-cherry);
+}
+
+/* Home Hero Component */
+.home-hero {
+  position: relative;
+  background-color: var(--pink-mochi);
+  color: var(--charcoal-black);
+  border: 3px solid var(--charcoal-black);
+  box-shadow: 6px 6px 0px var(--charcoal-black);
+  border-radius: 32px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 900px) {
+  .home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    min-height: clamp(420px, 48vw, 590px);
+  }
+}
+
+.home-hero__copy {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.75rem, 4vw, 3.5rem);
+}
+
+.home-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.home-hero__visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  overflow: visible;
+}
+
+.home-hero__bowl {
+  width: min(100%, 520px);
+  height: auto;
+  max-height: 440px;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 26px rgb(86 22 33 / 0.18));
+  transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.home-hero:hover .home-hero__bowl {
+  transform: scale(1.02) rotate(1deg);
+}
+
+/* Mode Grid */
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.mode-card--featured {
+  grid-column: span 12;
+}
+
+.mode-card--secondary {
+  grid-column: span 12;
+}
+
+@media (min-width: 768px) {
+  .mode-card--featured {
+    grid-column: span 7;
+  }
+  .mode-card--secondary {
+    grid-column: span 5;
+  }
+}
+
+/* University Grid */
+.university-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 360px) {
+  .university-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 768px) {
+  .university-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+.university-card {
+  min-width: 0;
+  min-height: 112px;
+  height: auto;
+  padding: clamp(12px, 3vw, 20px);
+}
+
+.training-attention-once {
+  animation: trainingAttention 0.75s ease-in-out 2;
+}
+
+@keyframes trainingAttention {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.025); opacity: 0.76; }
+}
+
+/* Finite Animation Overrides */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 2 !important;
+}
+
+.animate-pulse-fast {
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) 2 !important;
+}
+
+.animate-bounce {
+  animation: bounce 1s ease-in-out 2 !important;
+}
+
+.animate-dance {
+  animation: dance 0.6s ease-in-out 2 !important;
+}
+
 /* Keyboard Focus Ring */
 *:focus-visible {
   outline: 3px solid #FF83AF !important;
@@ -231,7 +492,7 @@ html, body, #root {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .animate-bounce, .animate-dance {
+  .animate-bounce, .animate-dance, .animate-pulse, .animate-pulse-fast, .animate-spin {
     animation: none !important;
     transform: none !important;
   }

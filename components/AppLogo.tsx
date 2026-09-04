@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import localLogo from '../src/assets/brand/poke-house-logo.png';
 
-const logoUrl = "https://i.ibb.co/hRS6QzKH/Poke-House-Logo.png";
+const remoteLogoUrl = "https://i.ibb.co/hRS6QzKH/Poke-House-Logo.png";
 
 interface AppLogoProps {
   className?: string;
@@ -8,6 +9,8 @@ interface AppLogoProps {
 }
 
 export const AppLogo: React.FC<AppLogoProps> = ({ className = '', variant = 'default' }) => {
+  const [src, setSrc] = useState<string>(localLogo || remoteLogoUrl);
+
   // Determine standard styles to maintain original proportions and safe spacing
   let baseClass = 'object-contain select-none';
   if (variant === 'mobile') {
@@ -20,9 +23,14 @@ export const AppLogo: React.FC<AppLogoProps> = ({ className = '', variant = 'def
 
   return (
     <img
-      src={logoUrl}
+      src={src}
       alt="Poke House Logo"
       className={`${baseClass} ${className}`}
+      onError={() => {
+        if (src !== remoteLogoUrl) {
+          setSrc(remoteLogoUrl);
+        }
+      }}
       referrerPolicy="no-referrer"
     />
   );

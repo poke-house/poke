@@ -19,7 +19,7 @@ import { TRANSLATIONS } from '../../translations';
 // ==========================================
 const StartingScreen: React.FC<{ language: 'pt' | 'en' }> = ({ language }) => {
   return (
-    <div className="bg-brand-linen min-h-screen w-full flex items-center justify-center font-sans px-4">
+    <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex items-center justify-center font-sans px-4">
       <div className="bg-white border-4 border-brand-charcoal rounded-card p-8 shadow-elevated max-w-md w-full text-center space-y-6">
         <div className="flex justify-center">
           <AppLogo variant="desktop" />
@@ -89,7 +89,7 @@ const ActiveRoundScreen: React.FC<{
     : (language === 'pt' ? 'Teste rápido de conhecimentos operacionais e de receitas.' : 'Rapid-fire test on operations and recipe SOP.');
 
   return (
-    <div className="bg-brand-linen min-h-screen w-full flex items-center justify-center font-sans px-4 py-8">
+    <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex items-center justify-center font-sans px-4 py-8">
       <div className="bg-white border-4 border-brand-charcoal rounded-card p-6 shadow-elevated max-w-lg w-full space-y-6">
         {/* Header with Round Information */}
         <div className="flex justify-between items-center border-b-2 border-dashed border-brand-charcoal pb-4">
@@ -164,7 +164,7 @@ const RoundTransitionScreen: React.FC<{
   const sortedParticipants = [...participants].sort((a, b) => b.totalScore - a.totalScore);
 
   return (
-    <div className="bg-brand-linen min-h-screen w-full flex items-center justify-center font-sans px-4 py-8">
+    <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex items-center justify-center font-sans px-4 py-8">
       <div className="bg-white border-4 border-brand-charcoal rounded-card p-6 shadow-elevated max-w-md w-full space-y-6">
         <div className="text-center space-y-2 border-b-2 border-dashed border-brand-charcoal pb-4">
           <span className="bg-brand-green text-white text-xs font-display font-black px-3 py-1 rounded-full border border-brand-charcoal uppercase tracking-wider">
@@ -224,7 +224,7 @@ const ResultsScreen: React.FC<{
   onExit: () => void;
 }> = ({ language, onExit }) => {
   return (
-    <div className="bg-brand-linen min-h-screen w-full flex items-center justify-center font-sans px-4">
+    <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex items-center justify-center font-sans px-4">
       <div className="bg-white border-4 border-brand-charcoal rounded-card p-8 shadow-elevated max-w-sm text-center space-y-6">
         <div className="flex justify-center">
           <AppLogo variant="desktop" />
@@ -308,7 +308,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
   // Safe developer-only mock loader if needed
   if (isLoading && !activeRoom) {
     return (
-      <div className="bg-brand-linen min-h-screen w-full flex items-center justify-center font-sans">
+      <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex items-center justify-center font-sans">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-tomato mx-auto"></div>
           <p className="text-brand-charcoal font-semibold">
@@ -322,7 +322,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
   // 1. If arena has been closed, render a beautiful closure screen
   if (activeRoom && activeRoom.status === 'closed') {
     return (
-      <div className="bg-brand-linen min-h-screen w-full flex items-center justify-center font-sans px-4">
+      <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex items-center justify-center font-sans px-4">
         <div className="bg-white border-4 border-brand-charcoal rounded-card p-6 shadow-elevated max-w-sm text-center">
           <ShieldAlert className="text-brand-tomato mx-auto mb-4" size={48} />
           <h3 className="font-display font-black text-2xl mb-2">
@@ -349,7 +349,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
   if (activeRoom) {
     if (activeRoom.status === 'lobby') {
       return (
-        <div className="bg-brand-linen min-h-screen w-full flex flex-col justify-start py-8">
+        <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex flex-col justify-start py-8">
           <ArenaLobby
             room={activeRoom}
             localPlayer={localPlayer}
@@ -409,7 +409,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
         );
       } else {
         return (
-          <div className="bg-brand-linen min-h-screen w-full flex flex-col justify-start py-12 px-4 md:px-8">
+          <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex flex-col justify-start py-12 px-4 md:px-8">
             <ArenaRoundResults 
               roomCode={activeRoom.roomCode} 
               reconnectToken={reconnectToken} 
@@ -422,7 +422,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
     
     if (activeRoom.status === 'results') {
       return (
-        <div className="bg-brand-linen min-h-screen w-full flex flex-col justify-start py-4 px-2 md:px-4">
+        <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex flex-col justify-start py-4 px-2 md:px-4">
           <ArenaFinalResults 
             roomCode={activeRoom.roomCode} 
             reconnectToken={reconnectToken} 
@@ -438,7 +438,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
 
   // 3. No active room: render Home (Create/Join/Reconnect) screen
   return (
-    <div className="bg-brand-linen min-h-screen w-full flex flex-col justify-center py-8">
+    <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex flex-col justify-center py-8">
       <ArenaHome
         onBack={onBack}
         onCreateRoom={createRoom}

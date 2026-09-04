@@ -371,7 +371,12 @@ export const TRANSLATIONS = {
         home_modes_overview: "Desafios e Modos de Jogo",
         home_btn_enter: "Entrar",
         home_active_session: "Tens uma arena ativa no código {code}!",
-        home_reconnect: "Voltar a Ligar"
+        home_reconnect: "Voltar a Ligar",
+        home_hero_eyebrow: "TREINO POKE HOUSE",
+        home_hero_title: "Aprende. Monta. Brilha.",
+        home_hero_desc: "O teu caminho de treino imersivo. Domina as receitas oficiais, aperfeiçoa a linha e brilha em loja com precisão e velocidade.",
+        home_hero_cta_primary: "COMEÇAR TREINO",
+        home_hero_cta_secondary: "EXPLORAR MODOS"
     },
     en: {
         // Home & Sidebar
@@ -743,7 +748,12 @@ export const TRANSLATIONS = {
         home_modes_overview: "Challenges and Training Modes",
         home_btn_enter: "Enter",
         home_active_session: "You have an active arena session with code {code}!",
-        home_reconnect: "Reconnect"
+        home_reconnect: "Reconnect",
+        home_hero_eyebrow: "POKE HOUSE TRAINING",
+        home_hero_title: "Learn. Build. Shine.",
+        home_hero_desc: "Your official guided learning journey. Master standard recipes, build assembly speed on the line, and guarantee service excellence.",
+        home_hero_cta_primary: "START TRAINING",
+        home_hero_cta_secondary: "EXPLORE MODES"
     }
 };
 

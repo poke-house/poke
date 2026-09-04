@@ -218,7 +218,7 @@ export const RushMode: React.FC<RushModeProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center relative p-2 md:p-6" id="rush-mode-container">
+    <div className="safe-bottom w-full h-full overflow-y-auto custom-scroll flex items-center justify-center relative p-2 md:p-6" id="rush-mode-container">
       {/* Entry Name/Store Modal */}
       {showRushEntry && (
         <RushEntryModal 
@@ -552,7 +552,7 @@ export const RushMode: React.FC<RushModeProps> = ({
       {/* RUSH GAME OVER: Redesigned final result screen with score submitting and leaderboard saving */}
       {rushGameState === "RUSH_GAME_OVER" && (
         <div className="text-center p-6 md:p-8 bg-brand-linen border-4 border-brand-charcoal rounded-card shadow-elevated animate-slide-up mx-4 max-w-md w-full overflow-y-auto max-h-[92vh] custom-scroll" id="rush-gameover-screen">
-          <div className="text-5xl mb-3 animate-bounce" style={{ animationDuration: '4s' }} aria-hidden="true">😰</div>
+          <div className="text-5xl mb-3 training-attention-once" aria-hidden="true">😰</div>
           
           <h2 className="text-2xl md:text-3xl font-display font-black text-brand-charcoal uppercase mb-1">
             {t('rush_game_over') || "Fim do Lodo!"}

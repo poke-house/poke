@@ -29,7 +29,7 @@ export const RushLeaderboard: React.FC<RushLeaderboardProps> = ({
       {leaderboardLoading ? (
         <div className="h-full min-h-[250px] flex flex-col items-center justify-center p-8 text-center space-y-4" id="leaderboard-loading-view">
           <div className="w-10 h-10 border-4 border-brand-tomato border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
-          <p className="text-sm font-body font-bold text-brand-charcoal uppercase tracking-wider animate-pulse">
+          <p className="text-sm font-body font-bold text-brand-charcoal uppercase tracking-wider training-attention-once">
             {t('rush_ranking_loading') || t('leaderboard_loading')}
           </p>
         </div>
@@ -127,7 +127,7 @@ export const RushLeaderboard: React.FC<RushLeaderboardProps> = ({
                   <div className="order-2 flex flex-col items-center">
                     <div className="w-full text-center space-y-2 relative -translate-y-2">
                       {/* Floating Crown Accent */}
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-2xl animate-bounce" style={{ animationDuration: '3s' }} aria-hidden="true">
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-2xl training-attention-once" aria-hidden="true">
                         👑
                       </div>
                       <div className="relative mx-auto w-16 h-16 rounded-full border-4 border-brand-charcoal bg-brand-butter flex items-center justify-center font-display font-bold text-2xl shadow-soft">

@@ -1,0 +1,6 @@
+{
+  "name": "Poke House Training",
+  "description": "A gamified training application for Poke House employees to learn recipes, ingredients, and bowl construction with standard and custom game modes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

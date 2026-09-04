@@ -263,15 +263,15 @@ export function UniversityMode({
             
             {/* Header / Brand Bar */}
             <div className="max-w-4xl w-full mx-auto flex items-center justify-between gap-2 mb-3 md:mb-6 shrink-0">
-                <div className="flex items-center gap-2 min-w-0">
-                    <div className="bg-brand-icy text-white p-2 rounded-xl md:rounded-2xl border-2 border-brand-charcoal shadow-sm shrink-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="bg-brand-mochi text-white p-2.5 rounded-2xl border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] shrink-0">
                         <IconUniversity size={24} />
                     </div>
                     <div className="min-w-0">
-                        <h1 className="text-base min-[375px]:text-lg md:text-2xl font-display font-black leading-tight">
+                        <h1 className="text-base min-[375px]:text-lg md:text-2xl font-display font-black leading-tight text-brand-charcoal">
                             {t('university_title')}
                         </h1>
-                        <p className="hidden min-[390px]:block text-[11px] md:text-xs font-body text-brand-charcoal/60 mt-0.5 font-medium leading-tight">
+                        <p className="hidden min-[390px]:block text-[11px] md:text-xs font-body text-brand-burgundy font-medium leading-tight">
                             {t('university_objective')}
                         </p>
                     </div>
@@ -280,7 +280,7 @@ export function UniversityMode({
                 {gameState !== "UNIVERSITY_PLAYING" && (
                     <button 
                         onClick={resetToHome}
-                        className="bg-white hover:bg-brand-sorbet text-brand-charcoal p-2.5 min-[390px]:px-3 rounded-button font-body font-bold border-2 border-brand-charcoal transition-all shadow-sm flex items-center gap-1.5 active:translate-y-0.5 text-xs shrink-0"
+                        className="bg-brand-butter hover:bg-brand-butter/90 text-brand-charcoal p-2.5 min-[390px]:px-4 rounded-full font-functional text-sm uppercase tracking-wider border-2 border-brand-charcoal transition-all shadow-[2px_2px_0px_#080D09] flex items-center gap-1.5 active:translate-y-0.5 shrink-0 cursor-pointer"
                         aria-label={t('btn_menu_main')}
                     >
                         <IconHome size={18} />
@@ -294,48 +294,56 @@ export function UniversityMode({
                 
                 {/* 1. ENTRY VIEW */}
                 {gameState === "UNIVERSITY_SELECT" && subState === "ENTRY" && (
-                    <div className="bg-white border-4 border-brand-charcoal rounded-modal shadow-elevated p-6 md:p-10 w-full animate-slide-up text-center max-w-2xl">
-                        <span className="text-5xl md:text-6xl mb-6 block">🎓</span>
-                        <h2 className="text-2xl md:text-3xl font-display font-black text-brand-charcoal mb-3">
+                    <div className="bg-brand-linen border-3 border-brand-charcoal rounded-[28px] shadow-[6px_6px_0px_#080D09] p-6 md:p-10 w-full animate-slide-up text-center max-w-2xl">
+                        <div className="w-16 h-16 rounded-2xl bg-brand-butter border-2 border-brand-charcoal shadow-[3px_3px_0px_#080D09] flex items-center justify-center mx-auto mb-4">
+                            <span className="text-3xl">🎓</span>
+                        </div>
+                        <h2 className="text-2xl md:text-3xl font-display font-black text-brand-charcoal mb-2">
                             {t('university_title')}
                         </h2>
-                        <p className="text-brand-charcoal/80 font-body text-sm md:text-base leading-relaxed mb-8 max-w-md mx-auto">
+                        <p className="text-brand-burgundy font-body text-sm md:text-base leading-relaxed mb-8 max-w-md mx-auto font-medium">
                             {t('uni_intro_sub')}
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                             <button 
                                 onClick={() => { setMenuCategory("HOUSE"); setSubState("SELECT_PRODUCT"); }}
-                                className="bg-brand-sorbet/30 hover:bg-brand-sorbet border-2 border-brand-charcoal rounded-win p-5 flex flex-col items-center justify-center gap-3 transition-all transform hover:-translate-y-1 active:translate-y-0 shadow-sm"
+                                className="bg-brand-sorbet text-brand-burgundy hover:bg-brand-sorbet/90 border-3 border-brand-burgundy rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all hover:-translate-y-1 active:translate-y-0 shadow-[4px_4px_0px_#561621] cursor-pointer group"
                             >
-                                <span className="text-3xl">🐟</span>
-                                <span className="font-display text-xs font-black uppercase tracking-wider text-brand-charcoal">
+                                <div className="w-12 h-12 rounded-xl bg-brand-butter border-2 border-brand-burgundy flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                    🐟
+                                </div>
+                                <span className="font-functional text-sm uppercase tracking-wider text-brand-burgundy font-black">
                                     {t('menu_house')}
                                 </span>
                             </button>
                             
                             <button 
                                 onClick={() => { setMenuCategory("GREEN"); setSubState("SELECT_PRODUCT"); }}
-                                className="bg-brand-butter/30 hover:bg-brand-butter border-2 border-brand-charcoal rounded-win p-5 flex flex-col items-center justify-center gap-3 transition-all transform hover:-translate-y-1 active:translate-y-0 shadow-sm"
+                                className="bg-brand-butter text-brand-charcoal hover:bg-brand-butter/90 border-3 border-brand-charcoal rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all hover:-translate-y-1 active:translate-y-0 shadow-[4px_4px_0px_#080D09] cursor-pointer group"
                             >
-                                <span className="text-3xl">🥗</span>
-                                <span className="font-display text-xs font-black uppercase tracking-wider text-brand-charcoal">
+                                <div className="w-12 h-12 rounded-xl bg-white border-2 border-brand-charcoal flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                    🥗
+                                </div>
+                                <span className="font-functional text-sm uppercase tracking-wider text-brand-charcoal font-black">
                                     {t('menu_green')}
                                 </span>
                             </button>
 
                             <button 
                                 onClick={() => { setMenuCategory("SMOOTHIE"); setSubState("SELECT_PRODUCT"); }}
-                                className="bg-brand-icy/20 hover:bg-brand-icy/40 border-2 border-brand-charcoal rounded-win p-5 flex flex-col items-center justify-center gap-3 transition-all transform hover:-translate-y-1 active:translate-y-0 shadow-sm"
+                                className="bg-brand-icy text-brand-charcoal hover:bg-brand-icy/90 border-3 border-brand-charcoal rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all hover:-translate-y-1 active:translate-y-0 shadow-[4px_4px_0px_#080D09] cursor-pointer group"
                             >
-                                <span className="text-3xl">🥤</span>
-                                <span className="font-display text-xs font-black uppercase tracking-wider text-brand-charcoal">
+                                <div className="w-12 h-12 rounded-xl bg-white border-2 border-brand-charcoal flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                    🥤
+                                </div>
+                                <span className="font-functional text-sm uppercase tracking-wider text-brand-charcoal font-black">
                                     {t('menu_smoothie')}
                                 </span>
                             </button>
                         </div>
 
-                        <p className="text-xs font-condensed font-bold uppercase tracking-wider text-brand-tomato bg-brand-tomato/10 py-2 px-4 rounded-full inline-block">
+                        <p className="text-xs font-functional text-brand-charcoal bg-brand-butter py-2 px-4 rounded-full inline-block border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] uppercase tracking-wider">
                             {t('uni_recommended_order')}
                         </p>
                     </div>
@@ -343,51 +351,46 @@ export function UniversityMode({
 
                 {/* 2. PRODUCT SELECTION GRID */}
                 {gameState === "UNIVERSITY_SELECT" && subState === "SELECT_PRODUCT" && menuCategory && (
-                    <div className="w-full bg-white border-2 md:border-4 border-brand-charcoal rounded-2xl md:rounded-modal shadow-elevated p-3 md:p-8 animate-slide-up flex flex-col max-w-3xl min-h-0">
-                        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 mb-3 md:mb-6 border-b-2 border-brand-linen pb-3 md:pb-4">
+                    <div className="w-full bg-brand-linen border-3 border-brand-charcoal rounded-[28px] shadow-[6px_6px_0px_#080D09] p-4 md:p-8 animate-slide-up flex flex-col max-w-4xl min-h-0">
+                        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 mb-4 md:mb-6 border-b-2 border-brand-charcoal/15 pb-3 md:pb-4">
                             <button 
                                 onClick={() => setSubState("ENTRY")}
-                                className="flex items-center gap-1 text-brand-charcoal/70 hover:text-brand-charcoal font-body font-bold text-xs md:text-sm bg-brand-linen py-2 px-2.5 md:px-4 rounded-button border-2 border-transparent hover:border-brand-charcoal transition-all"
+                                className="flex items-center gap-1.5 text-brand-charcoal font-functional text-sm bg-brand-butter hover:bg-brand-butter/90 py-2 px-3.5 rounded-full border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] active:translate-y-0.5 transition-all cursor-pointer uppercase"
                             >
                                 <IconArrowLeft size={16} />
                                 <span>{t('btn_back')}</span>
                             </button>
-                            <h2 className="text-base md:text-xl text-center font-display font-black text-brand-charcoal min-w-0">
+                            <h2 className="text-lg md:text-2xl text-center font-display font-black text-brand-charcoal min-w-0">
                                 {menuCategory === "HOUSE" ? t('menu_house') : menuCategory === "GREEN" ? t('menu_green') : t('menu_smoothie')}
                             </h2>
                             <div className="w-8 md:w-[84px] invisible" /> {/* Spacer */}
                         </div>
 
-                        <div className="grid grid-cols-1 min-[360px]:grid-cols-2 md:grid-cols-3 gap-2.5 md:gap-4 overflow-y-auto max-h-none md:max-h-[50vh] pr-1 custom-scroll">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 overflow-y-auto max-h-none md:max-h-[55vh] pr-1 custom-scroll">
                             {RECIPES
                                 .filter(r => r.category === menuCategory)
                                 .map(recipe => {
                                     const isHouse = recipe.category === "HOUSE";
-                                    const stepCount = isHouse 
-                                        ? Object.values(recipe.variants || {})[0]?.base?.length ? 8 : 9 
-                                        : recipe.category === "SMOOTHIE" 
-                                            ? 8 
-                                            : 7; // Approx size overview indicator
 
                                     return (
                                         <button 
                                             key={recipe.id} 
                                             onClick={() => handleLevelStart(recipe)}
-                                            className="bg-brand-linen hover:bg-brand-sorbet/20 border-2 border-brand-charcoal rounded-win p-3 md:p-5 text-left flex flex-col justify-between min-h-[112px] md:h-40 transition-all transform hover:-translate-y-1 shadow-sm active:translate-y-0 group min-w-0"
+                                            className="bg-white hover:bg-brand-sorbet/25 border-3 border-brand-charcoal rounded-2xl p-4 md:p-5 text-left flex flex-col justify-between min-h-[140px] transition-all hover:-translate-y-1 shadow-[4px_4px_0px_#080D09] active:translate-y-0 group min-w-0 cursor-pointer"
                                         >
                                             <div>
-                                                <h3 className="font-display text-xs md:text-sm font-black text-brand-charcoal leading-tight group-hover:text-brand-tomato transition-colors break-words">
+                                                <h3 className="font-display text-sm md:text-base font-black text-brand-charcoal leading-tight group-hover:text-brand-burgundy transition-colors break-words">
                                                     {recipe.name}
                                                 </h3>
-                                                <p className="text-[10px] font-condensed font-black text-brand-charcoal/50 uppercase tracking-widest mt-1">
+                                                <p className="text-xs font-functional text-brand-burgundy/80 uppercase tracking-widest mt-1">
                                                     {recipe.category === "SMOOTHIE" ? "Smoothie" : recipe.category === "HOUSE" ? "Poke Bowl" : "Salad Bowl"}
                                                 </p>
                                             </div>
-                                            <div className="flex flex-wrap items-end justify-between gap-1 mt-3">
-                                                <span className="text-[10px] font-condensed font-bold bg-white px-2 py-1 rounded border border-brand-charcoal/20">
+                                            <div className="flex flex-wrap items-end justify-between gap-1 mt-4 pt-3 border-t border-brand-charcoal/10">
+                                                <span className="text-[11px] font-functional text-brand-charcoal bg-brand-butter px-2.5 py-0.5 rounded-full border border-brand-charcoal uppercase">
                                                     {isHouse ? "R & L Sizes" : "Regular"}
                                                 </span>
-                                                <span className="text-xs font-body font-bold text-brand-tomato group-hover:underline">
+                                                <span className="text-xs font-functional font-black text-brand-burgundy group-hover:translate-x-0.5 transition-transform flex items-center gap-1 uppercase">
                                                     Treinar →
                                                 </span>
                                             </div>
@@ -400,21 +403,21 @@ export function UniversityMode({
 
                 {/* 3. SIZE SELECTION SCREEN */}
                 {gameState === "UNIVERSITY_SELECT" && subState === "SIZE_SELECT" && tempRecipe && (
-                    <div className="w-full bg-white border-4 border-brand-charcoal rounded-modal shadow-elevated p-6 md:p-8 animate-slide-up flex flex-col max-w-2xl text-center">
+                    <div className="w-full bg-brand-linen border-3 border-brand-charcoal rounded-[28px] shadow-[6px_6px_0px_#080D09] p-6 md:p-8 animate-slide-up flex flex-col max-w-2xl text-center">
                         <h2 className="text-2xl font-display font-black text-brand-charcoal mb-2">
                             {t('university_select_size')}
                         </h2>
-                        <p className="text-xs font-body text-brand-charcoal/60 mb-8 font-medium">
+                        <p className="text-xs md:text-sm font-body text-brand-burgundy mb-8 font-medium">
                             Escolha o tamanho para treinar as proporções corretas de ingredientes da {tempRecipe.name}
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <button 
                                 onClick={() => setSelectedSize("R")}
-                                className={`border-4 rounded-modal p-6 text-center transition-all flex flex-col items-center justify-center gap-3 relative ${
+                                className={`border-3 rounded-2xl p-6 text-center transition-all flex flex-col items-center justify-center gap-3 relative cursor-pointer ${
                                     selectedSize === "R" 
-                                        ? "border-brand-mochi bg-brand-sorbet/20 shadow-sm" 
-                                        : "border-brand-charcoal bg-brand-linen hover:bg-brand-linen/80"
+                                        ? "border-brand-charcoal bg-brand-butter text-brand-charcoal shadow-[5px_5px_0px_#080D09]" 
+                                        : "border-brand-charcoal/40 bg-white text-brand-charcoal hover:border-brand-charcoal"
                                 }`}
                             >
                                 {selectedSize === "R" && (
@@ -423,20 +426,20 @@ export function UniversityMode({
                                     </div>
                                 )}
                                 <span className="text-4xl">Bowl</span>
-                                <span className="font-display text-lg font-black text-brand-charcoal uppercase">
+                                <span className="font-display text-lg font-black uppercase">
                                     Regular (R)
                                 </span>
-                                <span className="text-xs font-condensed font-bold text-brand-charcoal/60 uppercase tracking-wider">
+                                <span className="text-xs font-functional uppercase tracking-wider text-brand-charcoal/80">
                                     Base: 180g Arroz Sushi • 2x Protein
                                 </span>
                             </button>
 
                             <button 
                                 onClick={() => setSelectedSize("L")}
-                                className={`border-4 rounded-modal p-6 text-center transition-all flex flex-col items-center justify-center gap-3 relative ${
+                                className={`border-3 rounded-2xl p-6 text-center transition-all flex flex-col items-center justify-center gap-3 relative cursor-pointer ${
                                     selectedSize === "L" 
-                                        ? "border-brand-mochi bg-brand-sorbet/20 shadow-sm" 
-                                        : "border-brand-charcoal bg-brand-linen hover:bg-brand-linen/80"
+                                        ? "border-brand-charcoal bg-brand-butter text-brand-charcoal shadow-[5px_5px_0px_#080D09]" 
+                                        : "border-brand-charcoal/40 bg-white text-brand-charcoal hover:border-brand-charcoal"
                                 }`}
                             >
                                 {selectedSize === "L" && (
@@ -445,10 +448,10 @@ export function UniversityMode({
                                     </div>
                                 )}
                                 <span className="text-4xl">Big Bowl</span>
-                                <span className="font-display text-lg font-black text-brand-charcoal uppercase">
+                                <span className="font-display text-lg font-black uppercase">
                                     Large (L)
                                 </span>
-                                <span className="text-xs font-condensed font-bold text-brand-charcoal/60 uppercase tracking-wider">
+                                <span className="text-xs font-functional uppercase tracking-wider text-brand-charcoal/80">
                                     Base: 270g Arroz Sushi • 3x Protein
                                 </span>
                             </button>
@@ -457,13 +460,13 @@ export function UniversityMode({
                         <div className="flex items-center justify-between gap-4 mt-4">
                             <button 
                                 onClick={() => setSubState("SELECT_PRODUCT")}
-                                className="flex-1 bg-brand-linen hover:bg-brand-linen/80 text-brand-charcoal py-4 rounded-button font-body font-bold border-2 border-brand-charcoal transition-all uppercase text-xs"
+                                className="flex-1 brand-button--secondary"
                             >
                                 {t('btn_back')}
                             </button>
                             <button 
                                 onClick={() => setSubState("RECIPE_OVERVIEW")}
-                                className="flex-1 bg-brand-mochi hover:bg-brand-mochi/90 text-brand-charcoal py-4 rounded-button font-display font-black border-2 border-brand-charcoal transition-all uppercase text-sm shadow-sm active:translate-y-0.5"
+                                className="flex-1 brand-button--primary"
                             >
                                 Continuar
                             </button>
@@ -473,23 +476,25 @@ export function UniversityMode({
 
                 {/* 4. RECIPE OVERVIEW CARD */}
                 {gameState === "UNIVERSITY_SELECT" && subState === "RECIPE_OVERVIEW" && tempRecipe && (
-                    <div className="w-full bg-white border-4 border-brand-charcoal rounded-modal shadow-elevated p-6 md:p-8 animate-slide-up flex flex-col max-w-md text-center">
-                        <span className="text-5xl mb-4 block">📋</span>
+                    <div className="w-full bg-brand-linen border-3 border-brand-charcoal rounded-[28px] shadow-[6px_6px_0px_#080D09] p-6 md:p-8 animate-slide-up flex flex-col max-w-md text-center">
+                        <div className="w-16 h-16 rounded-2xl bg-brand-butter border-2 border-brand-charcoal shadow-[3px_3px_0px_#080D09] flex items-center justify-center mx-auto mb-3 text-3xl">
+                            📋
+                        </div>
                         <h2 className="text-xl font-display font-black text-brand-charcoal mb-1">
                             {t('university_recipe_overview')}
                         </h2>
-                        <h3 className="text-2xl font-display font-black text-brand-tomato mb-2">
+                        <h3 className="text-2xl font-display font-black text-brand-burgundy mb-2">
                             {tempRecipe.name}
                         </h3>
-                        <p className="text-xs font-condensed font-black bg-brand-linen py-1.5 px-4 rounded-full border border-brand-charcoal/20 uppercase tracking-widest inline-block mx-auto mb-6">
+                        <p className="text-xs font-functional bg-brand-butter py-1.5 px-4 rounded-full border border-brand-charcoal uppercase tracking-wider inline-block mx-auto mb-6 text-brand-charcoal font-black">
                             Tamanho: {tempRecipe.category === "SMOOTHIE" ? "Padrão" : selectedSize === "R" ? "Regular" : "Large"}
                         </p>
 
-                        <div className="bg-brand-sorbet/30 border-2 border-brand-charcoal rounded-win p-4 text-left space-y-3 mb-8">
-                            <h4 className="font-condensed font-black uppercase text-brand-charcoal text-xs tracking-wider">
+                        <div className="bg-brand-sorbet text-brand-burgundy border-2 border-brand-burgundy rounded-2xl p-4 text-left space-y-2 mb-8 shadow-xs">
+                            <h4 className="font-functional font-black uppercase text-xs tracking-wider text-brand-burgundy">
                                 Notas de Preparação Importantes:
                             </h4>
-                            <p className="font-body text-xs text-brand-charcoal/80 leading-relaxed font-medium">
+                            <p className="font-body text-xs text-brand-burgundy/90 leading-relaxed font-medium">
                                 {tempRecipe.category === "SMOOTHIE" 
                                     ? "Os smoothies são preparados batendo os packs de frutas congeladas com líquidos e ingredientes adicionais no copo de servir. Atente-se à marmorização do copo com iogurte ou pastas antes de servir."
                                     : "A montagem segue o padrão de camadas estritas para garantir estética impecável. Meça o peso da base com rigor e distribua os greens uniformemente antes das proteínas."}
@@ -499,7 +504,7 @@ export function UniversityMode({
                         <div className="space-y-3">
                             <button 
                                 onClick={handleStartTraining}
-                                className="w-full bg-brand-mochi hover:bg-brand-mochi/90 text-brand-charcoal py-4 rounded-button font-display font-black border-2 border-brand-charcoal transition-all uppercase text-sm shadow-sm active:translate-y-0.5"
+                                className="w-full brand-button--primary text-center justify-center"
                             >
                                 {t('university_start_training')}
                             </button>
@@ -511,7 +516,7 @@ export function UniversityMode({
                                         setSubState("SELECT_PRODUCT");
                                     }
                                 }}
-                                className="w-full bg-brand-linen hover:bg-brand-linen/80 text-brand-charcoal py-3 rounded-button font-body font-bold border-2 border-brand-charcoal transition-all text-xs uppercase"
+                                className="w-full brand-button--secondary text-center justify-center"
                             >
                                 {t('btn_back')}
                             </button>
@@ -812,7 +817,7 @@ export function UniversityMode({
                 {/* 6. COMPLETION SCREEN */}
                 {gameState === "UNIVERSITY_SUCCESS" && selectedRecipe && (
                     <div className="w-full bg-white border-4 border-brand-charcoal rounded-modal shadow-elevated p-8 md:p-10 text-center animate-slide-up max-w-xl">
-                        <span className="text-6xl mb-6 block animate-bounce">🎓</span>
+                        <span className="text-6xl mb-6 block training-attention-once">🎓</span>
                         <h2 className="text-2xl md:text-3xl font-display font-black text-brand-olives mb-2 uppercase leading-none">
                             {t('res_uni_success_title')}
                         </h2>

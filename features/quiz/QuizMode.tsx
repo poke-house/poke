@@ -115,7 +115,7 @@ export function QuizMode({ gameState, setGameState, resetToHome, t }: QuizModePr
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center p-2 min-h-[500px]">
+    <div className="safe-bottom w-full h-full overflow-y-auto custom-scroll flex flex-col items-center justify-start sm:justify-center p-3 sm:p-4" id="quiz-mode-container">
       <AnimatePresence mode="wait">
         
         {/* State 1: QUIZ_INTRO (Landing Screen) */}
@@ -126,10 +126,10 @@ export function QuizMode({ gameState, setGameState, resetToHome, t }: QuizModePr
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="w-full max-w-2xl bg-white border-4 border-brand-charcoal rounded-card shadow-elevated p-6 md:p-8 text-center flex flex-col items-center gap-6"
+            className="w-full max-w-2xl bg-white border-4 border-brand-charcoal rounded-card shadow-elevated p-6 md:p-8 text-center flex flex-col items-center gap-6 my-auto"
           >
             <div className="w-20 h-20 bg-brand-olives/20 border-4 border-brand-charcoal rounded-full flex items-center justify-center shadow-soft">
-              <IconBrain size={40} className="text-brand-olives animate-pulse" />
+              <IconBrain size={40} className="text-brand-olives training-attention-once" />
             </div>
 
             <div className="space-y-2">

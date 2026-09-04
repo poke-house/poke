@@ -24,44 +24,7 @@ import { RushMode } from './features/rush/RushMode';
 import { BowlTrainingMode } from './features/training/BowlTrainingMode';
 import { HouseArenaMode } from './features/house-arena/HouseArenaMode';
 import { houseArenaSessionStorage } from './features/house-arena/services/houseArenaSession.storage';
-
-const StylizedBowlSVG = () => (
-    <svg viewBox="0 0 200 200" className="w-48 h-48 md:w-56 md:h-56 select-none drop-shadow-sm animate-pulse-subtle">
-        {/* Soft shadow below bowl */}
-        <ellipse cx="100" cy="165" rx="55" ry="10" fill="#080D09" opacity="0.06" />
-        
-        {/* Abstract Salad/Greens Layer - organic shapes */}
-        <path d="M 50 110 C 60 90, 80 85, 100 100 C 120 85, 140 90, 150 110" fill="#99CA5C" opacity="0.85" />
-        <path d="M 65 115 C 75 100, 95 95, 115 105 C 130 95, 140 100, 145 115" fill="#99CA5C" />
-        
-        {/* Rice/Base under greens */}
-        <path d="M 45 125 C 60 115, 140 115, 155 125" fill="#F5F6E6" />
-        
-        {/* Salmon Cubes (Tomato Soup color) */}
-        <rect x="75" y="95" width="20" height="20" rx="3" fill="#F65300" transform="rotate(15 85 105)" />
-        <rect x="110" y="90" width="18" height="18" rx="3" fill="#F65300" transform="rotate(-10 119 99)" />
-        <rect x="90" y="85" width="16" height="16" rx="3" fill="#F65300" transform="rotate(45 98 93)" />
-        
-        {/* Mango/Pineapple Cubes (Butter Yellow color) */}
-        <circle cx="70" cy="115" r="10" fill="#F3E39F" />
-        <circle cx="130" cy="110" r="11" fill="#F3E39F" />
-        
-        {/* Avocado slices (Darker/Slightly styled greens) */}
-        <path d="M 55 125 A 15 15 0 0 1 85 125 Z" fill="#99CA5C" transform="rotate(-25 70 125)" opacity="0.9" />
-        <path d="M 115 125 A 15 15 0 0 1 145 125 Z" fill="#99CA5C" transform="rotate(15 130 125)" opacity="0.9" />
-        
-        {/* Physical Ceramic Bowl */}
-        <path d="M 40 120 C 40 165, 160 165, 160 120 Z" fill="white" stroke="#080D09" strokeWidth="3" />
-        {/* Branded band around the ceramic bowl */}
-        <path d="M 40 135 C 50 155, 150 155, 160 135" fill="none" stroke="#FF83AF" strokeWidth="4" />
-        
-        {/* Sesame Seeds dots */}
-        <circle cx="95" cy="115" r="1.5" fill="#080D09" />
-        <circle cx="102" cy="110" r="1.5" fill="#080D09" />
-        <circle cx="98" cy="120" r="1.5" fill="#080D09" />
-        <circle cx="106" cy="116" r="1.5" fill="#080D09" />
-    </svg>
-);
+import pokeBowlHero from './src/assets/brand/poke-bowl-hero.png';
 
 function App() {
     const [gameState, setGameState] = useState<GameState>("HOME");
@@ -403,13 +366,15 @@ function App() {
 
     if (gameState.startsWith("RUSH_")) {
         return (
-            <RushMode
-                gameState={gameState}
-                setGameState={setGameState}
-                resetToHome={resetToHome}
-                t={t}
-                language={language}
-            />
+            <div className="safe-screen fixed inset-0 w-full h-[100dvh] font-sans text-brand-charcoal flex flex-col overflow-hidden bg-brand-linen">
+                <RushMode
+                    gameState={gameState}
+                    setGameState={setGameState}
+                    resetToHome={resetToHome}
+                    t={t}
+                    language={language}
+                />
+            </div>
         );
     }
 
@@ -439,26 +404,25 @@ function App() {
                     onClick();
                     setMobileMenuOpen(false);
                 }}
-                className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group cursor-pointer ${
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-body transition-all text-left group cursor-pointer min-h-[44px] ${
                     isActive
-                        ? "bg-brand-linen/45 border-brand-charcoal/15 text-brand-charcoal font-extrabold shadow-xs"
-                        : "bg-white border-transparent text-brand-charcoal/75 hover:text-brand-charcoal hover:bg-brand-linen/15 font-semibold"
+                        ? "bg-brand-butter text-brand-charcoal border-2 border-brand-charcoal shadow-[3px_3px_0px_#080D09] font-black"
+                        : "text-brand-burgundy hover:bg-brand-sorbet/90 hover:text-brand-charcoal border-2 border-transparent font-bold"
                 }`}
             >
-                <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg transition-all ${isActive ? "bg-white text-brand-tomato shadow-xs scale-105" : "bg-brand-linen/15 text-brand-charcoal/45 group-hover:text-brand-charcoal group-hover:bg-brand-linen/20"}`}>
+                <div className="flex items-center gap-2.5 min-w-0">
+                    <div className={`p-1.5 rounded-lg shrink-0 transition-transform ${
+                        isActive ? "bg-white text-brand-charcoal border border-brand-charcoal shadow-xs scale-105" : "bg-white/40 text-brand-burgundy group-hover:scale-105"
+                    }`}>
                         {icon}
                     </div>
-                    <span className="font-body tracking-tight text-xs md:text-sm">{label}</span>
+                    <span className="truncate text-xs md:text-sm">{label}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 shrink-0 ml-1">
                     {badgeText && (
-                        <span className={`text-[8px] font-condensed font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider ${badgeColor || "bg-brand-butter text-brand-charcoal"}`}>
+                        <span className={`text-[9px] font-functional px-2 py-0.5 rounded-full uppercase tracking-wider ${badgeColor || "bg-brand-butter text-brand-charcoal border border-brand-charcoal/30 font-bold"}`}>
                             {badgeText}
                         </span>
-                    )}
-                    {isActive && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-brand-tomato animate-pulse" />
                     )}
                 </div>
             </button>
@@ -471,7 +435,7 @@ function App() {
             {showPopup && <PopupModal message={showPopup.msg} onConfirm={showPopup.callback} t={t} />}
 
             {/* Mobile Navigation Header */}
-            <div className="md:hidden flex items-center justify-between px-4 py-2.5 border-b border-brand-charcoal/10 bg-white z-40 shrink-0">
+            <div className="md:hidden flex items-center justify-between px-4 py-2.5 border-b-2 border-brand-charcoal bg-brand-mochi z-40 shrink-0">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={resetToHome}>
                     <AppLogo variant="mobile" />
                 </div>
@@ -479,7 +443,7 @@ function App() {
                     <button 
                         onClick={() => setMobileMenuOpen(prev => !prev)}
                         aria-label="Toggle Navigation Menu"
-                        className="px-3 py-1.5 rounded-lg border border-brand-charcoal/15 bg-brand-linen text-brand-charcoal font-bold text-xs flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+                        className="px-3.5 py-1.5 rounded-full border-2 border-brand-charcoal bg-brand-butter text-brand-charcoal font-functional text-sm uppercase tracking-wider flex items-center gap-1.5 shadow-[2px_2px_0px_#080D09] active:translate-y-0.5 transition-all cursor-pointer"
                     >
                         {mobileMenuOpen ? <X size={14} /> : <Menu size={14} />}
                         <span>Menu</span>
@@ -489,9 +453,9 @@ function App() {
 
             {/* Mobile Dropdown Menu Overlay */}
             {mobileMenuOpen && (
-                <div className="safe-bottom md:hidden absolute top-[49px] inset-x-0 bottom-0 bg-brand-linen/95 backdrop-blur-md z-30 flex flex-col p-4 overflow-y-auto custom-scroll gap-4 animate-fade-in">
+                <div className="safe-bottom md:hidden absolute top-[52px] inset-x-0 bottom-0 bg-brand-mochi/98 backdrop-blur-md z-30 flex flex-col p-4 overflow-y-auto custom-scroll gap-4 animate-fade-in border-b-2 border-brand-charcoal">
                     <div className="flex flex-col gap-1">
-                        <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
+                        <span className="font-functional font-normal text-xs tracking-wider text-brand-burgundy uppercase px-3 mb-1">
                             {t('nav_section_training')}
                         </span>
                         {renderNavItem(t('btn_create_bowl'), <Sparkles size={16} />, gameState === "CUSTOM_BOWL", () => setGameState("CUSTOM_BOWL"))}
@@ -502,7 +466,7 @@ function App() {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
+                        <span className="font-functional font-normal text-xs tracking-wider text-brand-burgundy uppercase px-3 mb-1">
                             {t('nav_section_challenges')}
                         </span>
                         {renderNavItem(t('menu_rush'), <Timer size={16} />, gameState.startsWith("RUSH_"), startRushMode)}
@@ -510,20 +474,20 @@ function App() {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
+                        <span className="font-functional font-normal text-xs tracking-wider text-brand-burgundy uppercase px-3 mb-1">
                             {t('nav_section_arena')}
                         </span>
                         {renderNavItem(t('house_arena_title'), <Trophy size={16} />, (gameState as string) === "HOUSE_ARENA", () => setGameState("HOUSE_ARENA"), "MULTIPLAYER", "bg-brand-mochi text-white")}
                     </div>
 
                     {/* Mobile Utility Area */}
-                    <div className="mt-auto pt-4 border-t border-brand-charcoal/10 flex items-center justify-between gap-3 shrink-0">
+                    <div className="mt-auto pt-4 border-t border-brand-charcoal/20 flex items-center justify-between gap-3 shrink-0">
                         <button 
                             onClick={() => {
                                 setLanguage(l => l === 'pt' ? 'en' : 'pt');
                             }} 
                             aria-label="Toggle language"
-                            className="text-xs font-condensed font-black text-brand-charcoal bg-brand-butter px-3 py-1.5 rounded-lg border border-brand-charcoal/10 hover:bg-brand-butter/80 transition-all shadow-sm uppercase flex items-center gap-1.5 active:scale-95 cursor-pointer"
+                            className="text-xs font-functional text-brand-charcoal bg-brand-butter px-3 py-1.5 rounded-full border-2 border-brand-charcoal hover:bg-brand-butter/90 transition-all shadow-[2px_2px_0px_#080D09] uppercase flex items-center gap-1.5 active:translate-y-0.5 cursor-pointer"
                         >
                             <LucideGlobe size={14} /> {language}
                         </button>
@@ -532,7 +496,7 @@ function App() {
                                 setShowChangelog(true);
                                 setMobileMenuOpen(false);
                             }} 
-                            className="text-xs font-condensed font-black text-brand-charcoal bg-white px-3 py-1.5 rounded-lg border border-brand-charcoal/10 hover:bg-brand-linen transition-all shadow-sm opacity-90 hover:opacity-100 active:scale-95 cursor-pointer flex items-center gap-1.5"
+                            className="text-xs font-functional text-brand-burgundy bg-brand-sorbet px-3 py-1.5 rounded-full border-2 border-brand-burgundy hover:bg-brand-sorbet/90 transition-all shadow-[2px_2px_0px_#561621] uppercase active:translate-y-0.5 cursor-pointer flex items-center gap-1.5"
                         >
                             <History size={14} />
                             <span>{CHANGELOG[0].version} BETA</span>
@@ -541,17 +505,16 @@ function App() {
                 </div>
             )}
 
-            {/* Desktop Sidebar */}
-            <div className={`p-6 w-80 shrink-0 flex-col gap-5 z-10 border-r border-brand-charcoal/10 bg-white hidden md:flex h-full overflow-hidden custom-scroll ${sidebarScrollClass}`}>
-                <div className="flex-shrink-0 flex justify-center py-2 cursor-pointer" onClick={resetToHome}>
+            {/* Desktop Sidebar (Pink Mochi Dominant, 264px width) */}
+            <div className={`p-4 w-[264px] shrink-0 flex-col gap-4 z-10 border-r-3 border-brand-charcoal bg-brand-mochi hidden md:flex h-full overflow-hidden custom-scroll ${sidebarScrollClass}`}>
+                <div className="flex-shrink-0 flex justify-center py-2.5 px-2 cursor-pointer bg-brand-linen/85 rounded-2xl border-2 border-brand-charcoal shadow-[3px_3px_0px_#080D09] hover:bg-white transition-all" onClick={resetToHome}>
                     <AppLogo variant="desktop" />
                 </div>
                 
                 {menuCategory === null && gameState !== "CUSTOM_BOWL" ? ( 
                     <div className="flex-1 flex flex-col gap-4 overflow-y-auto custom-scroll pr-1">
-                        
                         <div className="flex flex-col gap-1">
-                            <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
+                            <span className="font-functional font-normal text-xs tracking-wider text-brand-burgundy uppercase px-2 mb-1">
                                 {t('nav_section_training')}
                             </span>
                             {renderNavItem(t('btn_create_bowl'), <Sparkles size={16} />, (gameState as string) === "CUSTOM_BOWL", () => setGameState("CUSTOM_BOWL"))}
@@ -562,7 +525,7 @@ function App() {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
+                            <span className="font-functional font-normal text-xs tracking-wider text-brand-burgundy uppercase px-2 mb-1">
                                 {t('nav_section_challenges')}
                             </span>
                             {renderNavItem(t('menu_rush'), <Timer size={16} />, gameState.startsWith("RUSH_"), startRushMode)}
@@ -570,7 +533,7 @@ function App() {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
+                            <span className="font-functional font-normal text-xs tracking-wider text-brand-burgundy uppercase px-2 mb-1">
                                 {t('nav_section_arena')}
                             </span>
                             {renderNavItem(t('house_arena_title'), <Trophy size={16} />, (gameState as string) === "HOUSE_ARENA", () => setGameState("HOUSE_ARENA"), "MULTIPLAYER", "bg-brand-mochi text-white")}
@@ -580,11 +543,11 @@ function App() {
                     <div className="flex-1 flex flex-col gap-2 animate-fade-in overflow-y-auto custom-scroll pr-1">
                         <button 
                             onClick={() => setMenuCategory(null)} 
-                            className="mb-4 font-bold flex items-center gap-2 px-3.5 py-2 rounded-xl border border-brand-charcoal/10 bg-brand-linen/30 hover:bg-brand-linen/65 text-brand-charcoal transition-all cursor-pointer text-xs"
+                            className="mb-3 font-functional font-normal flex items-center gap-2 px-3 py-1.5 rounded-full border-2 border-brand-charcoal bg-brand-butter hover:bg-brand-butter/90 text-brand-charcoal transition-all cursor-pointer text-sm shadow-[2px_2px_0px_#080D09] active:translate-y-0.5 uppercase"
                         >
                             <ChevronLeft size={16}/> {t('btn_back')}
                         </button>
-                        <h3 className="font-condensed font-black text-brand-burgundy/60 text-xs uppercase tracking-widest mb-3 px-1.5">
+                        <h3 className="font-functional font-normal text-brand-burgundy text-xs uppercase tracking-widest mb-2 px-1">
                             {menuCategory || "MENU"}
                         </h3>
                         <div className="flex flex-col gap-1.5">
@@ -592,10 +555,10 @@ function App() {
                                 <button 
                                     key={recipe.id} 
                                     onClick={() => startGame(recipe)} 
-                                    className={`w-full text-left font-body font-bold text-sm px-4 py-3 rounded-xl border transition-all cursor-pointer ${
+                                    className={`w-full text-left font-body font-bold text-sm px-3.5 py-2.5 rounded-xl border-2 transition-all cursor-pointer ${
                                         selectedRecipe?.id === recipe.id 
-                                            ? "bg-brand-linen/50 border-brand-charcoal/20 text-brand-charcoal font-extrabold shadow-xs" 
-                                            : "bg-white border-transparent text-brand-charcoal/80 hover:bg-brand-linen/15 hover:text-brand-charcoal font-semibold"
+                                            ? "bg-brand-butter border-brand-charcoal text-brand-charcoal shadow-[3px_3px_0px_#080D09]" 
+                                            : "bg-white/80 border-transparent text-brand-burgundy hover:bg-white hover:text-brand-charcoal"
                                     }`}
                                 >
                                     {recipe.name}
@@ -606,17 +569,17 @@ function App() {
                 )}
 
                 {/* Desktop Utility Area */}
-                <div className="mt-auto pt-4 border-t border-brand-charcoal/10 flex items-center justify-between gap-2 shrink-0">
+                <div className="mt-auto pt-3 border-t border-brand-burgundy/20 flex items-center justify-between gap-2 shrink-0">
                     <button 
                         onClick={() => setLanguage(l => l === 'pt' ? 'en' : 'pt')} 
                         aria-label="Toggle language"
-                        className="text-[11px] font-condensed font-black text-brand-charcoal bg-brand-butter px-2.5 py-1.5 rounded-lg border border-brand-charcoal/10 hover:bg-brand-butter/80 transition-all shadow-sm uppercase flex items-center gap-1 active:scale-95 cursor-pointer shrink-0"
+                        className="text-xs font-functional text-brand-charcoal bg-brand-butter px-3 py-1.5 rounded-full border-2 border-brand-charcoal hover:bg-brand-butter/90 transition-all shadow-[2px_2px_0px_#080D09] uppercase flex items-center gap-1.5 active:translate-y-0.5 cursor-pointer shrink-0"
                     >
                         <LucideGlobe size={13} /> {language}
                     </button>
                     <button 
                         onClick={() => setShowChangelog(true)} 
-                        className="text-[11px] font-condensed font-black text-brand-charcoal bg-brand-linen/40 px-2.5 py-1.5 rounded-lg border border-brand-charcoal/10 hover:bg-brand-linen transition-all shadow-sm opacity-90 hover:opacity-100 active:scale-95 cursor-pointer flex items-center gap-1 shrink-0"
+                        className="text-xs font-functional text-brand-burgundy bg-brand-sorbet px-3 py-1.5 rounded-full border-2 border-brand-burgundy hover:bg-brand-sorbet/90 transition-all shadow-[2px_2px_0px_#561621] uppercase active:translate-y-0.5 cursor-pointer flex items-center gap-1.5 shrink-0"
                     >
                         <History size={13} />
                         <span>{CHANGELOG[0].version} BETA</span>
@@ -656,169 +619,231 @@ function App() {
                 )}
 
                 {gameState === "HOME" && ( 
-                    <div className="safe-bottom w-full h-full overflow-y-auto custom-scroll px-4 py-6 sm:px-6 md:py-12">
-                        <div className="max-w-4xl mx-auto flex flex-col gap-6 md:gap-10 animate-fade-in">
+                    <div className="safe-bottom w-full h-full overflow-y-auto custom-scroll px-4 py-6 sm:px-6 md:py-8 lg:py-10">
+                        <div className="max-w-6xl mx-auto flex flex-col gap-8 md:gap-10 animate-fade-in">
                             
-                            {/* Welcome Banner / Header */}
-                            <div className="flex flex-col gap-3">
-                                <h1 className="font-display font-black text-3xl md:text-5xl text-brand-charcoal leading-tight tracking-tight">
-                                    {t('home_welcome_title')}
-                                </h1>
-                                <p className="font-body font-medium text-brand-burgundy/85 text-sm md:text-base max-w-2xl leading-relaxed">
-                                    {t('home_welcome_desc')}
-                                </p>
-
-                                {/* Active Session Reconnect Notice */}
-                                {localSession && (
-                                    <div className="mt-4 bg-brand-sorbet/25 border border-brand-mochi/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs animate-fade-in">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-white text-brand-mochi shadow-xs">
-                                                <Trophy size={16} />
-                                            </div>
-                                            <p className="text-xs font-semibold text-brand-burgundy">
-                                                {t('home_active_session', { code: localSession.roomCode })}
-                                            </p>
+                            {/* Active Session Reconnect Notice */}
+                            {localSession && (
+                                <div className="bg-brand-sorbet text-brand-burgundy border-3 border-brand-burgundy rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[4px_4px_0px_#561621] animate-fade-in">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-xl bg-brand-butter text-brand-charcoal border-2 border-brand-burgundy shadow-xs">
+                                            <Trophy size={18} />
                                         </div>
-                                        <button 
-                                            onClick={() => setGameState("HOUSE_ARENA")}
-                                            className="px-4 py-2 rounded-xl bg-brand-mochi hover:bg-brand-mochi/90 text-white font-display font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 shrink-0"
-                                        >
-                                            {t('home_reconnect')}
-                                        </button>
+                                        <p className="text-sm font-body font-bold text-brand-burgundy">
+                                            {t('home_active_session', { code: localSession.roomCode })}
+                                        </p>
                                     </div>
-                                )}
-                            </div>
-
-                            {/* Main Learning Pathway Feature Card (University Bowl) */}
-                            <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-5 md:p-8 flex flex-col sm:flex-row items-center gap-4 md:gap-8 hover:border-brand-charcoal/20 transition-all shadow-xs relative overflow-hidden">
-                                <div className="flex-1 flex flex-col gap-3 z-10 text-left">
-                                    <span className="font-condensed font-black text-[9px] text-brand-tomato bg-brand-tomato/10 px-2 py-1 rounded-md uppercase tracking-wider self-start">
-                                        Percurso Recomendado • Recommended Path
-                                    </span>
-                                    <h2 className="font-display font-black text-2xl md:text-3xl text-brand-charcoal">
-                                        {t('home_featured_title')}
-                                    </h2>
-                                    <p className="font-body font-medium text-brand-burgundy/75 text-xs md:text-sm leading-relaxed max-w-lg">
-                                        {t('home_featured_desc')}
-                                    </p>
                                     <button 
-                                        onClick={startUniversityMode}
-                                        className="mt-2 px-5 py-3 rounded-xl bg-brand-charcoal hover:bg-brand-burgundy text-white font-display font-bold text-xs md:text-sm transition-all cursor-pointer shadow-sm active:scale-95 self-start flex items-center gap-2 group"
+                                        onClick={() => setGameState("HOUSE_ARENA")}
+                                        className="brand-button--primary text-sm py-2 px-4 shadow-[3px_3px_0px_#080D09]"
                                     >
-                                        <span>{t('home_primary_cta')}</span>
-                                        <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                                        {t('home_reconnect')}
                                     </button>
                                 </div>
-                                <div className="shrink-0 flex items-center justify-center [&>svg]:w-32 [&>svg]:h-32 sm:[&>svg]:w-40 sm:[&>svg]:h-40 md:[&>svg]:w-56 md:[&>svg]:h-56">
-                                    <StylizedBowlSVG />
-                                </div>
-                            </div>
+                            )}
 
-                            {/* Interactive Modes Overview Grid */}
-                            <div className="flex flex-col gap-5 text-left">
-                                <h3 className="font-display font-bold text-lg md:text-xl text-brand-charcoal tracking-tight">
-                                    {t('home_modes_overview')}
-                                </h3>
-                                <div className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-3 md:gap-4">
-                                    
-                                    {/* Custom Bowl Card */}
-                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-4 md:p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[148px] md:min-h-[170px]">
+                            {/* Home Hero Component */}
+                            <section className="home-hero">
+                                <div className="home-hero__copy">
+                                    <span className="eyebrow text-sm text-brand-burgundy font-black mb-2 tracking-widest">
+                                        {t('home_hero_eyebrow')}
+                                    </span>
+                                    <h1 className="hero-title text-brand-charcoal font-black">
+                                        {t('home_hero_title')}
+                                    </h1>
+                                    <p className="body-copy text-brand-charcoal/90 mt-3 font-medium max-w-lg">
+                                        {t('home_hero_desc')}
+                                    </p>
+
+                                    <div className="home-hero__actions">
+                                        <button 
+                                            onClick={startUniversityMode}
+                                            className="brand-button--primary"
+                                        >
+                                            <span>{t('home_hero_cta_primary')}</span>
+                                            <ArrowRight size={18} />
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                const el = document.getElementById('modes-section');
+                                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className="brand-button--secondary"
+                                        >
+                                            <span>{t('home_hero_cta_secondary')}</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="home-hero__visual">
+                                    <img 
+                                        src={pokeBowlHero} 
+                                        alt="Poke House Bowl Oficial" 
+                                        className="home-hero__bowl"
+                                    />
+                                    <div className="pointer-events-none absolute -bottom-8 -right-8 w-40 h-40 rounded-full bg-brand-butter/30 -z-10" />
+                                    <div className="pointer-events-none absolute top-4 left-4 w-20 h-20 rounded-full bg-brand-sorbet/40 -z-10" />
+                                </div>
+                            </section>
+
+                            {/* Modes Section */}
+                            <div id="modes-section" className="flex flex-col gap-6 text-left">
+                                <div className="flex items-baseline justify-between border-b-2 border-brand-charcoal/15 pb-2">
+                                    <h2 className="section-title text-brand-charcoal font-black">
+                                        {t('home_modes_overview')}
+                                    </h2>
+                                    <span className="font-functional text-sm text-brand-burgundy uppercase tracking-wider font-normal">
+                                        5 Modos de Treino
+                                    </span>
+                                </div>
+
+                                <div className="mode-grid">
+                                    {/* 1. University Bowl Card (Featured span 7) */}
+                                    <div className="mode-card--featured bg-brand-sorbet text-brand-burgundy border-3 border-brand-burgundy rounded-[28px] p-6 md:p-8 shadow-[6px_6px_0px_#561621] flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-[8px_8px_0px_#561621]">
                                         <div>
-                                            <div className="flex items-center justify-between mb-3">
-                                                <div className="p-2 rounded-lg bg-brand-sorbet/20 text-brand-mochi">
-                                                    <Sparkles size={18} />
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="w-13 h-13 rounded-2xl bg-brand-butter text-brand-charcoal border-2 border-brand-burgundy shadow-[2px_2px_0px_#561621] flex items-center justify-center">
+                                                    <BookOpen size={26} className="text-brand-burgundy" />
                                                 </div>
+                                                <span className="font-functional text-xs uppercase px-3 py-1 rounded-full bg-brand-tomato text-white border border-brand-burgundy tracking-wider">
+                                                    Percurso Recomendado
+                                                </span>
                                             </div>
-                                            <h4 className="font-display font-bold text-sm text-brand-charcoal">
+                                            <h3 className="font-display font-black text-2xl md:text-3xl text-brand-burgundy">
+                                                {t('home_featured_title')}
+                                            </h3>
+                                            <p className="font-body text-sm text-brand-burgundy/85 mt-2.5 leading-relaxed max-w-lg">
+                                                {t('home_featured_desc')}
+                                            </p>
+                                        </div>
+                                        <div className="mt-6 pt-4 border-t border-brand-burgundy/20 flex items-center justify-between">
+                                            <span className="font-functional text-xs text-brand-burgundy/75 uppercase tracking-wider">Estudo Passo a Passo</span>
+                                            <button 
+                                                onClick={startUniversityMode}
+                                                className="brand-button--primary text-sm py-2 px-5 shadow-[3px_3px_0px_#080D09]"
+                                            >
+                                                <span>{t('home_btn_enter')}</span>
+                                                <ArrowRight size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* 2. Custom Bowl Card (Secondary span 5) */}
+                                    <div className="mode-card--secondary bg-brand-butter text-brand-charcoal border-3 border-brand-charcoal rounded-[28px] p-6 md:p-8 shadow-[6px_6px_0px_#080D09] flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-[8px_8px_0px_#080D09]">
+                                        <div>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="w-13 h-13 rounded-2xl bg-white text-brand-charcoal border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] flex items-center justify-center">
+                                                    <Sparkles size={26} className="text-brand-mochi" />
+                                                </div>
+                                                <span className="font-functional text-xs uppercase px-3 py-1 rounded-full bg-brand-mochi text-white border border-brand-charcoal tracking-wider">
+                                                    Modo Livre
+                                                </span>
+                                            </div>
+                                            <h3 className="font-display font-black text-2xl md:text-3xl text-brand-charcoal">
                                                 {t('btn_create_bowl')}
-                                            </h4>
-                                            <p className="font-body font-medium text-brand-burgundy/65 text-xs mt-1.5 leading-relaxed">
+                                            </h3>
+                                            <p className="font-body text-sm text-brand-charcoal/85 mt-2.5 leading-relaxed">
                                                 {t('nav_desc_custom_bowl')}
                                             </p>
                                         </div>
-                                        <button 
-                                            onClick={() => setGameState("CUSTOM_BOWL")}
-                                            className="mt-4 px-3.5 py-2 rounded-lg bg-brand-linen/40 hover:bg-brand-linen/80 text-brand-charcoal font-bold text-xs transition-all cursor-pointer border border-brand-charcoal/5 self-start active:scale-95 font-sans"
-                                        >
-                                            {t('home_btn_enter')}
-                                        </button>
+                                        <div className="mt-6 pt-4 border-t border-brand-charcoal/15 flex items-center justify-between">
+                                            <span className="font-functional text-xs text-brand-charcoal/70 uppercase tracking-wider">Criação Guiada</span>
+                                            <button 
+                                                onClick={() => setGameState("CUSTOM_BOWL")}
+                                                className="px-5 py-2.5 rounded-full bg-brand-mochi hover:bg-brand-mochi/90 text-white font-functional text-base tracking-wider uppercase border-2 border-brand-charcoal shadow-[3px_3px_0px_#080D09] active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-2"
+                                            >
+                                                <span>{t('home_btn_enter')}</span>
+                                                <ArrowRight size={16} />
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    {/* Rush Hour Card */}
-                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-4 md:p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[148px] md:min-h-[170px]">
+                                    {/* 3. Hora do Lodo (Rush) Card */}
+                                    <div className="col-span-12 sm:col-span-6 lg:col-span-4 bg-brand-tomato text-brand-linen border-3 border-brand-charcoal rounded-[24px] p-5 md:p-6 shadow-[5px_5px_0px_#080D09] flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-[7px_7px_0px_#080D09]">
                                         <div>
                                             <div className="flex items-center justify-between mb-3">
-                                                <div className="p-2 rounded-lg bg-brand-tomato/10 text-brand-tomato">
-                                                    <Timer size={18} />
+                                                <div className="w-11 h-11 rounded-xl bg-brand-butter text-brand-charcoal border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] flex items-center justify-center">
+                                                    <Timer size={22} className="text-brand-charcoal" />
                                                 </div>
+                                                <span className="font-functional text-xs uppercase px-2.5 py-0.5 rounded-full bg-brand-butter text-brand-charcoal border border-brand-charcoal tracking-wider">
+                                                    Velocidade
+                                                </span>
                                             </div>
-                                            <h4 className="font-display font-bold text-sm text-brand-charcoal">
+                                            <h3 className="font-display font-black text-xl md:text-2xl text-brand-linen">
                                                 {t('menu_rush')}
-                                            </h4>
-                                            <p className="font-body font-medium text-brand-burgundy/65 text-xs mt-1.5 leading-relaxed">
+                                            </h3>
+                                            <p className="font-body text-xs text-brand-linen/90 mt-2 leading-relaxed">
                                                 {t('nav_desc_rush')}
                                             </p>
                                         </div>
-                                        <button 
-                                            onClick={startRushMode}
-                                            className="mt-4 px-3.5 py-2 rounded-lg bg-brand-linen/40 hover:bg-brand-linen/80 text-brand-charcoal font-bold text-xs transition-all cursor-pointer border border-brand-charcoal/5 self-start active:scale-95 font-sans"
-                                        >
-                                            {t('home_btn_enter')}
-                                        </button>
+                                        <div className="mt-5 pt-3 border-t border-brand-linen/25 flex items-center justify-between">
+                                            <span className="font-functional text-xs text-brand-linen/75 uppercase tracking-wider">Fila de Pedidos</span>
+                                            <button 
+                                                onClick={startRushMode}
+                                                className="px-4 py-2 rounded-full bg-brand-butter hover:bg-brand-butter/90 text-brand-charcoal font-functional text-sm tracking-wider uppercase border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] active:translate-y-0.5 transition-all cursor-pointer"
+                                            >
+                                                {t('home_btn_enter')}
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    {/* Fast Thinker (Quiz) Card */}
-                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-4 md:p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[148px] md:min-h-[170px]">
+                                    {/* 4. Pensa Rápido (Quiz) Card */}
+                                    <div className="col-span-12 sm:col-span-6 lg:col-span-4 bg-brand-icy text-brand-charcoal border-3 border-brand-charcoal rounded-[24px] p-5 md:p-6 shadow-[5px_5px_0px_#080D09] flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-[7px_7px_0px_#080D09]">
                                         <div>
                                             <div className="flex items-center justify-between mb-3">
-                                                <div className="p-2 rounded-lg bg-brand-olives/10 text-brand-olives">
-                                                    <Brain size={18} />
+                                                <div className="w-11 h-11 rounded-xl bg-white text-brand-charcoal border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] flex items-center justify-center">
+                                                    <Brain size={22} className="text-brand-charcoal" />
                                                 </div>
-                                                <span className="text-[8px] font-condensed font-black px-1.5 py-0.5 rounded-full bg-brand-butter text-brand-charcoal uppercase tracking-wider">
-                                                    Novo • New
+                                                <span className="font-functional text-xs uppercase px-2.5 py-0.5 rounded-full bg-brand-butter text-brand-charcoal border border-brand-charcoal tracking-wider">
+                                                    Regras & SOP
                                                 </span>
                                             </div>
-                                            <h4 className="font-display font-bold text-sm text-brand-charcoal">
+                                            <h3 className="font-display font-black text-xl md:text-2xl text-brand-charcoal">
                                                 {t('menu_quiz')}
-                                            </h4>
-                                            <p className="font-body font-medium text-brand-burgundy/65 text-xs mt-1.5 leading-relaxed">
+                                            </h3>
+                                            <p className="font-body text-xs text-brand-charcoal/80 mt-2 leading-relaxed">
                                                 {t('nav_desc_quiz')}
                                             </p>
                                         </div>
-                                        <button 
-                                            onClick={() => setGameState("QUIZ_PLAYING")}
-                                            className="mt-4 px-3.5 py-2 rounded-lg bg-brand-linen/40 hover:bg-brand-linen/80 text-brand-charcoal font-bold text-xs transition-all cursor-pointer border border-brand-charcoal/5 self-start active:scale-95 font-sans"
-                                        >
-                                            {t('home_btn_enter')}
-                                        </button>
+                                        <div className="mt-5 pt-3 border-t border-brand-charcoal/15 flex items-center justify-between">
+                                            <span className="font-functional text-xs text-brand-charcoal/70 uppercase tracking-wider">Desafio Teórico</span>
+                                            <button 
+                                                onClick={() => setGameState("QUIZ_PLAYING")}
+                                                className="px-4 py-2 rounded-full bg-brand-butter hover:bg-brand-butter/90 text-brand-charcoal font-functional text-sm tracking-wider uppercase border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] active:translate-y-0.5 transition-all cursor-pointer"
+                                            >
+                                                {t('home_btn_enter')}
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    {/* House Arena Card */}
-                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-4 md:p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[148px] md:min-h-[170px]">
+                                    {/* 5. House Arena Card */}
+                                    <div className="col-span-12 lg:col-span-4 bg-brand-olives text-brand-charcoal border-3 border-brand-charcoal rounded-[24px] p-5 md:p-6 shadow-[5px_5px_0px_#080D09] flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-[7px_7px_0px_#080D09]">
                                         <div>
                                             <div className="flex items-center justify-between mb-3">
-                                                <div className="p-2 rounded-lg bg-brand-mochi/10 text-brand-mochi">
-                                                    <Trophy size={18} />
+                                                <div className="w-11 h-11 rounded-xl bg-white text-brand-charcoal border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] flex items-center justify-center">
+                                                    <Trophy size={22} className="text-brand-charcoal" />
                                                 </div>
-                                                <span className="text-[8px] font-condensed font-black px-1.5 py-0.5 rounded-full bg-brand-mochi text-white uppercase tracking-wider">
-                                                    MULTIPLAYER
+                                                <span className="font-functional text-xs uppercase px-2.5 py-0.5 rounded-full bg-brand-mochi text-white border border-brand-charcoal tracking-wider">
+                                                    Multijogador
                                                 </span>
                                             </div>
-                                            <h4 className="font-display font-bold text-sm text-brand-charcoal">
+                                            <h3 className="font-display font-black text-xl md:text-2xl text-brand-charcoal">
                                                 {t('house_arena_title')}
-                                            </h4>
-                                            <p className="font-body font-medium text-brand-burgundy/65 text-xs mt-1.5 leading-relaxed">
+                                            </h3>
+                                            <p className="font-body text-xs text-brand-charcoal/80 mt-2 leading-relaxed">
                                                 {t('nav_desc_arena')}
                                             </p>
                                         </div>
-                                        <button 
-                                            onClick={() => setGameState("HOUSE_ARENA")}
-                                            className="mt-4 px-3.5 py-2 rounded-lg bg-brand-linen/40 hover:bg-brand-linen/80 text-brand-charcoal font-bold text-xs transition-all cursor-pointer border border-brand-charcoal/5 self-start active:scale-95 font-sans"
-                                        >
-                                            {t('home_btn_enter')}
-                                        </button>
+                                        <div className="mt-5 pt-3 border-t border-brand-charcoal/15 flex items-center justify-between">
+                                            <span className="font-functional text-xs text-brand-charcoal/70 uppercase tracking-wider">Salas em Direto</span>
+                                            <button 
+                                                onClick={() => setGameState("HOUSE_ARENA")}
+                                                className="px-4 py-2 rounded-full bg-brand-mochi hover:bg-brand-mochi/90 text-white font-functional text-sm tracking-wider uppercase border-2 border-brand-charcoal shadow-[2px_2px_0px_#080D09] active:translate-y-0.5 transition-all cursor-pointer"
+                                            >
+                                                {t('home_btn_enter')}
+                                            </button>
+                                        </div>
                                     </div>
-
                                 </div>
                             </div>
 

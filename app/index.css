@@ -1,0 +1,282 @@
+@font-face {
+  font-family: 'Special Gothic Variable';
+  src: url('/assets/fonts/SpecialGothic-VariableFont_wdth,wght.ttf') format('truetype-variations'),
+       local('Special Gothic Variable'),
+       local('Arial');
+  font-weight: 100 900;
+  font-stretch: 50% 150%;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Special Gothic Expanded One';
+  src: url('/assets/fonts/SpecialGothicExpandedOne-Regular.ttf') format('truetype'),
+       local('Special Gothic Expanded One'),
+       local('Arial Black');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Special Gothic Condensed One';
+  src: url('/assets/fonts/SpecialGothicCondensedOne-Regular.ttf') format('truetype'),
+       local('Special Gothic Condensed One'),
+       local('Impact');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Special Gothic Variable", system-ui, -apple-system, sans-serif;
+  --font-body: "Special Gothic Variable", system-ui, -apple-system, sans-serif;
+  --font-display: "Special Gothic Expanded One", "Special Gothic Variable", system-ui, sans-serif;
+  --font-condensed: "Bebas Neue", "Special Gothic Condensed One", "Special Gothic Variable", system-ui, sans-serif;
+
+  /* Official Poke House Brand Palette */
+  --color-brand-mochi: #FF83AF;
+  --color-brand-butter: #F3E39F;
+  --color-brand-olives: #99CA5C;
+  --color-brand-icy: #819EC5;
+  --color-brand-burgundy: #561621;
+  --color-brand-sorbet: #FFD7E8;
+  --color-brand-tomato: #F65300;
+  --color-brand-linen: #F5F6E6;
+  --color-brand-charcoal: #080D09;
+
+  /* Legacy brand mappings for full backward compatibility but styled in brand-authority colors */
+  --color-brand-pink: #FF83AF;
+  --color-brand-blue: #819EC5;
+  --color-brand-dark: #080D09;
+
+  /* Mappings for pastel-blue (Bowl Training / HOUSE Category) */
+  --color-pastel-blue-50: #FFD7E8;
+  --color-pastel-blue-100: #F5F6E6;
+  --color-pastel-blue-200: #819EC5;
+  --color-pastel-blue-300: #FF83AF;
+  --color-pastel-blue-500: #819EC5;
+  --color-pastel-blue-text: #561621;
+
+  /* Mappings for pastel-pink (Custom Bowl / GREEN Category) */
+  --color-pastel-pink-50: #FFD7E8;
+  --color-pastel-pink-100: #F5F6E6;
+  --color-pastel-pink-200: #FF83AF;
+  --color-pastel-pink-300: #FF83AF;
+  --color-pastel-pink-500: #FF83AF;
+  --color-pastel-pink-text: #561621;
+
+  /* Mappings for pastel-yellow (SMOOTHIE Category) */
+  --color-pastel-yellow-50: #F3E39F;
+  --color-pastel-yellow-100: #F5F6E6;
+  --color-pastel-yellow-200: #F3E39F;
+  --color-pastel-yellow-300: #FF83AF;
+  --color-pastel-yellow-500: #F3E39F;
+  --color-pastel-yellow-text: #561621;
+
+  /* Mappings for rush (RUSH Category) */
+  --color-rush-100: #FFD7E8;
+  --color-rush-200: #FF83AF;
+  --color-rush-300: #F65300;
+  --color-rush-400: #F65300;
+  --color-rush-500: #F65300;
+  --color-rush-900: #561621;
+
+  /* Semantic surface mappings */
+  --color-surface-primary: #F5F6E6;
+  --color-surface-secondary: #FFFFFF;
+  --color-surface-muted: #FFD7E8;
+  --color-surface-inverse: #080D09;
+
+  /* Semantic text mappings */
+  --color-text-primary: #080D09;
+  --color-text-secondary: #561621;
+  --color-text-muted: #555C56;
+  --color-text-inverse: #F5F6E6;
+
+  /* Status colors */
+  --color-status-success: #99CA5C;
+  --color-status-warning: #F3E39F;
+  --color-status-error: #F65300;
+  --color-status-info: #819EC5;
+
+  /* Poke House border radii */
+  --radius-card: 24px;
+  --radius-button: 16px;
+  --radius-pill: 9999px;
+  --radius-modal: 32px;
+
+  /* Match Poke House design requirements - replace legacy win style */
+  --radius-win: 16px;
+
+  /* Shadows - Flat graphic offset shadows for premium tactile appearance */
+  --shadow-soft: 4px 4px 0px 0px #080D09;
+  --shadow-elevated: 8px 8px 0px 0px #080D09;
+  --shadow-fluent: 4px 4px 0px 0px #080D09;
+  --shadow-fluent-hover: 6px 6px 0px 0px #080D09;
+
+  /* Animation overrides */
+  --animate-fade-in: fadeIn 0.3s ease-out forwards;
+  --animate-slide-up: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-pulse-fast: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-dance: dance 0.6s ease-in-out infinite;
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes slideUp {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes dance {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-12deg) scale(1.08); }
+    75% { transform: rotate(12deg) scale(1.08); }
+  }
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #F5F6E6; /* White Linen brand color */
+  color: #080D09; /* Charcoal Black brand color */
+  font-family: "Special Gothic Variable", system-ui, -apple-system, sans-serif;
+  touch-action: manipulation;
+}
+
+html, body, #root {
+  width: 100%;
+  min-width: 320px;
+  height: 100%;
+  min-height: 100%;
+}
+
+/* Keep interactive content clear of iPhone notches and the home indicator. */
+.safe-screen {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* Scrollbar Global Styles in Poke House Theme */
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: #F5F6E6;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #FFD7E8; /* Rose Sorbet */
+  border-radius: 9999px;
+  border: 2px solid #F5F6E6;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #FF83AF; /* Pink Mochi */
+}
+
+/* Themed Scrollbars mapped to Brand Colors */
+.scroll-blue::-webkit-scrollbar-thumb {
+  background: #819EC5; /* Icy Water */
+  border: 2px solid #F5F6E6;
+}
+.scroll-pink::-webkit-scrollbar-thumb {
+  background: #FF83AF; /* Pink Mochi */
+  border: 2px solid #F5F6E6;
+}
+.scroll-yellow::-webkit-scrollbar-thumb {
+  background: #F3E39F; /* Butter Yellow */
+  border: 2px solid #F5F6E6;
+}
+.scroll-red::-webkit-scrollbar-thumb {
+  background: #F65300; /* Tomato Soup */
+  border: 2px solid #F5F6E6;
+}
+.scroll-rush::-webkit-scrollbar-thumb {
+  background: #F65300; /* Tomato Soup */
+  border: 2px solid #F5F6E6;
+}
+
+/* Glass panel - replaced with soft solid border style */
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 3px solid #080D09;
+  box-shadow: 4px 4px 0px 0px #080D09;
+}
+
+.btn-transition {
+  transition: all 0.15s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.home-canvas {
+  background-color: #F3E39F;
+  background-image:
+    radial-gradient(circle at 9% 12%, rgba(255, 131, 175, 0.72) 0 7rem, transparent 7.1rem),
+    radial-gradient(circle at 92% 8%, rgba(255, 215, 232, 0.92) 0 10rem, transparent 10.1rem),
+    linear-gradient(135deg, rgba(245, 246, 230, 0.78), rgba(243, 227, 159, 0.72));
+}
+
+.brand-feature-card {
+  background:
+    radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.32) 0 4.5rem, transparent 4.6rem),
+    linear-gradient(118deg, #FF83AF 0%, #FF83AF 56%, #F3E39F 56%, #F3E39F 100%);
+}
+
+.brand-action {
+  font-family: "Bebas Neue", "Special Gothic Condensed One", sans-serif;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.training-attention-once {
+  animation: trainingAttention 0.75s ease-in-out 2;
+}
+
+@keyframes trainingAttention {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.025); opacity: 0.76; }
+}
+
+/* Keyboard Focus Ring */
+*:focus-visible {
+  outline: 3px solid #FF83AF !important;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-bounce, .animate-dance {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* 3D card flipping perspective classes */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.rotateY-180 {
+  transform: rotateY(180deg);
+}

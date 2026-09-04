@@ -178,7 +178,7 @@ export function CustomBowlMode({
             case 1:
                 return (
                     <div className="flex flex-col items-center justify-center h-full min-h-[400px] p-8 text-center space-y-8 animate-fade-in" id="cb-step-1">
-                        <div className="w-24 h-24 bg-brand-sorbet border-4 border-brand-charcoal rounded-full flex items-center justify-center text-5xl shadow-[4px_4px_0px_0px_#080D09] animate-bounce">
+                        <div className="w-24 h-24 bg-brand-sorbet border-4 border-brand-charcoal rounded-full flex items-center justify-center text-5xl shadow-[4px_4px_0px_0px_#080D09] training-attention-once">
                             {paPersona.emoji}
                         </div>
                         <div className="max-w-md">
@@ -539,7 +539,7 @@ export function CustomBowlMode({
             case 11:
                 return (
                     <div className="flex flex-col items-center justify-center h-full min-h-[400px] p-8 text-center space-y-8 animate-slide-up" id="cb-step-11">
-                        <div className="w-24 h-24 bg-brand-butter border-4 border-brand-charcoal rounded-full flex items-center justify-center text-5xl shadow-[4px_4px_0px_0px_#080D09] animate-bounce">
+                        <div className="w-24 h-24 bg-brand-butter border-4 border-brand-charcoal rounded-full flex items-center justify-center text-5xl shadow-[4px_4px_0px_0px_#080D09] training-attention-once">
                             🎉
                         </div>
                         <div className="max-w-md">

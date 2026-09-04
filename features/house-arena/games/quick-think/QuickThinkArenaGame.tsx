@@ -88,7 +88,7 @@ export const QuickThinkArenaGame: React.FC<QuickThinkArenaGameProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-brand-linen min-h-screen w-full flex items-center justify-center font-sans">
+      <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex items-center justify-center font-sans">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-tomato mx-auto"></div>
           <p className="text-brand-charcoal font-semibold">

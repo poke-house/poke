@@ -101,7 +101,7 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-brand-linen min-h-screen w-full flex items-center justify-center font-sans">
+      <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex items-center justify-center font-sans">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-tomato mx-auto"></div>
           <p className="text-brand-charcoal font-semibold">
@@ -114,7 +114,7 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
 
   if (!challenge) {
     return (
-      <div className="bg-brand-linen min-h-screen w-full flex items-center justify-center font-sans p-4">
+      <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex items-center justify-center font-sans p-4">
         <div className="bg-white border-4 border-brand-charcoal rounded-card p-6 shadow-elevated max-w-sm text-center">
           <ShieldAlert className="text-brand-tomato mx-auto mb-4" size={48} />
           <h3 className="font-display font-black text-xl mb-2">
@@ -681,7 +681,7 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
 
       {/* 3. Global Floating Feedbacks/Toasts */}
       {showFeedback && feedback.status && (
-        <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 training-attention-once">
           <div className={`p-4 rounded-card border-4 border-brand-charcoal shadow-elevated flex items-center gap-3 ${
             feedback.status === 'success' ? 'bg-brand-green text-white' : 'bg-brand-tomato text-white'
           }`}>
