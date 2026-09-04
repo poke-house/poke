@@ -1,10 +1,12 @@
 import { 
   ArenaRoom, ArenaParticipant, ArenaRoomCreateRequest, ArenaRoomCreateResult,
   ArenaRoomJoinRequest, ArenaRoomJoinResult, ArenaRoomStatus, ArenaParticipantStatus,
-  ArenaGameType
+  ArenaGameType, ArenaReconnectFailureReason
 } from '../houseArena.types';
 import { generateRoomCode, generateReconnectToken } from '../houseArena.utils';
 import { getSupabaseClient } from '../../../services/supabase/client';
+import { classifyReconnectError, TERMINAL_RECONNECT_REASONS } from './arenaErrorClassification';
+import { arenaSessionStorage } from './houseArenaSession.storage';
 
 const MOCK_STORAGE_KEY_ROOM = 'poke_house_mock_room';
 const MOCK_STORAGE_KEY_PARTS = 'poke_house_mock_participants';
@@ -213,7 +215,7 @@ export class HouseArenaRoomService {
   async reconnectToRoom(roomCode: string, token: string): Promise<ArenaRoomJoinResult> {
     try {
       if (!token || !roomCode) {
-        return { status: 'reconnect_failed' };
+        return { status: 'reconnect_failed', reason: 'invalid_room_code' };
       }
 
       const supabase = this.getSupabase();
@@ -231,15 +233,35 @@ export class HouseArenaRoomService {
       });
 
       if (error) {
-        console.error('[HouseArenaRoomService] RPC reconnect_arena_participant error:', error);
-        return { status: 'reconnect_failed' };
+        const failureReason = classifyReconnectError(error);
+        if (TERMINAL_RECONNECT_REASONS.has(failureReason)) {
+          console.info('[HouseArenaRoomService] Reconnection terminal failure:', failureReason);
+          if (failureReason === 'room_closed') {
+            return { status: 'room_closed', reason: 'room_closed' };
+          }
+          if (failureReason === 'room_not_found') {
+            return { status: 'room_not_found' };
+          }
+          if (failureReason === 'invalid_room_code') {
+            return { status: 'invalid_room_code' };
+          }
+          return { status: 'reconnect_failed', reason: failureReason };
+        }
+        console.error('[HouseArenaRoomService] RPC reconnect_arena_participant unexpected error:', error);
+        return { status: 'reconnect_failed', reason: failureReason };
       }
 
       if (!data || data.length === 0) {
-        return { status: 'reconnect_failed' };
+        return { status: 'reconnect_failed', reason: 'participant_not_found' };
       }
 
       const row = data[0];
+
+      // If server explicitly returned a closed room row
+      if (row.room_status === 'closed') {
+        console.info('[HouseArenaRoomService] Server reported room is closed upon reconnection.');
+        return { status: 'room_closed', reason: 'room_closed' };
+      }
 
       const participant: ArenaParticipant = {
         id: row.participant_id,
@@ -273,8 +295,77 @@ export class HouseArenaRoomService {
         reconnectToken: token
       };
     } catch (err: unknown) {
+      const failureReason = classifyReconnectError(err);
+      if (TERMINAL_RECONNECT_REASONS.has(failureReason)) {
+        console.info('[HouseArenaRoomService] Reconnect caught terminal error:', failureReason);
+        if (failureReason === 'room_closed') {
+          return { status: 'room_closed', reason: 'room_closed' };
+        }
+        return { status: 'reconnect_failed', reason: failureReason };
+      }
       console.error('[HouseArenaRoomService] reconnectToRoom unexpected error:', err);
-      return { status: 'reconnect_failed' };
+      return { status: 'reconnect_failed', reason: failureReason };
+    }
+  }
+
+  /**
+   * Fast, non-throwing validation of an existing persisted session.
+   * Used by Home screen to confirm the room still exists and is not closed.
+   */
+  async validateSession(session: { roomCode: string; reconnectToken: string }): Promise<{
+    valid: boolean;
+    reason?: ArenaReconnectFailureReason;
+    room?: ArenaRoom;
+  }> {
+    try {
+      if (!session.roomCode || !session.reconnectToken) {
+        return { valid: false, reason: 'invalid_room_code' };
+      }
+
+      const supabase = this.getSupabase();
+      if (!supabase) {
+        const mockRoom = this.getRoomStateMockByCode(session.roomCode);
+        if (!mockRoom || mockRoom.status === 'closed') {
+          return { valid: false, reason: 'room_closed' };
+        }
+        return { valid: true, room: mockRoom };
+      }
+
+      // Check room status from database without triggering error logs
+      const { data, error } = await supabase
+        .from('arena_rooms')
+        .select('id, room_code, status, current_round_number, current_game_type, lobby_started_at, lobby_ends_at, tournament_started_at, tournament_ended_at, last_activity_at, created_at')
+        .eq('room_code', session.roomCode.trim().toUpperCase())
+        .maybeSingle();
+
+      if (error || !data) {
+        return { valid: false, reason: 'room_not_found' };
+      }
+
+      if (data.status === 'closed') {
+        return { valid: false, reason: 'room_closed' };
+      }
+
+      const room: ArenaRoom = {
+        id: data.id,
+        roomCode: data.room_code,
+        status: data.status as ArenaRoomStatus,
+        createdAt: data.created_at,
+        lobbyStartsAt: data.lobby_started_at,
+        lobbyEndsAt: data.lobby_ends_at,
+        tournamentStartedAt: data.tournament_started_at,
+        tournamentEndedAt: data.tournament_ended_at,
+        lastActivityAt: data.last_activity_at,
+        activeParticipantCount: 0,
+        currentRoundNumber: data.current_round_number,
+        currentGameType: data.current_game_type,
+        createdByParticipantId: null,
+        selectedGameType: null
+      };
+
+      return { valid: true, room };
+    } catch {
+      return { valid: false, reason: 'network_error' };
     }
   }
 
@@ -732,11 +823,10 @@ export class HouseArenaRoomService {
     const savedPartsStr = localStorage.getItem(MOCK_STORAGE_KEY_PARTS) || '[]';
     const participants = JSON.parse(savedPartsStr) as ArenaParticipant[];
 
-    const session = localStorage.getItem('poke_house_arena_session');
-    if (!session) {
+    const sess = arenaSessionStorage.read();
+    if (!sess) {
       return { status: 'reconnect_failed' };
     }
-    const sess = JSON.parse(session);
     
     let participant = participants.find(p => p.displayName === sess.displayName);
     if (!participant) {

@@ -23,11 +23,20 @@ import { CustomBowlMode } from './features/custom-bowl/CustomBowlMode';
 import { RushMode } from './features/rush/RushMode';
 import { BowlTrainingMode } from './features/training/BowlTrainingMode';
 import { HouseArenaMode } from './features/house-arena/HouseArenaMode';
+import { MemoryMatchArenaGame } from './features/house-arena/games/memory-match/MemoryMatchArenaGame';
 import { houseArenaSessionStorage } from './features/house-arena/services/houseArenaSession.storage';
 import pokeBowlHero from './src/assets/brand/poke-bowl-hero-900.png';
 
 function App() {
-    const [gameState, setGameState] = useState<GameState>("HOME");
+    const [gameState, setGameState] = useState<GameState>(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('game') === 'memory_match' || params.get('mode') === 'memory_match') {
+                return 'MEMORY_MATCH';
+            }
+        }
+        return 'HOME';
+    });
     const [language, setLanguage] = useState<Language>('pt');
     const [menuCategory, setMenuCategory] = useState<string | null>(null); 
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -340,6 +349,26 @@ function App() {
     };
 
     handleGameOverRef.current = handleGameOver;
+
+    if (gameState === "MEMORY_MATCH") {
+        const devRoom: any = {
+            roomCode: 'DEVMM',
+            status: 'round_active',
+            currentGameType: 'memory_match',
+            currentRoundNumber: 1,
+            totalRounds: 1,
+            remainingRoundSeconds: 300,
+        };
+        return (
+            <MemoryMatchArenaGame
+                room={devRoom}
+                reconnectToken="dev_token"
+                language={language}
+                onRoundFinished={() => {}}
+                onHome={resetToHome}
+            />
+        );
+    }
 
     if (gameState === "HOUSE_ARENA") {
         return (

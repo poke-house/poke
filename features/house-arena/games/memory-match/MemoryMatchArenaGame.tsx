@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Clock, RefreshCw, AlertCircle, Sparkles, Home } from 'lucide-react';
+import { Clock, RefreshCw, AlertCircle, Sparkles, Home } from 'lucide-react';
 import { ArenaRoom } from '../../houseArena.types';
 import { useMemoryMatchGameplay } from './hooks/useMemoryMatchGameplay';
-import { MemoryMatchCardGrid } from './components/MemoryMatchCardGrid';
+import { MemoryCard } from './components/MemoryCard';
 
 interface MemoryMatchArenaGameProps {
   room: ArenaRoom;
@@ -37,6 +37,198 @@ export const MemoryMatchArenaGame: React.FC<MemoryMatchArenaGameProps> = ({
   });
 
   const lastScoreRef = useRef(roundScore);
+  const mainRef = useRef<HTMLElement | null>(null);
+
+  // Responsive state for dynamic columns & rows computation
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  interface BoardLayout {
+    width: number;
+    height: number;
+    cardWidth: number;
+    cardHeight: number;
+    columns: number;
+    rows: number;
+    gap: number;
+    padding: number;
+  }
+  const [boardLayout, setBoardLayout] = useState<BoardLayout | null>(null);
+
+  const computeLayout = (containerW: number, containerH: number) => {
+    if (containerW <= 0 || containerH <= 0) return;
+
+    // Mobile (< 768px): 4 cols x 5 rows. Desktop: 5 cols x 4 rows.
+    const cols = containerW < 768 ? 4 : 5;
+    const rows = Math.ceil((cards.length || 20) / cols);
+
+    // Responsive gap & padding based on container size
+    const gap = containerH < 500 ? 5 : containerH < 700 ? 7 : 10;
+    const padding = containerH < 500 ? 6 : containerH < 700 ? 8 : 12;
+    const border = 3;
+
+    const totalExtraH = 2 * padding + 2 * border + (rows - 1) * gap;
+    const totalExtraW = 2 * padding + 2 * border + (cols - 1) * gap;
+
+    // Safety buffer of 6px to avoid any sub-pixel collision with footer/header
+    const maxAvailableH = Math.max(0, containerH - totalExtraH - 6);
+    const maxAvailableW = Math.max(0, containerW - totalExtraW - 6);
+
+    // Target card aspect ratio (width / height)
+    const aspect = 0.76;
+
+    // 1. PRIMARY DIMENSION: Dimension by available height between header and footer
+    let cardH = Math.floor(maxAvailableH / rows);
+    let cardW = Math.floor(cardH * aspect);
+
+    // 2. If card width exceeds horizontal available space, clamp by width
+    if (cardW * cols > maxAvailableW) {
+      cardW = Math.floor(maxAvailableW / cols);
+      cardH = Math.min(Math.floor(maxAvailableH / rows), Math.floor(cardW / aspect));
+    }
+
+    // Minimum limits to prevent invisible cards
+    cardW = Math.max(20, cardW);
+    cardH = Math.max(20, cardH);
+
+    const boardWidth = cardW * cols + totalExtraW;
+    const boardHeight = cardH * rows + totalExtraH;
+
+    setBoardLayout({
+      width: boardWidth,
+      height: boardHeight,
+      cardWidth: cardW,
+      cardHeight: cardH,
+      columns: cols,
+      rows,
+      gap,
+      padding
+    });
+  };
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!mainRef.current) return;
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        computeLayout(width, height);
+      }
+    });
+
+    ro.observe(mainRef.current);
+    const rect = mainRef.current.getBoundingClientRect();
+    computeLayout(rect.width, rect.height);
+
+    return () => ro.disconnect();
+  }, [cards.length]);
+
+  const columnCount = boardLayout ? boardLayout.columns : (isMobile ? 4 : 5);
+  const rowCount = boardLayout ? boardLayout.rows : Math.ceil((cards.length || 20) / columnCount);
+
+  const boardStyle: React.CSSProperties = boardLayout ? {
+    width: `${boardLayout.width}px`,
+    height: `${boardLayout.height}px`,
+    gridTemplateColumns: `repeat(${boardLayout.columns}, ${boardLayout.cardWidth}px)`,
+    gridTemplateRows: `repeat(${boardLayout.rows}, ${boardLayout.cardHeight}px)`,
+    gap: `${boardLayout.gap}px`,
+    padding: `${boardLayout.padding}px`,
+    '--mm-columns': boardLayout.columns,
+    '--mm-rows': boardLayout.rows,
+  } as React.CSSProperties : {
+    '--mm-columns': columnCount,
+    '--mm-rows': rowCount,
+  } as React.CSSProperties;
+
+  // Geometric validation runner per user specifications
+  useEffect(() => {
+    const runVerification = () => {
+      const page = document.querySelector('.mm-page');
+      const header = document.querySelector('.mm-header');
+      const main = document.querySelector('.mm-main');
+      const board = document.querySelector('.mm-board');
+      const footer = document.querySelector('.mm-footer');
+      const cardEls = Array.from(document.querySelectorAll('.mm-card'));
+
+      if (!page || !header || !main || !board || !footer || cardEls.length === 0) {
+        return;
+      }
+
+      const pageRect = page.getBoundingClientRect();
+      const headerRect = header.getBoundingClientRect();
+      const mainRect = main.getBoundingClientRect();
+      const boardRect = board.getBoundingClientRect();
+      const footerRect = footer.getBoundingClientRect();
+
+      const failures: string[] = [];
+
+      if (Math.abs(pageRect.height - window.innerHeight) > 1) {
+        failures.push(`Page height (${pageRect.height}) !== window.innerHeight (${window.innerHeight})`);
+      }
+
+      if (boardRect.bottom > mainRect.bottom + 1) {
+        failures.push(`Board bottom (${boardRect.bottom}) overlaps outside main (${mainRect.bottom})`);
+      }
+
+      if (boardRect.bottom > footerRect.top + 1) {
+        failures.push(`Board bottom (${boardRect.bottom}) overlaps footer top (${footerRect.top})`);
+      }
+
+      cardEls.forEach((card, index) => {
+        const r = card.getBoundingClientRect();
+        if (r.bottom > boardRect.bottom + 1) {
+          failures.push(`Card ${index} bottom (${r.bottom}) exceeds board (${boardRect.bottom})`);
+        }
+        if (r.bottom > footerRect.top + 1) {
+          failures.push(`Card ${index} bottom (${r.bottom}) overlaps footer (${footerRect.top})`);
+        }
+        if (r.height <= 0 || r.width <= 0) {
+          failures.push(`Card ${index} collapsed: ${r.width}x${r.height}`);
+        }
+      });
+
+      const metrics = {
+        windowHeight: window.innerHeight,
+        pageHeight: pageRect.height,
+        headerHeight: headerRect.height,
+        mainHeight: mainRect.height,
+        boardHeight: boardRect.height,
+        footerHeight: footerRect.height,
+        cardsCount: cardEls.length,
+        failuresCount: failures.length
+      };
+
+      console.table(metrics);
+      if (failures.length > 0) {
+        console.warn('Memory Match Geometric Failures:', failures);
+      } else {
+        console.log('✅ Memory Match Geometric Validation: 0 failures, all cards visible!');
+      }
+
+      (window as any).__MM_VERIFICATION__ = {
+        metrics,
+        failures,
+        pageRect,
+        headerRect,
+        mainRect,
+        boardRect,
+        footerRect,
+        cardsCount: cardEls.length
+      };
+    };
+
+    const timer = setTimeout(runVerification, 100);
+    (window as any).runMemoryMatchVerification = runVerification;
+
+    return () => clearTimeout(timer);
+  }, [cards.length, isMobile, loading, boardLayout]);
 
   // Trigger confetti on positive score increases
   useEffect(() => {
@@ -60,154 +252,138 @@ export const MemoryMatchArenaGame: React.FC<MemoryMatchArenaGameProps> = ({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const timePercent = (timeLeft / 300) * 100;
+  const timePercent = Math.min(100, Math.max(0, (timeLeft / 300) * 100));
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[450px] p-6 text-center" id="memory-match-loading">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
-          className="text-rose-500 mb-4"
-        >
-          <RefreshCw size={40} className="stroke-[2.5]" />
-        </motion.div>
-        <h3 className="text-xl font-bold text-slate-800 font-display">
-          {language === 'pt' ? 'A preparar o tabuleiro...' : 'Preparing the board...'}
-        </h3>
-        <p className="text-sm text-slate-500 mt-2 font-sans">
-          {language === 'pt' ? 'Carregando o jogo de memória.' : 'Loading the memory match game.'}
-        </p>
+      <div className="mm-page items-center justify-center p-6 text-center" id="memory-match-loading">
+        <div className="flex flex-col items-center justify-center m-auto">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+            className="text-rose-500 mb-4"
+          >
+            <RefreshCw size={40} className="stroke-[2.5]" />
+          </motion.div>
+          <h3 className="text-xl font-bold text-slate-800 font-display">
+            {language === 'pt' ? 'A preparar o tabuleiro...' : 'Preparing the board...'}
+          </h3>
+          <p className="text-sm text-slate-500 mt-2 font-sans">
+            {language === 'pt' ? 'Carregando o jogo de memória.' : 'Loading the memory match game.'}
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-brand-linen min-h-[100dvh] w-full flex flex-col font-sans" id="memory-match-arena-game">
-      {/* STICKY HEADER */}
-      <div className="bg-white border-b-4 border-brand-charcoal py-3 sm:py-4 px-3 sm:px-6 md:px-8 sticky top-0 z-40 shadow-soft">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2 sm:gap-4">
-          
-          {/* Left panel: Room and Mode Details */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600 shadow-sm shrink-0">
-              <Sparkles size={20} className="stroke-[2.5]" />
-            </div>
-            <div>
-              <span className="text-[10px] font-bold text-rose-500 tracking-wider uppercase font-mono">
-                Memory Match
-              </span>
-              <h2 className="text-base sm:text-lg md:text-xl font-bold text-brand-charcoal font-display">
-                {language === 'pt' ? 'Encontra os pares iguais!' : 'Find the matching pairs!'}
-              </h2>
-            </div>
+    <div className="mm-page" id="memory-match-arena-game">
+      {/* HEADER: Direct sibling 1 */}
+      <header className="mm-header">
+        <div className="mm-header__identity">
+          <div className="mm-header__icon rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600 border-2 border-brand-charcoal shrink-0">
+            <Sparkles size={22} className="stroke-[2.5]" />
+          </div>
+          <div className="mm-header__copy">
+            <span className="mm-header__eyebrow">
+              Memory Match
+            </span>
+            <h2 className="mm-header__title">
+              {language === 'pt' ? 'Encontra os pares iguais!' : 'Find the matching pairs!'}
+            </h2>
+          </div>
+        </div>
+
+        <div className="mm-header__timer">
+          <div className="mm-header__timer-badge">
+            <Clock size={14} className="animate-pulse" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
+          <div className="mm-header__progress">
+            <div
+              className="mm-header__progress-fill"
+              style={{ width: `${timePercent}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="mm-header__scores">
+          <div className="mm-score mm-score--round">
+            <p className="mm-score__label">
+              {language === 'pt' ? 'Ronda' : 'Round'}
+            </p>
+            <p className="mm-score__value">
+              +{roundScore}
+            </p>
           </div>
 
-          {/* Center panel: Clock Countdown */}
-          <div className="flex flex-col items-center">
-            <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-rose-50 border-2 border-rose-200 rounded-full text-rose-600 font-mono text-xs sm:text-base font-bold shadow-xs">
-              <Clock size={14} className="animate-pulse" />
-              <span>{formatTime(timeLeft)}</span>
-            </div>
-            <div className="w-28 sm:w-32 bg-slate-100 h-1.5 rounded-full mt-1.5 sm:mt-2 overflow-hidden border border-slate-200">
-              <div
-                className="bg-rose-500 h-full rounded-full transition-all duration-1000"
-                style={{ width: `${timePercent}%` }}
-              />
-            </div>
+          <div className="mm-score mm-score--total">
+            <p className="mm-score__label">
+              {language === 'pt' ? 'Total' : 'Total Score'}
+            </p>
+            <p className="mm-score__value">
+              {totalScore}
+            </p>
           </div>
-
-          {/* Right panel: Scores Display */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="text-center px-3 py-1.5 sm:px-4 sm:py-2 bg-emerald-50 border-2 border-emerald-200 rounded-2xl">
-              <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-emerald-600 font-sans">
-                {language === 'pt' ? 'Ronda' : 'Round'}
-              </p>
-              <p className="text-sm sm:text-lg font-black text-emerald-950 font-mono leading-none mt-0.5 sm:mt-1">
-                +{roundScore}
-              </p>
-            </div>
-            
-            <div className="text-center px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-50 border-2 border-slate-200 rounded-2xl">
-              <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-slate-500 font-sans">
-                {language === 'pt' ? 'Acumulado' : 'Total Score'}
-              </p>
-              <p className="text-sm sm:text-lg font-black text-slate-800 font-mono leading-none mt-0.5 sm:mt-1">
-                {totalScore}
-              </p>
-            </div>
-          </div>
-
         </div>
-      </div>
+      </header>
 
-      {/* Scrolling Middle Section */}
-      <div className="max-w-4xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-6 flex-1 overflow-y-auto pb-24 sm:pb-8">
-        {/* FLOATING ACTION NOTIFIER */}
-        <div className="relative min-h-[40px] flex items-center justify-center mb-4">
-          <AnimatePresence mode="wait">
-            {feedback.status && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className={`absolute px-4 py-2 rounded-full text-xs font-bold font-sans shadow-sm border flex items-center gap-1.5 z-10 ${
-                  feedback.status === 'success'
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                    : 'bg-rose-50 border-rose-300 text-rose-700'
-                }`}
-              >
-                <AlertCircle size={14} />
-                <span>{feedback.message}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* MAIN: Direct sibling 2 */}
+      <main ref={mainRef} className="mm-main relative">
+        <AnimatePresence mode="wait">
+          {feedback.status && (
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.95 }}
+              className={`pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xs font-bold font-sans shadow-md border flex items-center gap-1.5 z-30 ${
+                feedback.status === 'success'
+                  ? 'bg-emerald-600 text-white border-emerald-700'
+                  : 'bg-rose-600 text-white border-rose-700'
+              }`}
+            >
+              <AlertCircle size={14} />
+              <span>{feedback.message}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="mm-board" style={boardStyle} id="memory-match-board">
+          {cards.map((card) => (
+            <MemoryCard
+              key={card.id}
+              card={card}
+              className="mm-card"
+              onClick={() => !submitting && handleCardClick(card)}
+              disabled={submitting}
+              language={language}
+            />
+          ))}
         </div>
+      </main>
 
-        {/* CORE CARD BOARD */}
-        <div className="bg-radial from-slate-50 to-rose-50/20 border-3 border-brand-charcoal rounded-[24px] sm:rounded-[32px] p-3 sm:p-6 md:p-8 shadow-fluent relative overflow-visible">
-          
-          {/* Subtle decorative background grids */}
-          <div className="absolute inset-0 opacity-2.5 pointer-events-none bg-[radial-gradient(#f43f5e_1px,transparent_1px)] [background-size:16px_16px]" />
-
-          <MemoryMatchCardGrid
-            cards={cards}
-            onCardClick={handleCardClick}
-            disabled={submitting}
-            language={language}
-          />
-        </div>
-
-        {/* TUTORIAL / INSTRUCTIONS COMPASS */}
-        <div className="mt-6 text-center text-slate-500 max-w-md mx-auto">
-          <p className="text-[11px] leading-relaxed font-sans font-medium px-4 py-2 bg-white/60 border border-slate-200 rounded-xl">
-            💡 <span className="font-bold text-slate-700">{language === 'pt' ? 'Como jogar:' : 'How to play:'}</span> {language === 'pt' ? 'Encontra os pares correspondentes! Viras dois cartões de cada vez para encontrar os emojis iguais.' : 'Find the matching pairs! Flip two cards at a time to find identical emojis.'}
-          </p>
-        </div>
-      </div>
-
-      {/* STICKY ACTION BAR */}
-      <div className="sticky bottom-0 bg-white border-t-4 border-brand-charcoal p-3 sm:p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] flex flex-row items-center justify-between gap-2 sm:gap-4 z-30 min-h-[56px]">
+      {/* FOOTER: Direct sibling 3 */}
+      <footer className="mm-footer">
         <div className="flex items-center gap-2">
           {onHome && (
             <button
               type="button"
               onClick={onHome}
               title={language === 'pt' ? 'Sair para o Início' : 'Exit to Home'}
-              className="min-h-[44px] min-w-[44px] py-2.5 sm:py-3 px-3 rounded-button border-2 border-brand-charcoal bg-white text-brand-charcoal hover:bg-brand-linen font-display font-black text-xs uppercase flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              className="min-h-[40px] px-3 sm:px-4 py-2 rounded-button border-2 border-brand-charcoal bg-white text-brand-charcoal hover:bg-brand-linen font-display font-black text-xs uppercase flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-soft"
             >
-              <Home size={16} />
-              <span className="hidden sm:inline">{language === 'pt' ? 'Início' : 'Home'}</span>
+              <Home size={15} />
+              <span>{language === 'pt' ? 'Início' : 'Home'}</span>
             </button>
           )}
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="font-mono text-xs font-black text-brand-charcoal bg-emerald-50 px-3 py-2 rounded-button border border-emerald-200">
+          <div className="font-mono text-xs font-black text-brand-charcoal bg-emerald-50 px-3 py-1.5 rounded-button border border-emerald-300">
             +{roundScore} pts
           </div>
         </div>
-      </div>
+      </footer>
     </div>
   );
 };

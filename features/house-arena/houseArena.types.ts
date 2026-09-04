@@ -146,17 +146,54 @@ export interface ArenaRoomJoinRequest {
 }
 
 /**
+ * Classification of reconnection failure causes
+ */
+export type ArenaReconnectFailureReason =
+  | 'room_closed'
+  | 'room_not_found'
+  | 'invalid_room_code'
+  | 'participant_not_found'
+  | 'participant_removed'
+  | 'session_expired'
+  | 'network_error'
+  | 'unknown';
+
+/**
+ * State machine status for the House Arena room connection lifecycle
+ */
+export type ArenaConnectionStatus =
+  | 'idle'
+  | 'validating'
+  | 'reconnecting'
+  | 'connected'
+  | 'expired'
+  | 'error';
+
+/**
+ * Centralized persisted arena session representation
+ */
+export interface PersistedArenaSession {
+  roomId: string;
+  roomCode: string;
+  participantId: string;
+  reconnectToken: string;
+  displayName: string;
+  storeName: string;
+  storedAt: number;
+}
+
+/**
  * Union response representing join room result states.
  */
 export type ArenaRoomJoinResult =
   | { status: 'joined'; participant: ArenaParticipant; reconnectToken: string }
   | { status: 'room_not_found' }
-  | { status: 'room_closed' }
+  | { status: 'room_closed'; reason?: ArenaReconnectFailureReason }
   | { status: 'invalid_room_code' }
   | { status: 'name_required' }
   | { status: 'store_required' }
   | { status: 'avatar_unavailable' }
-  | { status: 'reconnect_failed' }
+  | { status: 'reconnect_failed'; reason?: ArenaReconnectFailureReason }
   | { status: 'unexpected_error'; message: string };
 
 /**

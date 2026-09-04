@@ -219,22 +219,25 @@ export class MemoryMatchService {
     const cached = localStorage.getItem(MOCK_MM_CARDS_KEY);
     if (cached) {
       try {
-        return JSON.parse(cached);
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length === 20) {
+          return parsed;
+        }
       } catch {
         // fail-safe
       }
     }
 
-    // Generate fresh board cards
+    // Generate fresh board cards with 20 cards (10 pairs)
     const fresh = this.generateFreshMockCardsPool();
     localStorage.setItem(MOCK_MM_CARDS_KEY, JSON.stringify(fresh));
     return fresh;
   }
 
   private generateFreshMockCardsPool(): LocalMockCard[] {
-    // Select 8 random pairs from MOCK_MEMORY_MATCH_PAIRS
+    // Select 10 random pairs from MOCK_MEMORY_MATCH_PAIRS to produce exactly 20 cards
     const shuffledPairs = [...MOCK_MEMORY_MATCH_PAIRS].sort(() => Math.random() - 0.5);
-    const selected = shuffledPairs.slice(0, 8);
+    const selected = shuffledPairs.slice(0, 10);
 
     const cards: Omit<LocalMockCard, 'position'>[] = [];
     selected.forEach((p) => {
@@ -252,7 +255,7 @@ export class MemoryMatchService {
       });
     });
 
-    // Shuffle positions 0 to 15
+    // Shuffle positions 0 to 19
     const shuffledCards = cards.sort(() => Math.random() - 0.5);
     return shuffledCards.map((c, index) => ({
       ...c,

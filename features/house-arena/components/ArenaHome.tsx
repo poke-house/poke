@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ArenaRoomCreateRequest, ArenaRoomJoinRequest } from '../houseArena.types';
-import { houseArenaSessionStorage } from '../services/houseArenaSession.storage';
+import { ArenaRoomCreateRequest, ArenaRoomJoinRequest, ArenaConnectionStatus, PersistedArenaSession } from '../houseArena.types';
+import { arenaSessionStorage } from '../services/houseArenaSession.storage';
 import { IconTrophy, IconArrowLeft, IconGlobe } from '../../../components/Icons';
-import { Sparkles, Trophy, Users, ShieldAlert, ArrowRight, RotateCw, RefreshCw } from 'lucide-react';
+import { Sparkles, Trophy, Users, ShieldAlert, ArrowRight, RotateCw, RefreshCw, Info } from 'lucide-react';
 
 interface ArenaHomeProps {
   onBack: () => void;
@@ -11,6 +11,8 @@ interface ArenaHomeProps {
   onReconnect: (roomCode: string, token: string) => Promise<void>;
   isLoading: boolean;
   error: string | null;
+  infoNotice?: string | null;
+  connectionStatus?: ArenaConnectionStatus;
   language: 'pt' | 'en';
 }
 
@@ -53,6 +55,8 @@ export const ArenaHome: React.FC<ArenaHomeProps> = ({
   onReconnect,
   isLoading,
   error,
+  infoNotice,
+  connectionStatus,
   language
 }) => {
   const [activeTab, setActiveTab] = useState<'join' | 'create'>('join');
@@ -60,15 +64,21 @@ export const ArenaHome: React.FC<ArenaHomeProps> = ({
   const [selectedStore, setSelectedStore] = useState(STORES[0].name);
   const [roomCodeInput, setRoomCodeInput] = useState('');
   const [selectedGame, setSelectedGame] = useState<'slop_clock' | 'quick_think' | 'memory_match'>('slop_clock');
-  const [localSession, setLocalSession] = useState<ReturnType<typeof houseArenaSessionStorage.getSession>>(null);
+  const [localSession, setLocalSession] = useState<PersistedArenaSession | null>(null);
 
-  // Load existing local session for one-click reconnection
+  // Synchronize local session with centralized storage
   useEffect(() => {
-    const session = houseArenaSessionStorage.getSession();
+    if (connectionStatus === 'expired') {
+      setLocalSession(null);
+      return;
+    }
+    const session = arenaSessionStorage.read();
     if (session) {
       setLocalSession(session);
+    } else {
+      setLocalSession(null);
     }
-  }, []);
+  }, [connectionStatus, infoNotice]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,7 +105,7 @@ export const ArenaHome: React.FC<ArenaHomeProps> = ({
   };
 
   const clearSession = () => {
-    houseArenaSessionStorage.clearSession();
+    arenaSessionStorage.clear();
     setLocalSession(null);
   };
 
@@ -105,8 +115,18 @@ export const ArenaHome: React.FC<ArenaHomeProps> = ({
 
   return (
     <div className="w-full max-w-md mx-auto p-4 md:p-6 animate-fade-in font-sans text-brand-charcoal">
+      {/* Informational Notification Banner */}
+      {infoNotice && (
+        <div className="mb-6 bg-brand-butter/30 border-2 border-brand-charcoal rounded-card p-4 shadow-soft flex items-start gap-3 animate-fade-in">
+          <Info className="text-brand-burgundy shrink-0 mt-0.5" size={18} />
+          <div className="text-xs font-semibold text-brand-charcoal leading-relaxed">
+            {infoNotice}
+          </div>
+        </div>
+      )}
+
       {/* Reconnect Banner */}
-      {localSession && (
+      {localSession && !infoNotice && (
         <div className="mb-6 bg-brand-butter border-3 border-brand-charcoal rounded-card p-5 shadow-soft relative overflow-hidden animate-slide-up">
           <div className="absolute right-2 top-2 text-brand-charcoal/10">
             <Trophy size={80} />

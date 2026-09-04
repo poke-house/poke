@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { GameState, Recipe, PaPersona, Language, BilingualMessage, RecipePhaseKey, Variant } from './types';
 import { 
     RECIPES, INGREDIENTS_DB, THEMES, SUCCESS_MESSAGES, FAIL_MESSAGES, 
@@ -23,11 +23,21 @@ import { CustomBowlMode } from './features/custom-bowl/CustomBowlMode';
 import { RushMode } from './features/rush/RushMode';
 import { BowlTrainingMode } from './features/training/BowlTrainingMode';
 import { HouseArenaMode } from './features/house-arena/HouseArenaMode';
-import { houseArenaSessionStorage } from './features/house-arena/services/houseArenaSession.storage';
+import { MemoryMatchArenaGame } from './features/house-arena/games/memory-match/MemoryMatchArenaGame';
+import { arenaSessionStorage, PersistedArenaSession } from './features/house-arena/services/houseArenaSession.storage';
+import { HouseArenaRoomService } from './features/house-arena/services/houseArenaRoom.service';
 import pokeBowlHero from './src/assets/brand/poke-bowl-hero.png';
 
 function App() {
-    const [gameState, setGameState] = useState<GameState>("HOME");
+    const [gameState, setGameState] = useState<GameState>(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('game') === 'memory_match' || params.get('mode') === 'memory_match') {
+                return 'MEMORY_MATCH';
+            }
+        }
+        return 'HOME';
+    });
     const [language, setLanguage] = useState<Language>('pt');
     const [menuCategory, setMenuCategory] = useState<string | null>(null); 
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -44,12 +54,42 @@ function App() {
     const [easterEggTrigger, setEasterEggTrigger] = useState(0);
     const [dancingEmoji, setDancingEmoji] = useState<number | null>(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [localSession, setLocalSession] = useState<{ roomCode: string; reconnectToken: string } | null>(null);
+    const [localSession, setLocalSession] = useState<PersistedArenaSession | null>(null);
+    const roomService = useMemo(() => new HouseArenaRoomService(), []);
 
-    // Read through the central store so malformed and expired sessions are removed.
+    // Validate that the persisted session actually points to an open, valid room before displaying active banner
     useEffect(() => {
-        setLocalSession(houseArenaSessionStorage.getSession());
-    }, [gameState]);
+        if (gameState !== "HOME") {
+            setLocalSession(null);
+            return;
+        }
+
+        const session = arenaSessionStorage.read();
+        if (!session) {
+            setLocalSession(null);
+            return;
+        }
+
+        let cancelled = false;
+        roomService.validateSession(session).then(result => {
+            if (cancelled) return;
+            if (result.valid) {
+                setLocalSession(session);
+            } else {
+                // If room is closed or nonexistent, purge storage and clear session
+                if (result.reason === 'room_closed' || result.reason === 'room_not_found') {
+                    arenaSessionStorage.clear();
+                }
+                setLocalSession(null);
+            }
+        }).catch(() => {
+            if (!cancelled) setLocalSession(null);
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [gameState, roomService]);
 
     const handleEasterEggClick = () => { if (window.innerWidth < 768) { setEasterEggTrigger(prev => prev + 1); } };
     
@@ -354,6 +394,26 @@ function App() {
     };
 
     handleGameOverRef.current = handleGameOver;
+
+    if (gameState === "MEMORY_MATCH") {
+        const devRoom: any = {
+            roomCode: 'DEVMM',
+            status: 'round_active',
+            currentGameType: 'memory_match',
+            currentRoundNumber: 1,
+            totalRounds: 1,
+            remainingRoundSeconds: 300,
+        };
+        return (
+            <MemoryMatchArenaGame
+                room={devRoom}
+                reconnectToken="dev_token"
+                language={language}
+                onRoundFinished={() => {}}
+                onHome={resetToHome}
+            />
+        );
+    }
 
     if (gameState === "HOUSE_ARENA") {
         return (

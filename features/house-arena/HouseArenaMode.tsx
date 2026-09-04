@@ -272,8 +272,10 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
     localPlayer,
     participants,
     reconnectToken,
+    connectionStatus,
     isLoading,
     error,
+    infoNotice,
     createRoom,
     joinRoom,
     reconnect,
@@ -446,6 +448,8 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
         onReconnect={reconnect}
         isLoading={isLoading}
         error={error}
+        infoNotice={infoNotice}
+        connectionStatus={connectionStatus}
         language={language}
       />
     </div>
