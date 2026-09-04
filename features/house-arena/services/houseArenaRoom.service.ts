@@ -303,6 +303,26 @@ export class HouseArenaRoomService {
     }
   }
 
+  async hostStartRoom(roomCode: string, reconnectToken: string):
+    Promise<{ success: boolean; message: string }> {
+    try {
+      const supabase = this.getSupabase();
+      if (!supabase) {
+        if (import.meta.env.DEV) return { success: true, message: 'Mock start' };
+        return { success: false, message: 'Supabase is not configured.' };
+      }
+      const { data, error } = await supabase.rpc('host_start_arena_room', {
+        p_room_code: roomCode.trim().toUpperCase(),
+        p_reconnect_token: reconnectToken.trim()
+      });
+      if (error) return { success: false, message: error.message };
+      const row = Array.isArray(data) ? data[0] : data;
+      return { success: !!row?.success, message: row?.message ?? '' };
+    } catch (e: any) {
+      return { success: false, message: e?.message ?? 'Erro inesperado.' };
+    }
+  }
+
   /**
    * Fetch current room state snapshot.
    */

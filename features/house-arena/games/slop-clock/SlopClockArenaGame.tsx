@@ -1,13 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useSlopClockGameplay } from './hooks/useSlopClockGameplay';
 import { ArenaRoom, ArenaParticipant } from '../../houseArena.types';
 import { TRANSLATIONS } from '../../../../translations';
 import { getFullIngredientList } from '../../../training/training.utils';
-import { ShieldAlert, CheckCircle, AlertTriangle, ChevronRight, ChevronLeft, RotateCcw, Award, Trophy, Users, X } from 'lucide-react';
+import { ShieldAlert, CheckCircle, AlertTriangle, ChevronRight, ChevronLeft, RotateCcw, Award, Trophy, Users, X, Home } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useArenaRoundLeaderboard } from '../../ranking/hooks/useArenaRoundLeaderboard';
 import { ArenaRoundLeaderboard } from '../../ranking/components/ArenaRoundLeaderboard';
 import { ArenaTournamentLeaderboard } from '../../ranking/components/ArenaTournamentLeaderboard';
+
+function shuffleStable<T>(arr: T[], seed: string): T[] {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return [...arr]
+    .map((v, i) => ({ v, k: ((h + i * 2654435761) >>> 0) }))
+    .sort((a, b) => a.k - b.k)
+    .map((o) => o.v);
+}
 
 interface SlopClockArenaGameProps {
   room: ArenaRoom;
@@ -15,6 +24,7 @@ interface SlopClockArenaGameProps {
   language: 'pt' | 'en';
   participants: ArenaParticipant[];
   localPlayer: ArenaParticipant | null;
+  onHome?: () => void;
 }
 
 export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
@@ -22,7 +32,8 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
   reconnectToken,
   language,
   participants,
-  localPlayer
+  localPlayer,
+  onHome
 }) => {
   const t = (key: string) => {
     const dict = TRANSLATIONS[language] as Record<string, string>;
@@ -31,6 +42,7 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
 
   const {
     challenge,
+    activeChallengeId,
     loading,
     submitting,
     timeLeft,
@@ -39,6 +51,7 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
     setCurrentPhaseIndex,
     currentPhases,
     currentPhase,
+    currentPhaseRequired,
     phaseLimit,
     feedback,
     clearFeedback,
@@ -125,13 +138,39 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
 
   const isLastPhase = currentPhaseIndex === currentPhases.length - 1;
   const currentPhaseSelections = selections[currentPhase?.key] || [];
-  const options = currentPhase ? getFullIngredientList(currentPhase.key as any) : [];
+
+  const MAX_OPTIONS_PER_PHASE = 4;
+
+  const fullList = useMemo(
+    () => (currentPhase ? getFullIngredientList(currentPhase.key as any) : []),
+    [currentPhase?.key]
+  );
+
+  const requiredForPhase = useMemo(
+    () => (currentPhase ? Array.from(new Set(currentPhaseRequired)) : []),
+    [currentPhaseRequired, currentPhase?.key]
+  );
+
+  const options = useMemo(() => {
+    if (fullList.length <= MAX_OPTIONS_PER_PHASE) return fullList;
+
+    // Always include the correct answers
+    const mustInclude = requiredForPhase.filter((x) => fullList.includes(x));
+    // Fill the rest with distractors (not already included)
+    const distractors = fullList.filter((x) => !mustInclude.includes(x));
+
+    const needed = Math.max(0, MAX_OPTIONS_PER_PHASE - mustInclude.length);
+    const chosen = [...mustInclude, ...distractors.slice(0, needed)];
+
+    // Final shuffle so the correct answer isn't always first
+    return shuffleStable(chosen, `${activeChallengeId ?? 'c'}-${currentPhase?.key}`);
+  }, [fullList, requiredForPhase, activeChallengeId, currentPhase?.key]);
 
   // Sort participants by score
   const sortedParticipants = [...participants].sort((a, b) => b.totalScore - a.totalScore);
 
   return (
-    <div className="bg-brand-linen min-h-screen w-full flex flex-col justify-start font-sans">
+    <div className="bg-brand-linen min-h-[100dvh] w-full flex flex-col font-sans">
       {/* 1. Header & Live Hud bar */}
       <div className="bg-white border-b-4 border-brand-charcoal py-2 sm:py-4 px-3 sm:px-6 md:px-8 sticky top-0 z-40 shadow-soft">
         <div className="max-w-7xl mx-auto flex flex-row items-center justify-between gap-2 md:gap-4">
@@ -196,7 +235,7 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
       )}
 
       {/* 2. Main Gameplay Layout Container */}
-      <div className="max-w-7xl w-full mx-auto px-4 md:px-8 py-3 sm:py-6 grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 flex-1">
+      <div className="max-w-7xl w-full mx-auto px-4 md:px-8 py-3 sm:py-6 grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 flex-1 overflow-y-auto pb-28 sm:pb-6">
         
         {/* Left Column: Challenge Objective details & Live Standings */}
         <div className="hidden lg:block lg:col-span-1 space-y-6">
@@ -440,6 +479,28 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
                     : 'This phase does not require ingredients for this recipe. Proceed to next.')}
             </p>
 
+            {/* Selected ingredients summary chips */}
+            {currentPhaseSelections.length > 0 && (
+              <div className="mb-3 max-h-32 overflow-y-auto sm:max-h-none p-2.5 bg-brand-linen/30 border border-brand-charcoal/15 rounded-button">
+                <div className="text-[10px] font-mono font-bold text-gray-500 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span>{language === 'pt' ? 'Ingredientes Selecionados:' : 'Selected Ingredients:'}</span>
+                  <span className="text-[9px] text-brand-tomato font-bold">{currentPhaseSelections.length} / {phaseLimit}</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {currentPhaseSelections.map((item, idx) => (
+                    <span
+                      key={`${item}-${idx}`}
+                      onClick={() => handleRemoveOneItem(item)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-green/20 text-brand-charcoal text-[10px] font-mono font-bold border border-brand-green/40 cursor-pointer hover:bg-brand-tomato/20 hover:text-brand-tomato transition-colors"
+                    >
+                      <span>{item}</span>
+                      <span className="text-[9px]">✕</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Ingredients Selection Grid */}
             {options.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
@@ -550,13 +611,26 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
           </div>
 
           {/* Stepper controls & Bowl delivery actions */}
-          <div className="sticky bottom-0 sm:relative -mx-4 sm:mx-0 bg-white border-t-4 sm:border-4 border-brand-charcoal rounded-none sm:rounded-card p-3 sm:p-5 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:shadow-elevated flex flex-row items-center justify-between gap-2 sm:gap-4 z-30">
+          <div className="sticky bottom-0 -mx-4 sm:mx-0 bg-white border-t-4 sm:border-4 border-brand-charcoal rounded-none sm:rounded-card p-3 sm:p-5 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] sm:shadow-elevated flex flex-row items-center justify-between gap-2 sm:gap-4 z-30 min-h-[56px]">
             <div className="flex items-center gap-1.5 sm:gap-2 flex-1 sm:flex-none">
+              {onHome && (
+                <button
+                  type="button"
+                  onClick={onHome}
+                  title={language === 'pt' ? 'Sair para o Início' : 'Exit to Home'}
+                  className="min-h-[44px] min-w-[44px] py-2.5 sm:py-3 px-2.5 sm:px-3 rounded-button border-2 border-brand-charcoal bg-white text-brand-charcoal hover:bg-brand-linen font-display font-black text-xs uppercase flex items-center justify-center transition-all cursor-pointer shrink-0"
+                >
+                  <Home size={16} />
+                  <span className="hidden md:inline ml-1">{language === 'pt' ? 'Início' : 'Home'}</span>
+                </button>
+              )}
+
               {/* Back step */}
               <button
+                type="button"
                 disabled={currentPhaseIndex === 0}
                 onClick={handlePrevPhase}
-                className="flex-1 sm:flex-none py-2.5 sm:py-3 px-2 sm:px-4 rounded-button border-2 border-brand-charcoal bg-white text-brand-charcoal hover:bg-brand-linen disabled:opacity-50 font-display font-black text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1 transition-all cursor-pointer"
+                className="min-h-[44px] flex-1 sm:flex-none py-2.5 sm:py-3 px-2 sm:px-4 rounded-button border-2 border-brand-charcoal bg-white text-brand-charcoal hover:bg-brand-linen disabled:opacity-50 font-display font-black text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1 transition-all cursor-pointer"
               >
                 <ChevronLeft size={14} className="shrink-0" />
                 <span>{language === 'pt' ? 'Anterior' : 'Back'}</span>
@@ -564,9 +638,10 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
 
               {/* Clear phase selections */}
               <button
+                type="button"
                 disabled={currentPhaseSelections.length === 0}
                 onClick={handleClearSelections}
-                className="flex-1 sm:flex-none py-2.5 sm:py-3 px-2 sm:px-4 rounded-button border-2 border-brand-charcoal bg-white text-brand-tomato hover:bg-brand-tomato/5 disabled:opacity-50 font-display font-black text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1 transition-all cursor-pointer"
+                className="min-h-[44px] flex-1 sm:flex-none py-2.5 sm:py-3 px-2 sm:px-4 rounded-button border-2 border-brand-charcoal bg-white text-brand-tomato hover:bg-brand-tomato/5 disabled:opacity-50 font-display font-black text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1 transition-all cursor-pointer"
               >
                 <RotateCcw size={14} className="shrink-0" />
                 <span>{language === 'pt' ? 'Limpar' : 'Clear'}</span>
@@ -577,17 +652,19 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
               {/* Next step / Submit */}
               {!isLastPhase ? (
                 <button
+                  type="button"
                   onClick={handleNextPhase}
-                  className="w-full py-2.5 sm:py-3.5 px-3 sm:px-6 rounded-button border-2 border-brand-charcoal bg-brand-charcoal hover:bg-brand-burgundy text-white font-display font-black text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1 transition-all shadow-soft cursor-pointer"
+                  className="min-h-[44px] w-full py-2.5 sm:py-3.5 px-3 sm:px-6 rounded-button border-2 border-brand-charcoal bg-brand-charcoal hover:bg-brand-burgundy text-white font-display font-black text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1 transition-all shadow-soft cursor-pointer"
                 >
                   <span>{language === 'pt' ? 'Seguinte' : 'Next'}</span>
                   <ChevronRight size={14} className="shrink-0" />
                 </button>
               ) : (
                 <button
+                  type="button"
                   disabled={submitting}
                   onClick={submitBowl}
-                  className="w-full py-2.5 sm:py-4 px-3 sm:px-8 rounded-button border-2 border-brand-charcoal bg-brand-green hover:bg-brand-green/95 text-white font-display font-black text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1.5 transition-all shadow-soft hover:translate-y-[1px] disabled:opacity-75 cursor-pointer"
+                  className="min-h-[44px] w-full py-2.5 sm:py-4 px-3 sm:px-8 rounded-button border-2 border-brand-charcoal bg-brand-green hover:bg-brand-green/95 text-white font-display font-black text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1.5 transition-all shadow-soft hover:translate-y-[1px] disabled:opacity-75 cursor-pointer"
                 >
                   {submitting ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

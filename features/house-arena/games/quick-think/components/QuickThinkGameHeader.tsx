@@ -55,7 +55,7 @@ export const QuickThinkGameHeader: React.FC<QuickThinkGameHeaderProps> = ({
 
         {/* Score Display */}
         <div className="flex items-center gap-1.5 bg-brand-butter border-2 border-brand-charcoal rounded-button px-3 py-1.5 font-mono text-xs font-black text-brand-charcoal">
-          <Trophy size={14} className="text-brand-charcoal animate-bounce" />
+          <Trophy size={14} className="text-brand-charcoal" />
           <span>
             {roundScore} {roundScore === 1 ? 'pt' : 'pts'}
           </span>

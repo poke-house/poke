@@ -74,11 +74,45 @@ export const ArenaTournamentLeaderboard: React.FC<ArenaTournamentLeaderboardProp
             </button>
           </div>
         ) : leaderboard.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-2 text-gray-400">
-            <Sparkles className="w-6 h-6 text-gray-300" />
-            <span className="text-xs">
-              {translations.house_arena_ranking_empty || 'Nenhuma classificação disponível.'}
-            </span>
+          <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
+            {/* Podium Placeholder */}
+            <div className="flex items-end justify-center gap-2.5 mb-5 w-full max-w-[240px] h-28">
+              {/* 2nd place */}
+              <div className="flex-1 flex flex-col items-center">
+                <div className="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-400 mb-1.5 font-mono">
+                  {translations?.language === 'en' || translations?.house_arena_ranking_retry === 'Try Again' ? '2nd' : '2º'}
+                </div>
+                <div className="w-full h-14 rounded-t-lg border-2 border-b-0 border-dashed border-gray-300 bg-gray-50/60 flex items-center justify-center">
+                  <span className="text-[10px] font-mono font-bold text-gray-300">#2</span>
+                </div>
+              </div>
+
+              {/* 1st place */}
+              <div className="flex-1 flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full border-2 border-dashed border-amber-400/80 bg-amber-50/50 flex items-center justify-center text-xs font-bold text-amber-600 mb-1.5 font-mono">
+                  {translations?.language === 'en' || translations?.house_arena_ranking_retry === 'Try Again' ? '1st' : '1º'}
+                </div>
+                <div className="w-full h-20 rounded-t-lg border-2 border-b-0 border-dashed border-amber-400/60 bg-amber-50/30 flex items-center justify-center">
+                  <Trophy className="w-5 h-5 text-amber-400/60" />
+                </div>
+              </div>
+
+              {/* 3rd place */}
+              <div className="flex-1 flex flex-col items-center">
+                <div className="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-400 mb-1.5 font-mono">
+                  {translations?.language === 'en' || translations?.house_arena_ranking_retry === 'Try Again' ? '3rd' : '3º'}
+                </div>
+                <div className="w-full h-10 rounded-t-lg border-2 border-b-0 border-dashed border-gray-300 bg-gray-50/60 flex items-center justify-center">
+                  <span className="text-[10px] font-mono font-bold text-gray-300">#3</span>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-xs font-semibold text-gray-500 max-w-[260px] leading-relaxed">
+              {translations?.language === 'en' || translations?.house_arena_ranking_retry === 'Try Again'
+                ? 'The ranking is just starting — be the first to score!'
+                : 'A classificação está a começar — sê o primeiro a marcar pontos!'}
+            </p>
           </div>
         ) : (
           leaderboard.map((row) => (

@@ -581,7 +581,7 @@ export function CustomBowlMode({
     const currentStepLimit = customPhase === 4 ? 2 : customPhase === 5 ? (size === "Large" ? 5 : 4) : customPhase === 6 ? (size === "Large" ? 3 : 2) : customPhase === 7 ? 1 : customPhase === 8 ? 2 : 0;
 
     return (
-        <div className="w-full h-full max-w-6xl flex flex-col overflow-hidden relative" id="custom-bowl-container">
+        <div className="safe-bottom w-full h-full max-w-6xl flex flex-col overflow-hidden relative px-3 py-3 md:px-4 md:py-4" id="custom-bowl-container">
             {showPopup && (
                 <PopupModal
                     message={showPopup.msg}
@@ -629,16 +629,16 @@ export function CustomBowlMode({
             {/* Layout Wrapper */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Modern Compact Header */}
-                <header className="bg-white border-2 border-brand-charcoal rounded-button p-4 mb-4 flex items-center justify-between shadow-[4px_4px_0px_0px_#080D09] shrink-0">
-                    <div className="flex items-center gap-3">
+                <header className="bg-white border-2 border-brand-charcoal rounded-button p-3 md:p-4 mb-3 md:mb-4 flex items-center justify-between gap-2 shadow-[4px_4px_0px_0px_#080D09] shrink-0">
+                    <div className="flex items-center gap-2 md:gap-3 min-w-0">
                         <div className="w-10 h-10 bg-brand-butter border-2 border-brand-charcoal rounded-button flex items-center justify-center text-xl shadow-[2px_2px_0px_0px_#080D09]">
                             <IconBowl size={20} className="text-brand-charcoal" />
                         </div>
-                        <div>
-                            <h1 className="font-display font-black text-lg text-brand-charcoal leading-none">
+                        <div className="min-w-0">
+                            <h1 className="font-display font-black text-base md:text-lg text-brand-charcoal leading-none">
                                 {t('custom_bowl_title')}
                             </h1>
-                            <p className="text-xs font-body font-bold text-brand-burgundy/80 mt-1">
+                            <p className="hidden min-[390px]:block text-[11px] md:text-xs font-body font-bold text-brand-burgundy/80 mt-1 leading-tight">
                                 {t('custom_bowl_objective')}
                             </p>
                         </div>
@@ -653,7 +653,7 @@ export function CustomBowlMode({
 
                 {/* Progress Indicator Bar */}
                 {hasProgress && (
-                    <div className="bg-white border-2 border-brand-charcoal rounded-button p-4 mb-4 shadow-[4px_4px_0px_0px_#080D09] space-y-3 shrink-0">
+                    <div className="bg-white border-2 border-brand-charcoal rounded-button p-3 md:p-4 mb-3 md:mb-4 shadow-[4px_4px_0px_0px_#080D09] space-y-2 md:space-y-3 shrink-0">
                         <div className="flex justify-between items-center text-xs font-display font-black text-brand-charcoal">
                             <span className="uppercase tracking-wider">{getPhaseName(customPhase)}</span>
                             <span>{t('custom_bowl_step_of', { current: currentStepIndex + 1, total: CUSTOM_STEPS.length })}</span>
@@ -669,7 +669,7 @@ export function CustomBowlMode({
 
                 {/* Two Column Layout for ordering steps */}
                 {customPhase >= 2 && customPhase <= 10 ? (
-                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 overflow-hidden min-h-0">
+                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4 overflow-y-auto lg:overflow-hidden min-h-0 custom-scroll">
                         {/* Left Column: Customer Request and Running Order Summary */}
                         <div className="lg:col-span-4 flex flex-col gap-4 overflow-y-auto custom-scroll pr-1 pb-4">
                             {/* Customer Request Speech bubble */}
@@ -699,7 +699,7 @@ export function CustomBowlMode({
                             </div>
 
                             {/* Running Order Summary Card */}
-                            <div className="bg-white border-2 border-brand-charcoal rounded-button p-4 shadow-[4px_4px_0px_0px_#080D09] flex-1 flex flex-col">
+                            <div className="hidden lg:flex bg-white border-2 border-brand-charcoal rounded-button p-4 shadow-[4px_4px_0px_0px_#080D09] flex-1 flex-col">
                                 <h3 className="font-display font-black text-xs text-brand-charcoal/50 uppercase tracking-wider mb-3">
                                     {t('custom_bowl_order_summary')}
                                 </h3>
@@ -761,7 +761,7 @@ export function CustomBowlMode({
                         </div>
 
                         {/* Right Column: Choices Grid */}
-                        <div className="lg:col-span-8 bg-white border-2 border-brand-charcoal rounded-button p-6 shadow-[4px_4px_0px_0px_#080D09] flex flex-col overflow-hidden">
+                        <div className="lg:col-span-8 bg-white border-2 border-brand-charcoal rounded-button p-4 md:p-6 shadow-[4px_4px_0px_0px_#080D09] flex flex-col overflow-visible lg:overflow-hidden min-h-fit lg:min-h-0">
                             {/* Option Header / Item tracker */}
                             {currentStepLimit > 0 && (
                                 <div className="flex justify-between items-center mb-4 shrink-0 border-b border-brand-charcoal/10 pb-2">
@@ -812,7 +812,7 @@ export function CustomBowlMode({
                     </div>
                 ) : (
                     /* Simple intro/completion screens take full container */
-                    <div className="flex-1 bg-white border-2 border-brand-charcoal rounded-button p-8 shadow-[4px_4px_0px_0px_#080D09] flex flex-col justify-center overflow-y-auto">
+                    <div className="flex-1 bg-white border-2 border-brand-charcoal rounded-button p-4 md:p-8 shadow-[4px_4px_0px_0px_#080D09] flex flex-col justify-start md:justify-center overflow-y-auto custom-scroll">
                         {renderCustomBowlContent()}
                     </div>
                 )}

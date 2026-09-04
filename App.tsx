@@ -23,6 +23,7 @@ import { CustomBowlMode } from './features/custom-bowl/CustomBowlMode';
 import { RushMode } from './features/rush/RushMode';
 import { BowlTrainingMode } from './features/training/BowlTrainingMode';
 import { HouseArenaMode } from './features/house-arena/HouseArenaMode';
+import { houseArenaSessionStorage } from './features/house-arena/services/houseArenaSession.storage';
 
 const StylizedBowlSVG = () => (
     <svg viewBox="0 0 200 200" className="w-48 h-48 md:w-56 md:h-56 select-none drop-shadow-sm animate-pulse-subtle">
@@ -82,16 +83,9 @@ function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [localSession, setLocalSession] = useState<{ roomCode: string; reconnectToken: string } | null>(null);
 
-    // Retrieve local session dynamically on mount
+    // Read through the central store so malformed and expired sessions are removed.
     useEffect(() => {
-        try {
-            const data = localStorage.getItem('poke_house_arena_session');
-            if (data) {
-                setLocalSession(JSON.parse(data));
-            }
-        } catch (e) {
-            console.error(e);
-        }
+        setLocalSession(houseArenaSessionStorage.getSession());
     }, [gameState]);
 
     const handleEasterEggClick = () => { if (window.innerWidth < 768) { setEasterEggTrigger(prev => prev + 1); } };
@@ -472,12 +466,12 @@ function App() {
     };
 
     return (
-        <div className="fixed inset-0 w-full h-full font-sans text-brand-charcoal flex flex-col md:flex-row overflow-hidden bg-brand-linen">
+        <div className="safe-screen fixed inset-0 w-full h-[100dvh] font-sans text-brand-charcoal flex flex-col md:flex-row overflow-hidden bg-brand-linen">
             <FoodRain trigger={easterEggTrigger} quantity={1} />
             {showPopup && <PopupModal message={showPopup.msg} onConfirm={showPopup.callback} t={t} />}
 
             {/* Mobile Navigation Header */}
-            <div className="md:hidden flex items-center justify-between px-5 py-3.5 border-b border-brand-charcoal/10 bg-white z-40 shrink-0">
+            <div className="md:hidden flex items-center justify-between px-4 py-2.5 border-b border-brand-charcoal/10 bg-white z-40 shrink-0">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={resetToHome}>
                     <AppLogo variant="mobile" />
                 </div>
@@ -495,7 +489,7 @@ function App() {
 
             {/* Mobile Dropdown Menu Overlay */}
             {mobileMenuOpen && (
-                <div className="md:hidden fixed top-[53px] inset-x-0 bottom-0 bg-brand-linen/95 backdrop-blur-md z-30 flex flex-col p-6 overflow-y-auto custom-scroll gap-4 animate-fade-in">
+                <div className="safe-bottom md:hidden absolute top-[49px] inset-x-0 bottom-0 bg-brand-linen/95 backdrop-blur-md z-30 flex flex-col p-4 overflow-y-auto custom-scroll gap-4 animate-fade-in">
                     <div className="flex flex-col gap-1">
                         <span className="font-condensed font-black text-[10px] tracking-wider text-brand-burgundy/55 uppercase px-3 mb-1">
                             {t('nav_section_training')}
@@ -662,8 +656,8 @@ function App() {
                 )}
 
                 {gameState === "HOME" && ( 
-                    <div className="w-full h-full overflow-y-auto custom-scroll px-6 py-8 md:py-16">
-                        <div className="max-w-4xl mx-auto flex flex-col gap-8 md:gap-14 animate-fade-in">
+                    <div className="safe-bottom w-full h-full overflow-y-auto custom-scroll px-4 py-6 sm:px-6 md:py-12">
+                        <div className="max-w-4xl mx-auto flex flex-col gap-6 md:gap-10 animate-fade-in">
                             
                             {/* Welcome Banner / Header */}
                             <div className="flex flex-col gap-3">
@@ -696,7 +690,7 @@ function App() {
                             </div>
 
                             {/* Main Learning Pathway Feature Card (University Bowl) */}
-                            <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 hover:border-brand-charcoal/20 transition-all shadow-xs relative overflow-hidden">
+                            <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-5 md:p-8 flex flex-col sm:flex-row items-center gap-4 md:gap-8 hover:border-brand-charcoal/20 transition-all shadow-xs relative overflow-hidden">
                                 <div className="flex-1 flex flex-col gap-3 z-10 text-left">
                                     <span className="font-condensed font-black text-[9px] text-brand-tomato bg-brand-tomato/10 px-2 py-1 rounded-md uppercase tracking-wider self-start">
                                         Percurso Recomendado • Recommended Path
@@ -715,7 +709,7 @@ function App() {
                                         <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                                     </button>
                                 </div>
-                                <div className="shrink-0 flex items-center justify-center">
+                                <div className="shrink-0 flex items-center justify-center [&>svg]:w-32 [&>svg]:h-32 sm:[&>svg]:w-40 sm:[&>svg]:h-40 md:[&>svg]:w-56 md:[&>svg]:h-56">
                                     <StylizedBowlSVG />
                                 </div>
                             </div>
@@ -725,10 +719,10 @@ function App() {
                                 <h3 className="font-display font-bold text-lg md:text-xl text-brand-charcoal tracking-tight">
                                     {t('home_modes_overview')}
                                 </h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-3 md:gap-4">
                                     
                                     {/* Custom Bowl Card */}
-                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[170px]">
+                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-4 md:p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[148px] md:min-h-[170px]">
                                         <div>
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="p-2 rounded-lg bg-brand-sorbet/20 text-brand-mochi">
@@ -751,7 +745,7 @@ function App() {
                                     </div>
 
                                     {/* Rush Hour Card */}
-                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[170px]">
+                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-4 md:p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[148px] md:min-h-[170px]">
                                         <div>
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="p-2 rounded-lg bg-brand-tomato/10 text-brand-tomato">
@@ -774,7 +768,7 @@ function App() {
                                     </div>
 
                                     {/* Fast Thinker (Quiz) Card */}
-                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[170px]">
+                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-4 md:p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[148px] md:min-h-[170px]">
                                         <div>
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="p-2 rounded-lg bg-brand-olives/10 text-brand-olives">
@@ -800,7 +794,7 @@ function App() {
                                     </div>
 
                                     {/* House Arena Card */}
-                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[170px]">
+                                    <div className="bg-white border border-brand-charcoal/10 rounded-2xl p-4 md:p-5 flex flex-col justify-between hover:border-brand-charcoal/20 transition-all shadow-xs min-h-[148px] md:min-h-[170px]">
                                         <div>
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="p-2 rounded-lg bg-brand-mochi/10 text-brand-mochi">

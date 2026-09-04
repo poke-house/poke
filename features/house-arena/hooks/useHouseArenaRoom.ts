@@ -156,6 +156,10 @@ export function useHouseArenaRoom() {
           setError('room_not_found');
         }
       } else {
+        // A stale/closed room must not keep advertising itself forever.
+        if (['room_not_found', 'room_closed', 'invalid_room_code', 'reconnect_failed'].includes(result.status)) {
+          houseArenaSessionStorage.clearSession();
+        }
         setError(result.status);
       }
     } catch (err: unknown) {
@@ -185,6 +189,16 @@ export function useHouseArenaRoom() {
   }, [activeRoom?.roomCode, reconnectToken, roomService]);
 
   /**
+   * Host starts the tournament room match
+   */
+  const hostStartRoom = useCallback(async (): Promise<{ success: boolean; message: string }> => {
+    if (!activeRoom?.roomCode || !reconnectToken) {
+      return { success: false, message: 'No active room or reconnect token' };
+    }
+    return await roomService.hostStartRoom(activeRoom.roomCode, reconnectToken);
+  }, [activeRoom?.roomCode, reconnectToken, roomService]);
+
+  /**
    * Resets state back to initial.
    */
   const resetRoomState = useCallback(() => {
@@ -206,6 +220,9 @@ export function useHouseArenaRoom() {
       try {
         const state = await roomService.syncRoomState(activeRoom.roomCode);
         if (state) {
+          if (state.status === 'closed') {
+            houseArenaSessionStorage.clearSession();
+          }
           setActiveRoom(prev => {
             if (!prev) return null;
             // Only update if there are changes to avoid excessive re-renders
@@ -380,6 +397,7 @@ export function useHouseArenaRoom() {
     joinRoom,
     reconnect,
     leaveRoom,
+    hostStartRoom,
     resetRoomState,
     refreshParticipants,
     refreshRoomState

@@ -37,12 +37,12 @@ const StartingScreen: React.FC<{ language: 'pt' | 'en' }> = ({ language }) => {
         
         <div className="flex flex-col items-center justify-center py-4">
           <div className="relative flex items-center justify-center">
-            <div className="absolute w-16 h-16 rounded-full border-4 border-brand-green/30 animate-ping"></div>
+            <div className="absolute w-16 h-16 rounded-full border-4 border-brand-green/30"></div>
             <div className="relative w-12 h-12 rounded-full bg-brand-green flex items-center justify-center border-2 border-brand-charcoal text-white font-display font-black">
               PH
             </div>
           </div>
-          <span className="text-xs font-mono text-gray-500 mt-6 tracking-wider animate-pulse uppercase">
+          <span className="text-xs font-mono text-gray-500 mt-6 tracking-wider uppercase">
             {language === 'pt' ? 'A iniciar torneio...' : 'Starting tournament...'}
           </span>
         </div>
@@ -173,7 +173,7 @@ const RoundTransitionScreen: React.FC<{
           <h3 className="font-display font-black text-2xl text-brand-charcoal pt-2">
             {language === 'pt' ? 'Intervalo da Arena' : 'Arena Interval'}
           </h3>
-          <p className="text-xs font-semibold text-brand-burgundy animate-pulse">
+          <p className="text-xs font-semibold text-brand-burgundy">
             {language === 'pt' 
               ? 'A preparar o próximo desafio...' 
               : 'Preparing the next challenge...'}
@@ -278,6 +278,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
     joinRoom,
     reconnect,
     leaveRoom,
+    hostStartRoom,
     resetRoomState
   } = useHouseArenaRoom();
 
@@ -354,6 +355,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
             localPlayer={localPlayer}
             participants={participants}
             onLeave={leaveRoom}
+            onHostStart={hostStartRoom}
             language={language}
           />
         </div>
@@ -373,6 +375,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
             language={language}
             participants={participants}
             localPlayer={localPlayer}
+            onHome={leaveRoom}
           />
         );
       } else if (activeRoom.currentGameType === 'quick_think') {
@@ -383,6 +386,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
             language={language}
             participants={participants}
             localPlayer={localPlayer}
+            onHome={leaveRoom}
           />
         );
       } else if (activeRoom.currentGameType === 'memory_match') {
@@ -392,6 +396,7 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
             reconnectToken={reconnectToken}
             language={language}
             onRoundFinished={() => {}}
+            onHome={leaveRoom}
           />
         );
       } else if (activeRoom.currentGameType) {

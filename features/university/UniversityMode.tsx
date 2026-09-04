@@ -259,19 +259,19 @@ export function UniversityMode({
     };
 
     return (
-        <div className="fixed inset-0 w-full h-full font-sans text-brand-charcoal flex flex-col overflow-y-auto bg-brand-linen p-4 md:p-8 select-none">
+        <div className="safe-screen fixed inset-0 w-full h-[100dvh] font-sans text-brand-charcoal flex flex-col overflow-hidden bg-brand-linen px-3 py-3 sm:p-4 md:p-8 select-none">
             
             {/* Header / Brand Bar */}
-            <div className="max-w-4xl w-full mx-auto flex items-center justify-between mb-6 shrink-0">
-                <div className="flex items-center gap-3">
-                    <div className="bg-brand-icy text-white p-2.5 rounded-2xl border-2 border-brand-charcoal shadow-sm">
+            <div className="max-w-4xl w-full mx-auto flex items-center justify-between gap-2 mb-3 md:mb-6 shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                    <div className="bg-brand-icy text-white p-2 rounded-xl md:rounded-2xl border-2 border-brand-charcoal shadow-sm shrink-0">
                         <IconUniversity size={24} />
                     </div>
-                    <div>
-                        <h1 className="text-xl md:text-2xl font-display font-black leading-none">
+                    <div className="min-w-0">
+                        <h1 className="text-base min-[375px]:text-lg md:text-2xl font-display font-black leading-tight">
                             {t('university_title')}
                         </h1>
-                        <p className="text-xs font-body text-brand-charcoal/60 mt-0.5 font-medium">
+                        <p className="hidden min-[390px]:block text-[11px] md:text-xs font-body text-brand-charcoal/60 mt-0.5 font-medium leading-tight">
                             {t('university_objective')}
                         </p>
                     </div>
@@ -280,17 +280,17 @@ export function UniversityMode({
                 {gameState !== "UNIVERSITY_PLAYING" && (
                     <button 
                         onClick={resetToHome}
-                        className="bg-white hover:bg-brand-sorbet text-brand-charcoal px-4 py-2.5 rounded-button font-body font-bold border-2 border-brand-charcoal transition-all shadow-sm flex items-center gap-2 active:translate-y-0.5 text-sm"
+                        className="bg-white hover:bg-brand-sorbet text-brand-charcoal p-2.5 min-[390px]:px-3 rounded-button font-body font-bold border-2 border-brand-charcoal transition-all shadow-sm flex items-center gap-1.5 active:translate-y-0.5 text-xs shrink-0"
                         aria-label={t('btn_menu_main')}
                     >
                         <IconHome size={18} />
-                        <span>{t('btn_menu')}</span>
+                        <span className="hidden min-[390px]:inline">{t('btn_menu')}</span>
                     </button>
                 )}
             </div>
 
             {/* Main view router */}
-            <div className="max-w-4xl w-full mx-auto flex-1 flex flex-col justify-center items-center">
+            <div className="safe-bottom max-w-4xl w-full mx-auto flex-1 min-h-0 flex flex-col justify-start md:justify-center items-center overflow-y-auto custom-scroll">
                 
                 {/* 1. ENTRY VIEW */}
                 {gameState === "UNIVERSITY_SELECT" && subState === "ENTRY" && (
@@ -343,22 +343,22 @@ export function UniversityMode({
 
                 {/* 2. PRODUCT SELECTION GRID */}
                 {gameState === "UNIVERSITY_SELECT" && subState === "SELECT_PRODUCT" && menuCategory && (
-                    <div className="w-full bg-white border-4 border-brand-charcoal rounded-modal shadow-elevated p-6 md:p-8 animate-slide-up flex flex-col max-w-3xl">
-                        <div className="flex items-center justify-between mb-6 border-b-2 border-brand-linen pb-4">
+                    <div className="w-full bg-white border-2 md:border-4 border-brand-charcoal rounded-2xl md:rounded-modal shadow-elevated p-3 md:p-8 animate-slide-up flex flex-col max-w-3xl min-h-0">
+                        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 mb-3 md:mb-6 border-b-2 border-brand-linen pb-3 md:pb-4">
                             <button 
                                 onClick={() => setSubState("ENTRY")}
-                                className="flex items-center gap-2 text-brand-charcoal/70 hover:text-brand-charcoal font-body font-bold text-sm bg-brand-linen py-2 px-4 rounded-button border-2 border-transparent hover:border-brand-charcoal transition-all"
+                                className="flex items-center gap-1 text-brand-charcoal/70 hover:text-brand-charcoal font-body font-bold text-xs md:text-sm bg-brand-linen py-2 px-2.5 md:px-4 rounded-button border-2 border-transparent hover:border-brand-charcoal transition-all"
                             >
                                 <IconArrowLeft size={16} />
                                 <span>{t('btn_back')}</span>
                             </button>
-                            <h2 className="text-xl font-display font-black text-brand-charcoal">
+                            <h2 className="text-base md:text-xl text-center font-display font-black text-brand-charcoal min-w-0">
                                 {menuCategory === "HOUSE" ? t('menu_house') : menuCategory === "GREEN" ? t('menu_green') : t('menu_smoothie')}
                             </h2>
-                            <div className="w-[84px] invisible" /> {/* Spacer */}
+                            <div className="w-8 md:w-[84px] invisible" /> {/* Spacer */}
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto max-h-[50vh] pr-2 custom-scroll">
+                        <div className="grid grid-cols-1 min-[360px]:grid-cols-2 md:grid-cols-3 gap-2.5 md:gap-4 overflow-y-auto max-h-none md:max-h-[50vh] pr-1 custom-scroll">
                             {RECIPES
                                 .filter(r => r.category === menuCategory)
                                 .map(recipe => {
@@ -373,17 +373,17 @@ export function UniversityMode({
                                         <button 
                                             key={recipe.id} 
                                             onClick={() => handleLevelStart(recipe)}
-                                            className="bg-brand-linen hover:bg-brand-sorbet/20 border-2 border-brand-charcoal rounded-win p-5 text-left flex flex-col justify-between h-40 transition-all transform hover:-translate-y-1 shadow-sm active:translate-y-0 group"
+                                            className="bg-brand-linen hover:bg-brand-sorbet/20 border-2 border-brand-charcoal rounded-win p-3 md:p-5 text-left flex flex-col justify-between min-h-[112px] md:h-40 transition-all transform hover:-translate-y-1 shadow-sm active:translate-y-0 group min-w-0"
                                         >
                                             <div>
-                                                <h3 className="font-display text-sm font-black text-brand-charcoal leading-tight group-hover:text-brand-tomato transition-colors">
+                                                <h3 className="font-display text-xs md:text-sm font-black text-brand-charcoal leading-tight group-hover:text-brand-tomato transition-colors break-words">
                                                     {recipe.name}
                                                 </h3>
                                                 <p className="text-[10px] font-condensed font-black text-brand-charcoal/50 uppercase tracking-widest mt-1">
                                                     {recipe.category === "SMOOTHIE" ? "Smoothie" : recipe.category === "HOUSE" ? "Poke Bowl" : "Salad Bowl"}
                                                 </p>
                                             </div>
-                                            <div className="flex items-center justify-between mt-4">
+                                            <div className="flex flex-wrap items-end justify-between gap-1 mt-3">
                                                 <span className="text-[10px] font-condensed font-bold bg-white px-2 py-1 rounded border border-brand-charcoal/20">
                                                     {isHouse ? "R & L Sizes" : "Regular"}
                                                 </span>

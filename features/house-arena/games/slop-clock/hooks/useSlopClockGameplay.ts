@@ -244,8 +244,12 @@ export const useSlopClockGameplay = ({
     setFeedback({ status: null, message: '' });
   };
 
+  const currentPhaseRequired = currentPhase && challenge ? challenge.requiredIngredients[currentPhase.key] || [] : [];
+  const activeChallengeId = challenge?.challengeId;
+
   return {
     challenge,
+    activeChallengeId,
     loading,
     submitting,
     timeLeft,
@@ -254,6 +258,7 @@ export const useSlopClockGameplay = ({
     setCurrentPhaseIndex,
     currentPhases,
     currentPhase,
+    currentPhaseRequired,
     phaseLimit: getPhaseLimit(),
     feedback,
     clearFeedback,

@@ -12,7 +12,8 @@ import {
   X,
   HelpCircle,
   Clock,
-  Sparkles
+  Sparkles,
+  Home
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useArenaRoundLeaderboard } from '../../ranking/hooks/useArenaRoundLeaderboard';
@@ -33,6 +34,7 @@ interface QuickThinkArenaGameProps {
   language: 'pt' | 'en';
   participants: ArenaParticipant[];
   localPlayer: ArenaParticipant | null;
+  onHome?: () => void;
 }
 
 export const QuickThinkArenaGame: React.FC<QuickThinkArenaGameProps> = ({
@@ -40,7 +42,8 @@ export const QuickThinkArenaGame: React.FC<QuickThinkArenaGameProps> = ({
   reconnectToken,
   language,
   participants,
-  localPlayer
+  localPlayer,
+  onHome
 }) => {
   const t = (key: string) => {
     const dict = TRANSLATIONS[language] as Record<string, string>;
@@ -97,7 +100,7 @@ export const QuickThinkArenaGame: React.FC<QuickThinkArenaGameProps> = ({
   }
 
   return (
-    <div className="bg-brand-linen min-h-screen w-full flex flex-col justify-start font-sans">
+    <div className="bg-brand-linen min-h-[100dvh] w-full flex flex-col font-sans">
       
       {/* 1. HUD / Navigation Header */}
       <div className="bg-white border-b-4 border-brand-charcoal py-4 px-4 md:px-8 sticky top-0 z-40 shadow-soft">
@@ -160,7 +163,7 @@ export const QuickThinkArenaGame: React.FC<QuickThinkArenaGameProps> = ({
       )}
 
       {/* 2. Main Game Layout */}
-      <div className="max-w-7xl w-full mx-auto px-4 md:px-8 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1">
+      <div className="max-w-7xl w-full mx-auto px-4 md:px-8 py-3 sm:py-6 grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 flex-1 overflow-y-auto pb-28 sm:pb-6">
         
         {/* Left Column: Live standings sidebar */}
         <div className="lg:col-span-1 space-y-6">
@@ -301,6 +304,38 @@ export const QuickThinkArenaGame: React.FC<QuickThinkArenaGameProps> = ({
             </div>
           )}
 
+        </div>
+      </div>
+
+      {/* Sticky Action Bar */}
+      <div className="sticky bottom-0 bg-white border-t-4 border-brand-charcoal p-3 sm:p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] flex flex-row items-center justify-between gap-2 sm:gap-4 z-30 min-h-[56px]">
+        <div className="flex items-center gap-2">
+          {onHome && (
+            <button
+              type="button"
+              onClick={onHome}
+              title={language === 'pt' ? 'Sair para o Início' : 'Exit to Home'}
+              className="min-h-[44px] min-w-[44px] py-2.5 sm:py-3 px-3 rounded-button border-2 border-brand-charcoal bg-white text-brand-charcoal hover:bg-brand-linen font-display font-black text-xs uppercase flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            >
+              <Home size={16} />
+              <span className="hidden sm:inline">{language === 'pt' ? 'Início' : 'Home'}</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setShowStandingsModal(true)}
+            className="min-h-[44px] py-2.5 sm:py-3 px-3 rounded-button border-2 border-brand-charcoal bg-brand-linen/30 text-brand-charcoal hover:bg-brand-linen font-display font-black text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+          >
+            <Trophy size={14} className="text-brand-tomato shrink-0" />
+            <span>{language === 'pt' ? 'Ranking' : 'Standings'}</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="font-mono text-[10px] sm:text-xs font-black text-brand-charcoal bg-brand-linen px-2.5 py-1.5 rounded-button border border-brand-charcoal/10">
+            Q{currentQuestion?.questionOrder ?? 1}/15
+          </div>
         </div>
       </div>
 
