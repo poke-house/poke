@@ -40,7 +40,7 @@ export const ArenaParticipantFinalResult: React.FC<ArenaParticipantFinalResultPr
       initial={{ scale: 0.98, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="w-full bg-brand-sorbet/20 border-4 border-brand-charcoal rounded-card p-6 shadow-soft flex flex-col gap-4 relative overflow-hidden"
+      className="arena-result-card w-full bg-brand-sorbet/20 border-4 border-brand-charcoal rounded-card p-5 sm:p-6 shadow-soft flex flex-col gap-4 relative overflow-hidden box-border"
     >
       <h4 className="font-display font-black text-xs text-brand-charcoal uppercase tracking-wider">
         {language === 'pt' ? 'O Teu Desempenho' : 'Your Performance'}
@@ -51,7 +51,7 @@ export const ArenaParticipantFinalResult: React.FC<ArenaParticipantFinalResultPr
           <div className="text-[10px] font-mono font-black text-brand-burgundy uppercase tracking-wider">
             {language === 'pt' ? 'CLASSIFICAÇÃO FINAL' : 'FINAL POSITION'}
           </div>
-          <div className="font-condensed font-black text-4xl text-brand-charcoal leading-none mt-1">
+          <div className="font-condensed font-black text-3xl sm:text-4xl text-brand-charcoal leading-none mt-1">
             {ordinalRank} <span className="font-sans text-xs font-semibold text-brand-burgundy/80">/ {totalParticipants}</span>
           </div>
         </div>
@@ -60,7 +60,7 @@ export const ArenaParticipantFinalResult: React.FC<ArenaParticipantFinalResultPr
           <div className="text-[10px] font-mono font-black text-brand-burgundy uppercase tracking-wider">
             {language === 'pt' ? 'PONTUAÇÃO OBTIDA' : 'SCORE ACHIEVED'}
           </div>
-          <div className="font-condensed font-black text-4xl text-brand-tomato leading-none mt-1">
+          <div className="font-condensed font-black text-3xl sm:text-4xl text-brand-tomato leading-none mt-1">
             {currentParticipant.totalScore} <span className="font-sans text-xs font-semibold text-brand-burgundy/80">pts</span>
           </div>
         </div>

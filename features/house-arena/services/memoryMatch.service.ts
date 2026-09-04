@@ -292,11 +292,14 @@ export class MemoryMatchService {
       let labelPt: string | null = null;
       let labelEn: string | null = null;
 
+      let emoji: string | undefined = undefined;
+
       if (isRevealedOrMatched) {
         const pair = MOCK_MEMORY_MATCH_PAIRS.find((p) => p.id === c.pairId);
         if (pair) {
           labelPt = c.cardSide === 'left' ? pair.leftLabelPt : pair.rightLabelPt;
           labelEn = c.cardSide === 'left' ? pair.leftLabelEn : pair.rightLabelEn;
+          emoji = pair.emoji;
         }
       }
 
@@ -306,7 +309,8 @@ export class MemoryMatchService {
         cardSide: c.cardSide,
         status: c.status,
         labelPt,
-        labelEn
+        labelEn,
+        emoji
       };
     });
 
@@ -339,7 +343,8 @@ export class MemoryMatchService {
       cardSide: card.cardSide,
       status: card.status,
       labelPt: pair ? (card.cardSide === 'left' ? pair.leftLabelPt : pair.rightLabelPt) : null,
-      labelEn: pair ? (card.cardSide === 'left' ? pair.leftLabelEn : pair.rightLabelEn) : null
+      labelEn: pair ? (card.cardSide === 'left' ? pair.leftLabelEn : pair.rightLabelEn) : null,
+      emoji: pair ? pair.emoji : undefined
     };
   }
 

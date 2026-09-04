@@ -424,15 +424,13 @@ export const HouseArenaMode: React.FC<HouseArenaModeProps> = ({
     
     if (activeRoom.status === 'results') {
       return (
-        <div className="bg-brand-linen safe-screen min-h-[100dvh] w-full flex flex-col justify-start py-4 px-2 md:px-4">
-          <ArenaFinalResults 
-            roomCode={activeRoom.roomCode} 
-            reconnectToken={reconnectToken} 
-            language={language}
-            onReturnHome={handleExit}
-            localParticipantId={localPlayer?.id || null}
-          />
-        </div>
+        <ArenaFinalResults 
+          roomCode={activeRoom.roomCode} 
+          reconnectToken={reconnectToken} 
+          language={language}
+          onReturnHome={handleExit}
+          localParticipantId={localPlayer?.id || null}
+        />
       );
     }
 

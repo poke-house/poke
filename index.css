@@ -746,6 +746,54 @@ html, body, #root {
   padding: 2px;
   overflow: hidden;
   box-sizing: border-box;
+  container-type: size;
+}
+
+.mm-card__front,
+.mm-card__back {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.mm-card__front {
+  padding: clamp(4px, 1cqi, 12px);
+}
+
+.mm-card__emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family:
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji",
+    sans-serif;
+  font-size: clamp(2rem, 6vmin, 6rem);
+  line-height: 1;
+  text-align: center;
+  transform: none;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: visible;
+}
+
+@supports (font-size: 1cqi) {
+  .mm-card__emoji {
+    font-size: clamp(
+      1.75rem,
+      min(48cqi, 48cqb),
+      6.5rem
+    );
+  }
 }
 
 .mm-card__logo {
@@ -832,5 +880,268 @@ html, body, #root {
     min-height: 38px;
     padding: 3px 8px max(3px, env(safe-area-inset-bottom)) 8px;
     border-top-width: 2px;
+  }
+}
+
+/* ==========================================================================
+   ARENA TOURNAMENT FINAL RESULTS SCREEN
+   ========================================================================== */
+
+html:has(.arena-results-page),
+body:has(.arena-results-page),
+#root:has(.arena-results-page),
+.safe-screen:has(.arena-results-page),
+.app-shell:has(.arena-results-page) {
+  height: auto !important;
+  min-height: 100dvh !important;
+  overflow-y: visible !important;
+}
+
+.arena-results-page {
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  overflow-x: clip;
+  overflow-y: visible;
+  padding:
+    clamp(14px, 3vw, 44px)
+    max(clamp(14px, 3vw, 44px), env(safe-area-inset-right, 0px))
+    max(clamp(32px, 5vw, 72px), env(safe-area-inset-bottom, 0px))
+    max(clamp(14px, 3vw, 44px), env(safe-area-inset-left, 0px));
+  background: var(--white-linen, #F5F6E6);
+  box-sizing: border-box;
+}
+
+.arena-results-container {
+  width: min(100%, 1440px);
+  min-width: 0;
+  margin-inline: auto;
+  display: grid;
+  gap: clamp(18px, 2.5vw, 32px);
+}
+
+.arena-result-card {
+  min-width: 0;
+  max-width: 100%;
+  height: auto;
+  box-sizing: border-box;
+}
+
+.arena-results-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+  padding: clamp(18px, 2.5vw, 32px);
+  box-sizing: border-box;
+}
+
+.arena-results-header__identity {
+  min-width: 0;
+}
+
+.arena-results-header__copy {
+  min-width: 0;
+}
+
+.arena-results-header__title {
+  overflow-wrap: anywhere;
+}
+
+.arena-results-header__exit {
+  min-height: 48px;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .arena-results-header {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+
+  .arena-results-header__identity {
+    align-items: flex-start;
+  }
+
+  .arena-results-header__title {
+    font-size: clamp(1.65rem, 8vw, 2.5rem);
+    line-height: 0.95;
+  }
+
+  .arena-results-header__exit {
+    width: 100%;
+  }
+}
+
+.arena-results-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(300px, 0.8fr)
+    minmax(0, 1.2fr);
+  align-items: start;
+  gap: clamp(20px, 2.5vw, 36px);
+  min-width: 0;
+}
+
+.arena-results-primary,
+.arena-results-secondary {
+  display: grid;
+  min-width: 0;
+  gap: clamp(18px, 2vw, 28px);
+}
+
+@media (max-width: 900px) {
+  .arena-results-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.arena-champion-card {
+  min-width: 0;
+  height: auto;
+  padding: clamp(20px, 5vw, 42px);
+  display: grid;
+  justify-items: center;
+  gap: clamp(14px, 3vw, 24px);
+}
+
+.arena-champion-card__title {
+  margin: 0;
+  max-width: 14ch;
+  text-align: center;
+  font-size: clamp(2rem, 6vw, 4.5rem);
+  line-height: 0.95;
+}
+
+.arena-champion-card__avatar {
+  width: clamp(104px, 22vw, 180px);
+  height: clamp(104px, 22vw, 180px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arena-champion-card__stats {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: clamp(14px, 3vw, 24px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .arena-champion-card {
+    padding: 22px 16px;
+  }
+
+  .arena-champion-card__title {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .arena-champion-card__avatar {
+    width: 112px;
+    height: 112px;
+  }
+
+  .arena-champion-card__stats {
+    padding: 14px 10px;
+  }
+}
+
+.arena-podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas: "second first third";
+  align-items: end;
+  gap: clamp(10px, 2vw, 20px);
+  min-width: 0;
+}
+
+.arena-podium__first {
+  grid-area: first;
+  min-width: 0;
+  width: 100%;
+}
+
+.arena-podium__second {
+  grid-area: second;
+  min-width: 0;
+  width: 100%;
+}
+
+.arena-podium__third {
+  grid-area: third;
+  min-width: 0;
+  width: 100%;
+}
+
+@media (max-width: 540px) {
+  .arena-podium {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "first first"
+      "second third";
+    align-items: stretch;
+  }
+
+  .arena-podium__first,
+  .arena-podium__second,
+  .arena-podium__third {
+    min-width: 0;
+    width: 100%;
+    transform: none;
+  }
+}
+
+.arena-podium-entry__name,
+.arena-ranking-row__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.arena-round-summary,
+.arena-final-ranking {
+  min-width: 0;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.arena-round-row,
+.arena-ranking-row {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.arena-ranking-row {
+  display: grid;
+  grid-template-columns:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 14px;
+}
+
+@media (max-width: 540px) {
+  .arena-ranking-row {
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+
+  .arena-ranking-row__points {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+
+  .arena-round-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
   }
 }

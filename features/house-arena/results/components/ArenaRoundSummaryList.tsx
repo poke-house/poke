@@ -14,12 +14,12 @@ export const ArenaRoundSummaryList: React.FC<ArenaRoundSummaryListProps> = ({ ro
   }
 
   return (
-    <div className="w-full bg-white border-4 border-brand-charcoal rounded-card p-5 shadow-soft flex flex-col gap-4">
+    <div className="arena-round-summary arena-result-card w-full bg-white border-4 border-brand-charcoal rounded-card p-5 shadow-soft flex flex-col gap-4 box-border">
       <h4 className="font-display font-black text-sm text-brand-charcoal uppercase tracking-wider">
         {language === 'pt' ? 'Resumo de Rondas' : 'Round-by-Round Log'}
       </h4>
 
-      <div className="space-y-3">
+      <div className="space-y-3 w-full min-w-0">
         {roundSummaries.map((summary, index) => {
           const gameTitle = getGameName(summary.gameType, language);
           const ordinalRank = formatOrdinalRank(summary.rank, language);
@@ -30,7 +30,7 @@ export const ArenaRoundSummaryList: React.FC<ArenaRoundSummaryListProps> = ({ ro
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="flex items-center justify-between p-3.5 bg-brand-linen/10 border-2 border-brand-charcoal/20 rounded-card"
+              className="arena-round-row flex items-center justify-between p-3.5 bg-brand-linen/10 border-2 border-brand-charcoal/20 rounded-card box-border"
             >
               {/* Left Group: Round + Game Info */}
               <div className="min-w-0">

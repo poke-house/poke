@@ -5,6 +5,7 @@ export interface MemoryMatchCard {
   status: 'hidden' | 'revealed' | 'matched';
   labelPt: string | null;
   labelEn: string | null;
+  emoji?: string;
 }
 
 export interface MemoryMatchRoundState {
