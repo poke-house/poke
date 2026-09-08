@@ -1,8 +1,29 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { SlopClockService } from '../../../services/slopClock.service';
 import { SlopClockChallenge, ArenaRoom } from '../../../houseArena.types';
 import { getFullIngredientList, getCurrentPhases } from '../../../../training/training.utils';
 import { Recipe, RecipePhaseKey } from '../../../../../types';
+
+const getRecipePhases = (category: string) => {
+  // If smoothie, return smoothie phases, otherwise bowl phases
+  if (category === 'SMOOTHIE') {
+    return [
+      { key: 'smoothie_liquid', title: 'Líquido' },
+      { key: 'smoothie_ingredients', title: 'Ingredientes' },
+      { key: 'smoothie_mode', title: 'Blender' },
+      { key: 'smoothie_marbling', title: 'Marmorização' }
+    ];
+  }
+  return [
+    { key: 'base', title: 'Base' },
+    { key: 'sauce_base', title: 'Molho Base' },
+    { key: 'greens', title: 'Greens' },
+    { key: 'protein', title: 'Proteína' },
+    { key: 'sauce_final', title: 'Molho Final' },
+    { key: 'crispy', title: 'Crispy' },
+    { key: 'sesame', title: 'Sésamo' }
+  ];
+};
 
 interface UseSlopClockGameplayProps {
   room: ArenaRoom;
@@ -34,6 +55,17 @@ export const useSlopClockGameplay = ({
     message: ''
   });
 
+  // Helper to initialize or clear selection map based on required ingredients
+  const initializeSelections = useCallback((ch: SlopClockChallenge) => {
+    const initial: Record<string, string[]> = {};
+    const phases = getRecipePhases(ch.recipeCategory);
+    phases.forEach((p) => {
+      initial[p.key] = [];
+    });
+    setSelections(initial);
+    setCurrentPhaseIndex(0);
+  }, []);
+
   // Fetch initial challenge on mount
   useEffect(() => {
     let active = true;
@@ -59,7 +91,7 @@ export const useSlopClockGameplay = ({
     return () => {
       active = false;
     };
-  }, [room.roomCode, reconnectToken]);
+  }, [room.roomCode, reconnectToken, initializeSelections]);
 
   // Handle countdown ticking
   useEffect(() => {
@@ -85,38 +117,6 @@ export const useSlopClockGameplay = ({
 
     return () => clearInterval(interval);
   }, [timeLeft, onRoundFinished, challenge]);
-
-  // Helper to initialize or clear selection map based on required ingredients
-  const initializeSelections = (ch: SlopClockChallenge) => {
-    const initial: Record<string, string[]> = {};
-    const phases = getRecipePhases(ch.recipeCategory);
-    phases.forEach((p) => {
-      initial[p.key] = [];
-    });
-    setSelections(initial);
-    setCurrentPhaseIndex(0);
-  };
-
-  const getRecipePhases = (category: string) => {
-    // If smoothie, return smoothie phases, otherwise bowl phases
-    if (category === 'SMOOTHIE') {
-      return [
-        { key: 'smoothie_liquid', title: 'Líquido' },
-        { key: 'smoothie_ingredients', title: 'Ingredientes' },
-        { key: 'smoothie_mode', title: 'Blender' },
-        { key: 'smoothie_marbling', title: 'Marmorização' }
-      ];
-    }
-    return [
-      { key: 'base', title: 'Base' },
-      { key: 'sauce_base', title: 'Molho Base' },
-      { key: 'greens', title: 'Greens' },
-      { key: 'protein', title: 'Proteína' },
-      { key: 'sauce_final', title: 'Molho Final' },
-      { key: 'crispy', title: 'Crispy' },
-      { key: 'sesame', title: 'Sésamo' }
-    ];
-  };
 
   const currentPhases = challenge ? getRecipePhases(challenge.recipeCategory) : [];
   const currentPhase = currentPhases[currentPhaseIndex];
@@ -240,9 +240,9 @@ export const useSlopClockGameplay = ({
     }
   };
 
-  const clearFeedback = () => {
+  const clearFeedback = useCallback(() => {
     setFeedback({ status: null, message: '' });
-  };
+  }, []);
 
   const currentPhaseRequired = currentPhase && challenge ? challenge.requiredIngredients[currentPhase.key] || [] : [];
   const activeChallengeId = challenge?.challengeId;

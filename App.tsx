@@ -24,6 +24,7 @@ import { RushMode } from './features/rush/RushMode';
 import { BowlTrainingMode } from './features/training/BowlTrainingMode';
 import { HouseArenaMode } from './features/house-arena/HouseArenaMode';
 import { MemoryMatchArenaGame } from './features/house-arena/games/memory-match/MemoryMatchArenaGame';
+import { ArenaFinalResults } from './features/house-arena/results/ArenaFinalResults';
 import { arenaSessionStorage, PersistedArenaSession } from './features/house-arena/services/houseArenaSession.storage';
 import { HouseArenaRoomService } from './features/house-arena/services/houseArenaRoom.service';
 import pokeBowlHero from './src/assets/brand/poke-bowl-hero.png';
@@ -34,6 +35,9 @@ function App() {
             const params = new URLSearchParams(window.location.search);
             if (params.get('game') === 'memory_match' || params.get('mode') === 'memory_match') {
                 return 'MEMORY_MATCH';
+            }
+            if (params.get('game') === 'arena_results' || params.get('mode') === 'arena_results' || params.get('view') === 'arena_results') {
+                return 'ARENA_RESULTS';
             }
         }
         return 'HOME';
@@ -420,6 +424,18 @@ function App() {
             <HouseArenaMode
                 onBack={resetToHome}
                 language={language}
+            />
+        );
+    }
+
+    if (gameState === "ARENA_RESULTS") {
+        return (
+            <ArenaFinalResults
+                roomCode="POKE-FINALS"
+                reconnectToken="demo_token"
+                language={language}
+                onReturnHome={resetToHome}
+                localParticipantId="p-user"
             />
         );
     }

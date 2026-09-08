@@ -15,64 +15,161 @@ interface LocalMockCard {
   status: 'hidden' | 'revealed' | 'matched';
 }
 
+function isDuplicateBoardError(error: unknown): boolean {
+  const candidate = error as {
+    code?: string;
+    message?: string;
+    details?: string;
+  };
+
+  return (
+    candidate?.code === '23505' ||
+    candidate?.message?.includes('uq_arena_mm_board') === true ||
+    candidate?.details?.includes('uq_arena_mm_board') === true
+  );
+}
+
 export class MemoryMatchService {
+  private readonly roundStateRequests = new Map<string, Promise<MemoryMatchRoundState | null>>();
+
   private getSupabase() {
     const res = getSupabaseClient();
     return res.status === 'available' ? res.client : null;
   }
 
+  private sanitizeSupabaseError(error: unknown): Record<string, unknown> {
+    if (!error || typeof error !== 'object') {
+      return { message: String(error) };
+    }
+    const err = error as Record<string, unknown>;
+    return {
+      code: err.code,
+      message: err.message,
+      details: err.details,
+      hint: err.hint
+    };
+  }
+
   /**
    * Fetches or generates the authoritative round state and card board.
+   * Uses single-flight deduplication to coalesce concurrent requests.
    */
-  async getMemoryMatchRoundState(
+  getMemoryMatchRoundState(
+    roomCode: string,
+    reconnectToken: string
+  ): Promise<MemoryMatchRoundState | null> {
+    const normalizedRoomCode = roomCode.trim().toUpperCase();
+    const key = `${normalizedRoomCode}:${reconnectToken}`;
+
+    const existing = this.roundStateRequests.get(key);
+    if (existing) {
+      return existing;
+    }
+
+    const request = this.loadMemoryMatchRoundStateWithFallback(
+      normalizedRoomCode,
+      reconnectToken
+    ).finally(() => {
+      if (this.roundStateRequests.get(key) === request) {
+        this.roundStateRequests.delete(key);
+      }
+    });
+
+    this.roundStateRequests.set(key, request);
+    return request;
+  }
+
+  /**
+   * Loads round state with a single fallback retry for legacy deployments (23505).
+   */
+  private async loadMemoryMatchRoundStateWithFallback(
     roomCode: string,
     reconnectToken: string
   ): Promise<MemoryMatchRoundState | null> {
     try {
-      const supabase = this.getSupabase();
-      if (!supabase) {
-        if (import.meta.env.DEV) {
-          console.log('[MemoryMatchService] Supabase unconfigured. Invoking local mock engine.');
-          return this.getRoundStateMock();
+      return await this.loadMemoryMatchRoundState(roomCode, reconnectToken);
+    } catch (err: unknown) {
+      // Temporary compatibility fallback for legacy deployments before migration v12 is applied:
+      // If 23505 race condition occurs, wait briefly for concurrent creation to complete and retry exactly once.
+      if (isDuplicateBoardError(err)) {
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        try {
+          return await this.loadMemoryMatchRoundState(roomCode, reconnectToken);
+        } catch (retryErr: unknown) {
+          console.error(
+            '[MemoryMatchService] Failed to retrieve round state after retry:',
+            this.sanitizeSupabaseError(retryErr)
+          );
+          return null;
         }
-        return null;
       }
 
-      const { data, error } = await supabase.rpc('get_memory_match_round_state', {
-        p_room_code: roomCode.trim().toUpperCase(),
-        p_reconnect_token: reconnectToken
-      });
-
-      if (error) {
-        console.error('[MemoryMatchService] rpc get_memory_match_round_state error:', error);
-        throw error;
-      }
-
-      if (!data || data.length === 0) {
-        return null;
-      }
-
-      const cards: MemoryMatchCard[] = data.map((row: any) => ({
-        id: row.card_id,
-        position: row.position,
-        cardSide: row.card_side as 'left' | 'right',
-        status: row.status as 'hidden' | 'revealed' | 'matched',
-        labelPt: row.label_pt,
-        labelEn: row.label_en
-      }));
-
-      const firstRow = data[0];
-      return {
-        cards,
-        roundScore: firstRow.round_score,
-        totalScore: firstRow.total_score,
-        remainingRoundSeconds: firstRow.remaining_round_seconds,
-        boardCompleted: firstRow.board_completed
-      };
-    } catch (err) {
-      console.error('[MemoryMatchService] Failed to retrieve Memory Match round state:', err);
+      console.error(
+        '[MemoryMatchService] Failed to retrieve round state:',
+        this.sanitizeSupabaseError(err)
+      );
       return null;
     }
+  }
+
+  /**
+   * Internal worker making the Supabase RPC call.
+   */
+  private async loadMemoryMatchRoundState(
+    roomCode: string,
+    reconnectToken: string
+  ): Promise<MemoryMatchRoundState | null> {
+    const supabase = this.getSupabase();
+    if (!supabase) {
+      if (import.meta.env.DEV) {
+        console.log('[MemoryMatchService] Supabase unconfigured. Invoking local mock engine.');
+        return this.getRoundStateMock();
+      }
+      return null;
+    }
+
+    const { data, error } = await supabase.rpc('get_memory_match_round_state', {
+      p_room_code: roomCode,
+      p_reconnect_token: reconnectToken
+    });
+
+    if (error) {
+      const msg = error.message || '';
+      if (
+        msg.includes('closed') ||
+        msg.includes('No active round') ||
+        msg.includes('not memory_match') ||
+        msg.includes('Unauthorized') ||
+        error.code === 'P0001'
+      ) {
+        console.info('[MemoryMatchService] Round not active or room closed:', msg);
+        return null;
+      }
+      // Throw once so it is cleanly caught and logged by the caller
+      throw error;
+    }
+
+    if (!data || data.length === 0) {
+      return null;
+    }
+
+    const cards: MemoryMatchCard[] = data.map((row: any) => ({
+      id: row.card_id,
+      position: row.position,
+      cardSide: row.card_side as 'left' | 'right',
+      status: row.status as 'hidden' | 'revealed' | 'matched',
+      labelPt: row.label_pt,
+      labelEn: row.label_en
+    }));
+
+    const firstRow = data[0];
+    return {
+      cards,
+      roundScore: firstRow.round_score,
+      totalScore: firstRow.total_score,
+      remainingRoundSeconds: firstRow.remaining_round_seconds,
+      boardCompleted: firstRow.board_completed
+    };
   }
 
   /**
@@ -100,7 +197,6 @@ export class MemoryMatchService {
       });
 
       if (error) {
-        console.error('[MemoryMatchService] rpc reveal_memory_match_card error:', error);
         throw error;
       }
 
@@ -118,7 +214,7 @@ export class MemoryMatchService {
         labelEn: row.label_en
       };
     } catch (err) {
-      console.error('[MemoryMatchService] Failed to reveal card:', err);
+      console.error('[MemoryMatchService] Failed to reveal card:', this.sanitizeSupabaseError(err));
       return null;
     }
   }
@@ -158,7 +254,6 @@ export class MemoryMatchService {
       });
 
       if (error) {
-        console.error('[MemoryMatchService] rpc submit_memory_match_pair error:', error);
         throw error;
       }
 
@@ -177,7 +272,7 @@ export class MemoryMatchService {
         secondPairId: row.second_pair_id
       };
     } catch (err) {
-      console.error('[MemoryMatchService] Failed to submit pair:', err);
+      console.error('[MemoryMatchService] Failed to submit pair:', this.sanitizeSupabaseError(err));
       return {
         isMatch: false,
         scoreAwarded: 0,

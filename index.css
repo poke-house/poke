@@ -887,6 +887,10 @@ html, body, #root {
    ARENA TOURNAMENT FINAL RESULTS SCREEN
    ========================================================================== */
 
+html.arena-results-active,
+body.arena-results-active,
+html.arena-results-active #root,
+body.arena-results-active #root,
 html:has(.arena-results-page),
 body:has(.arena-results-page),
 #root:has(.arena-results-page),
@@ -894,7 +898,8 @@ body:has(.arena-results-page),
 .app-shell:has(.arena-results-page) {
   height: auto !important;
   min-height: 100dvh !important;
-  overflow-y: visible !important;
+  overflow-y: auto !important;
+  overflow-x: clip !important;
 }
 
 .arena-results-page {
@@ -926,6 +931,7 @@ body:has(.arena-results-page),
   min-width: 0;
   max-width: 100%;
   height: auto;
+  margin-bottom: 10px;
   box-sizing: border-box;
 }
 

@@ -30,13 +30,21 @@ export const ArenaFinalResults: React.FC<ArenaFinalResultsProps> = ({
 
   const t = (pt: string, en: string) => (language === 'pt' ? pt : en);
 
-  // Scroll to top when the results page mounts
+  // Ensure scroll is at top and body/html scroll is enabled
   useEffect(() => {
+    document.documentElement.classList.add('arena-results-active');
+    document.body.classList.add('arena-results-active');
+
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: 'instant' as ScrollBehavior
     });
+
+    return () => {
+      document.documentElement.classList.remove('arena-results-active');
+      document.body.classList.remove('arena-results-active');
+    };
   }, []);
 
   // 1. Loading State

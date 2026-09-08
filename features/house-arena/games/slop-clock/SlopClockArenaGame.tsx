@@ -97,7 +97,34 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [feedback]);
+  }, [feedback, clearFeedback]);
+
+  const MAX_OPTIONS_PER_PHASE = 4;
+
+  const fullList = useMemo(
+    () => (currentPhase ? getFullIngredientList(currentPhase.key as any) : []),
+    [currentPhase]
+  );
+
+  const requiredForPhase = useMemo(
+    () => (currentPhase ? Array.from(new Set(currentPhaseRequired)) : []),
+    [currentPhaseRequired, currentPhase]
+  );
+
+  const options = useMemo(() => {
+    if (!currentPhase || fullList.length <= MAX_OPTIONS_PER_PHASE) return fullList;
+
+    // Always include the correct answers
+    const mustInclude = requiredForPhase.filter((x) => fullList.includes(x));
+    // Fill the rest with distractors (not already included)
+    const distractors = fullList.filter((x) => !mustInclude.includes(x));
+
+    const needed = Math.max(0, MAX_OPTIONS_PER_PHASE - mustInclude.length);
+    const chosen = [...mustInclude, ...distractors.slice(0, needed)];
+
+    // Final shuffle so the correct answer isn't always first
+    return shuffleStable(chosen, `${activeChallengeId ?? 'c'}-${currentPhase.key}`);
+  }, [fullList, requiredForPhase, activeChallengeId, currentPhase]);
 
   if (loading) {
     return (
@@ -137,34 +164,7 @@ export const SlopClockArenaGame: React.FC<SlopClockArenaGameProps> = ({
   };
 
   const isLastPhase = currentPhaseIndex === currentPhases.length - 1;
-  const currentPhaseSelections = selections[currentPhase?.key] || [];
-
-  const MAX_OPTIONS_PER_PHASE = 4;
-
-  const fullList = useMemo(
-    () => (currentPhase ? getFullIngredientList(currentPhase.key as any) : []),
-    [currentPhase?.key]
-  );
-
-  const requiredForPhase = useMemo(
-    () => (currentPhase ? Array.from(new Set(currentPhaseRequired)) : []),
-    [currentPhaseRequired, currentPhase?.key]
-  );
-
-  const options = useMemo(() => {
-    if (fullList.length <= MAX_OPTIONS_PER_PHASE) return fullList;
-
-    // Always include the correct answers
-    const mustInclude = requiredForPhase.filter((x) => fullList.includes(x));
-    // Fill the rest with distractors (not already included)
-    const distractors = fullList.filter((x) => !mustInclude.includes(x));
-
-    const needed = Math.max(0, MAX_OPTIONS_PER_PHASE - mustInclude.length);
-    const chosen = [...mustInclude, ...distractors.slice(0, needed)];
-
-    // Final shuffle so the correct answer isn't always first
-    return shuffleStable(chosen, `${activeChallengeId ?? 'c'}-${currentPhase?.key}`);
-  }, [fullList, requiredForPhase, activeChallengeId, currentPhase?.key]);
+  const currentPhaseSelections = (currentPhase ? selections[currentPhase.key] : []) || [];
 
   // Sort participants by score
   const sortedParticipants = [...participants].sort((a, b) => b.totalScore - a.totalScore);
